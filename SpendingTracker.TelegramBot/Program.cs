@@ -1,4 +1,9 @@
-﻿using System.Text;
+﻿using System.Reflection;
+using System.Text;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
+using SpendingTracker.Application.Spending.CrateSpending;
+using SpendingTracker.Dispatcher.Extensions;
 using SpendingTracker.TelegramBot;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
@@ -7,27 +12,28 @@ using Telegram.Bot.Types.Enums;
 
 var bot = new TelegramBotClient("6133107700:AAFPgfpteJtzLfauIHkmobDp8JbNNxrIwm0");
 
-var startButtonsGroup = new ButtonGroup(1, "Первый уровень");
-var level2ButtonsGroup = new ButtonGroup(2, "Второй уровень");
-var level3ButtonsGroup = new ButtonGroup(3, "Третий уровень");
-startButtonsGroup.AddButtons(
-    new Button("Перейти на 2 уровень", level2ButtonsGroup),
+//setup our DI
+var assemblyNamesForScan = new [] { "SpendingTracker.Application" };
+var assembliesForScan = assemblyNamesForScan.Select(Assembly.Load).ToArray();
+var serviceProvider = new ServiceCollection()
+    .AddDispatcher(assembliesForScan)
+    .BuildServiceProvider();
+
+IMediator mediator = new Mediator(serviceProvider);
+
+var startButtonsGroup = new ButtonGroup("Выберите действие");
+var level2ButtonsGroup = new ButtonGroup("Введите трату в формате сумма/дата/описание (каждое значение на новой строке)");
+
+startButtonsGroup.AddButtonsLayer(
+    new Button("Добавить трату", level2ButtonsGroup),
     new Button("Перейти на сайт", "https://www.google.com"));
 
-level2ButtonsGroup.AddButtons(
-    new Button("Перейти на 3 уровень", level3ButtonsGroup),
-    new Button("Вернуться на 1 уровень", startButtonsGroup),
-    new Button("Перейти на сайт", "https://www.google.com"));
-
-level3ButtonsGroup.AddButtons(
-    new Button("Вернуться на 1 уровень", startButtonsGroup),
-    new Button("Перейти на сайт", "https://www.google.com"));
+level2ButtonsGroup.AddButtonsLayer(new Button("Назад", startButtonsGroup));
 
 var buttonsGroups = new []
 {
     startButtonsGroup,
     level2ButtonsGroup,
-    level3ButtonsGroup
 };
 
 Console.OutputEncoding = Encoding.UTF8;
@@ -90,8 +96,9 @@ async Task HandleMessage(Message msg)
     }
     else if (text.Length > 0)
     {
-        // To preserve the markdown, we attach entities (bold, italic..)
-        await bot.SendTextMessageAsync(user.Id, text.ToUpper(), entities: msg.Entities);
+        var command = new CreateSpendingCommand();
+        await mediator.SendCommandAsync(command, cancellationToken);
+        await bot.SendTextMessageAsync(user.Id, "Done", entities: msg.Entities);
     }
 }
 

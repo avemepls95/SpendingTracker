@@ -6,28 +6,29 @@ public class ButtonGroup
 {
     public string Text { get; }
 
-    public int Id { get; }
+    public Guid Id { get; } = Guid.NewGuid();
 
-    private readonly List<Button> _buttons = new();
+    private readonly List<Button[]> _buttons = new();
     public InlineKeyboardMarkup MarkUp
     {
-        get => new (_buttons.Select(b => new [] { b.TelegramButton } ).ToArray());
+        get => new (_buttons
+                .Select(buttons => buttons.Select(b => b.TelegramButton).ToArray())
+                .ToArray());
     }
 
-    public ButtonGroup(int id, string text)
+    public ButtonGroup(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
         {
             throw new ArgumentNullException(nameof(text));
         }
 
-        Id = id;
         Text = text;
     }
 
-    public ButtonGroup AddButtons(params Button[] button)
+    public ButtonGroup AddButtonsLayer(params Button[] buttons)
     {
-        _buttons.AddRange(button);
+        _buttons.Add(buttons);
 
         return this;
     }

@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Remove="Class1.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\SpendingTracker.Common\SpendingTracker.Common.csproj" />
       <ProjectReference Include="..\SpendingTracker.GenericSubDomain\SpendingTracker.GenericSubDomain.csproj" />
       <ProjectReference Include="..\SpendingTracker.Infrastructure.Abstractions\SpendingTracker.Infrastructure.Abstractions.csproj" />

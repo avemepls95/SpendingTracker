@@ -1,10 +1,17 @@
-﻿namespace SpendingTracker.Domain;
+﻿using SpendingTracker.Common.Primitives;
+
+namespace SpendingTracker.Domain;
 
 /// <summary>
 /// Валюта.
 /// </summary>
-public class Currency
+public class Currency : EntityObject<Currency, Guid>
 {
+    /// <summary>
+    /// Идентификатор.
+    /// </summary>
+    public Guid Id { get; set; }
+
     /// <summary>
     /// Кодовое обозначение.
     /// </summary>
@@ -14,4 +21,9 @@ public class Currency
     /// Человекопонятное название.
     /// </summary>
     public string Title { get; set; }
+
+    public override Guid GetKey()
+    {
+        return Id;
+    }
 }

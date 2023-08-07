@@ -2,6 +2,8 @@
 using System.Text;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using SpendingTracker.Application;
 using SpendingTracker.Application.Spending.CrateSpending;
 using SpendingTracker.Dispatcher.Extensions;
@@ -17,14 +19,19 @@ var bot = new TelegramBotClient("6133107700:AAFPgfpteJtzLfauIHkmobDp8JbNNxrIwm0"
 
 var configuration = AppConfigurationBuilder.Build();
 
-//setup our DI
-var assemblyNamesForScan = new [] { "SpendingTracker.Application" };
-var assembliesForScan = assemblyNamesForScan.Select(Assembly.Load).ToArray();
-var serviceProvider = new ServiceCollection()
-    .AddDispatcher(assembliesForScan)
-    .AddGenericSubDomain(configuration)
-    .AddInfrastructure(configuration)
-    .BuildServiceProvider();
+var builder = new HostBuilder()
+    .ConfigureServices((_, services) =>
+    {
+        var assemblyNamesForScan = new [] { "SpendingTracker.Application" };
+        var assembliesForScan = assemblyNamesForScan.Select(Assembly.Load).ToArray();
+        services.AddLogging(configure => configure.AddConsole())
+            .AddInfrastructure(configuration)
+            .AddDispatcher(assembliesForScan)
+            .AddGenericSubDomain(configuration);
+    }).UseConsoleLifetime();
+
+
+var serviceProvider = builder.Build().Services;
 
 IMediator mediator = new Mediator(serviceProvider);
 

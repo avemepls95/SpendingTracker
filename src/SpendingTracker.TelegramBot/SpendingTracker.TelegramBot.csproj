@@ -15,6 +15,17 @@
 
     <ItemGroup>
       <ProjectReference Include="..\SpendingTracker.Application\SpendingTracker.Application.csproj" />
+      <ProjectReference Include="..\SpendingTracker.GenericSubDomain\SpendingTracker.GenericSubDomain.csproj" />
+      <ProjectReference Include="..\SpendingTracker.Infrastructure\SpendingTracker.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="appsettings.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="appsettings.Development.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

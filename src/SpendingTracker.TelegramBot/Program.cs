@@ -2,8 +2,11 @@
 using System.Text;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using SpendingTracker.Application;
 using SpendingTracker.Application.Spending.CrateSpending;
 using SpendingTracker.Dispatcher.Extensions;
+using SpendingTracker.GenericSubDomain;
+using SpendingTracker.Infrastructure;
 using SpendingTracker.TelegramBot;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
@@ -12,11 +15,15 @@ using Telegram.Bot.Types.Enums;
 
 var bot = new TelegramBotClient("6133107700:AAFPgfpteJtzLfauIHkmobDp8JbNNxrIwm0");
 
+var configuration = AppConfigurationBuilder.Build();
+
 //setup our DI
 var assemblyNamesForScan = new [] { "SpendingTracker.Application" };
 var assembliesForScan = assemblyNamesForScan.Select(Assembly.Load).ToArray();
 var serviceProvider = new ServiceCollection()
     .AddDispatcher(assembliesForScan)
+    .AddGenericSubDomain(configuration)
+    .AddInfrastructure(configuration)
     .BuildServiceProvider();
 
 IMediator mediator = new Mediator(serviceProvider);
@@ -89,7 +96,6 @@ async Task HandleMessage(Message msg)
     if (user is null)
         return;
 
-    // When we get a command, we react accordingly
     if (text.StartsWith("/"))
     {
         await HandleCommand(user.Id, text);

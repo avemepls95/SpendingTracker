@@ -1,6 +1,6 @@
 ﻿using SpendingTracker.Dispatcher.DataTransfer.Dispatcher;
 
-namespace SpendingTracker.Application.Spending.CrateSpending;
+namespace SpendingTracker.Application.Spending.CreateSpending;
 
 public class CreateSpendingCommandHandler : CommandHandler<CreateSpendingCommand>
 {

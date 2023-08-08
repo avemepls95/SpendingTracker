@@ -5,11 +5,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SpendingTracker.Application;
-using SpendingTracker.Application.Spending.CrateSpending;
+using SpendingTracker.Application.Spending.CreateSpending;
+using SpendingTracker.Common.Primitives;
 using SpendingTracker.Dispatcher.Extensions;
 using SpendingTracker.GenericSubDomain;
 using SpendingTracker.Infrastructure;
+using SpendingTracker.Infrastructure.Abstractions.Repositories;
 using SpendingTracker.TelegramBot;
+using SpendingTracker.TelegramBot.SpendingParsing;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -29,27 +32,30 @@ var builder = new HostBuilder()
             .AddDispatcher(assembliesForScan)
             .AddGenericSubDomain(configuration);
     }).UseConsoleLifetime();
-
-
 var serviceProvider = builder.Build().Services;
-
 IMediator mediator = new Mediator(serviceProvider);
 
+var currencyUserRepository = serviceProvider.GetService<IUserCurrencyRepository>();
+
 var startButtonsGroup = new ButtonGroup("Выберите действие");
-var level2ButtonsGroup = new ButtonGroup("Введите трату в формате сумма/дата/описание (каждое значение на новой строке)");
+var level2ButtonsGroup = new ButtonGroup(
+    "Введите трату в формате сумма/дата/описание (каждое значение на новой строке)",
+    UserOperationEnum.CreateSpending);
 
 startButtonsGroup.AddButtonsLayer(
-    new Button("Добавить трату", level2ButtonsGroup),
-    new Button("Перейти на сайт", "https://www.google.com"));
+    new Button("Добавить трату", level2ButtonsGroup, startButtonsGroup),
+    new Button("Перейти на сайт", "https://www.google.com", startButtonsGroup));
 
-level2ButtonsGroup.AddButtonsLayer(new Button("Назад", startButtonsGroup));
-
+level2ButtonsGroup.AddButtonsLayer(new Button("Назад", startButtonsGroup, level2ButtonsGroup));
 var buttonsGroups = new []
 {
     startButtonsGroup,
     level2ButtonsGroup,
 };
 
+var spendingMessageParser = new SpendingMessageParser();
+
+var userOperationDict = new Dictionary<long, UserOperationEnum?>();
 Console.OutputEncoding = Encoding.UTF8;
 Console.WriteLine("Запущен бот " + bot.GetMeAsync().Result.FirstName);
 
@@ -98,20 +104,48 @@ static Task HandleErrorAsync(
 async Task HandleMessage(Message msg)
 {
     var user = msg.From;
-    var text = msg.Text ?? string.Empty;
+    var messageText = msg.Text ?? string.Empty;
 
     if (user is null)
         return;
 
-    if (text.StartsWith("/"))
+    var userId = user.Id;
+
+    if (messageText.StartsWith("/"))
     {
-        await HandleCommand(user.Id, text);
+        await HandleCommand(user.Id, messageText);
     }
-    else if (text.Length > 0)
+    else if (messageText.Length > 0)
     {
-        var command = new CreateSpendingCommand();
-        await mediator.SendCommandAsync(command, cancellationToken);
-        await bot.SendTextMessageAsync(user.Id, "Done", entities: msg.Entities);
+        var rowByOperationExists = userOperationDict.TryGetValue(userId, out var userOperation);
+        if (rowByOperationExists && userOperation.HasValue)
+        {
+            switch (userOperation)
+            {
+                case UserOperationEnum.CreateSpending:
+                    var spendingParseResult = spendingMessageParser.TryParse(messageText, out var parsingResult);
+                    if (!spendingParseResult)
+                    {
+                        await bot.SendTextMessageAsync(user.Id, parsingResult.ErrorMessage, entities: msg.Entities);
+                        return;
+                    }
+
+                    var userCurrency = await currencyUserRepository!.Get(new UserKey(userId));
+
+                    var command = new CreateSpendingCommand
+                    {
+                        Amount = parsingResult.Amount,
+                        Currency = userCurrency,
+                        Date = parsingResult.Date ?? DateTimeOffset.Now,
+                        Description = parsingResult.Description
+                    };
+                    await mediator.SendCommandAsync(command, cancellationToken);
+                    await bot.SendTextMessageAsync(user.Id, "Done", entities: msg.Entities);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
     }
 }
 
@@ -137,6 +171,8 @@ async Task HandleButton(CallbackQuery query)
     var targetButtonsGroup = buttonsGroups.First(g => g.Id.ToString() == query.Data);
 
     await bot.AnswerCallbackQueryAsync(query.Id);
+
+    userOperationDict.Add(query.From.Id, targetButtonsGroup.Operation);
 
     await bot.EditMessageTextAsync(
         query.Message!.Chat.Id,

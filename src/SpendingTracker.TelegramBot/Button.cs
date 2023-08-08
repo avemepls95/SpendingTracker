@@ -7,8 +7,9 @@ public class Button
     public string Title { get; }
     public InlineKeyboardButton TelegramButton { get; }
     public ButtonGroup NavigationGroup { get; }
+    public ButtonGroup ParentGroup { get; }
 
-    public Button(string title, string url)
+    public Button(string title, string url, ButtonGroup parentGroup)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
@@ -21,13 +22,11 @@ public class Button
         }
 
         Title = title;
-        TelegramButton = new InlineKeyboardButton(title)
-        {
-            Url = url
-        };
+        TelegramButton = new InlineKeyboardButton(title) { Url = url };
+        ParentGroup = parentGroup;
     }
 
-    public Button(string title, ButtonGroup navigationGroup)
+    public Button(string title, ButtonGroup navigationGroup, ButtonGroup parentGroup)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
@@ -43,5 +42,6 @@ public class Button
 
         Title = title;
         TelegramButton = InlineKeyboardButton.WithCallbackData(title, navigationGroup.Id.ToString());
+        ParentGroup = parentGroup;
     }
 }

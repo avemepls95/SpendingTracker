@@ -8,6 +8,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\SpendingTracker.Dispatcher\SpendingTracker.Dispatcher.csproj" />
+      <ProjectReference Include="..\SpendingTracker.Domain\SpendingTracker.Domain.csproj" />
+      <ProjectReference Include="..\SpendingTracker.Infrastructure.Abstractions\SpendingTracker.Infrastructure.Abstractions.csproj" />
     </ItemGroup>
 
     <ItemGroup>

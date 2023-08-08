@@ -23,6 +23,7 @@ namespace SpendingTracker.Infrastructure
             services.AddServices();
 
             services.AddScoped<ISpendingRepository, SpendingRepository>();
+            services.AddScoped<IUserCurrencyRepository, UserCurrencyRepository>();
 
             return services;
         }

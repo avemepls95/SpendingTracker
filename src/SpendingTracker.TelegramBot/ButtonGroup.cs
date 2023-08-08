@@ -5,6 +5,7 @@ namespace SpendingTracker.TelegramBot;
 public class ButtonGroup
 {
     public string Text { get; }
+    public UserOperationEnum? Operation { get; }
 
     public Guid Id { get; } = Guid.NewGuid();
 
@@ -16,7 +17,7 @@ public class ButtonGroup
                 .ToArray());
     }
 
-    public ButtonGroup(string text)
+    public ButtonGroup(string text, UserOperationEnum? operation = null)
     {
         if (string.IsNullOrWhiteSpace(text))
         {
@@ -24,6 +25,7 @@ public class ButtonGroup
         }
 
         Text = text;
+        Operation = operation;
     }
 
     public ButtonGroup AddButtonsLayer(params Button[] buttons)

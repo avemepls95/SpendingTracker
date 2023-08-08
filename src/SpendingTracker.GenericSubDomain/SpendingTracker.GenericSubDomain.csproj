@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\SpendingTracker.Common\SpendingTracker.Common.csproj" />
+      <ProjectReference Include="..\SpendingTracker.Domain\SpendingTracker.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>

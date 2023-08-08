@@ -14,6 +14,8 @@ public class Spending : EntityObject<Spending, Guid>
 
     public string Description { get; set; }
 
+    public ActionSource ActionSource { get; set; }
+
     public override Guid GetKey()
     {
         return Id;

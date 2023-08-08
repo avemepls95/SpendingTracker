@@ -2,6 +2,6 @@
 {
     public interface ICurrentUserProvider
     {
-        Task<Common.User> Get(CancellationToken cancellationToken = default);
+        Task<Domain.User> Get(CancellationToken cancellationToken = default);
     }
 }

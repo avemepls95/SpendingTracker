@@ -24,6 +24,7 @@ namespace SpendingTracker.Infrastructure
 
             services.AddScoped<ISpendingRepository, SpendingRepository>();
             services.AddScoped<IUserCurrencyRepository, UserCurrencyRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             return services;
         }

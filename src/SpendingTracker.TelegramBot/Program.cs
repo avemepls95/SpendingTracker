@@ -1,17 +1,15 @@
 ﻿using System.Reflection;
 using System.Text;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SpendingTracker.Application;
-using SpendingTracker.Application.Spending.CreateSpending;
-using SpendingTracker.Common.Primitives;
 using SpendingTracker.Dispatcher.Extensions;
 using SpendingTracker.GenericSubDomain;
 using SpendingTracker.Infrastructure;
-using SpendingTracker.Infrastructure.Abstractions.Repositories;
 using SpendingTracker.TelegramBot;
+using SpendingTracker.TelegramBot.Services;
+using SpendingTracker.TelegramBot.Services.Model;
 using SpendingTracker.TelegramBot.SpendingParsing;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
@@ -20,38 +18,10 @@ using Telegram.Bot.Types.Enums;
 
 var bot = new TelegramBotClient("6133107700:AAFPgfpteJtzLfauIHkmobDp8JbNNxrIwm0");
 
-var configuration = AppConfigurationBuilder.Build();
+var serviceProvider = InitializeDependencies();
+var gatewayService = serviceProvider.GetService<GatewayService>()!;
 
-var builder = new HostBuilder()
-    .ConfigureServices((_, services) =>
-    {
-        var assemblyNamesForScan = new [] { "SpendingTracker.Application" };
-        var assembliesForScan = assemblyNamesForScan.Select(Assembly.Load).ToArray();
-        services.AddLogging(configure => configure.AddConsole())
-            .AddInfrastructure(configuration)
-            .AddDispatcher(assembliesForScan)
-            .AddGenericSubDomain(configuration);
-    }).UseConsoleLifetime();
-var serviceProvider = builder.Build().Services;
-IMediator mediator = new Mediator(serviceProvider);
-
-var currencyUserRepository = serviceProvider.GetService<IUserCurrencyRepository>();
-
-var startButtonsGroup = new ButtonGroup("Выберите действие");
-var level2ButtonsGroup = new ButtonGroup(
-    "Введите трату в формате сумма/дата/описание (каждое значение на новой строке)",
-    UserOperationEnum.CreateSpending);
-
-startButtonsGroup.AddButtonsLayer(
-    new Button("Добавить трату", level2ButtonsGroup, startButtonsGroup),
-    new Button("Перейти на сайт", "https://www.google.com", startButtonsGroup));
-
-level2ButtonsGroup.AddButtonsLayer(new Button("Назад", startButtonsGroup, level2ButtonsGroup));
-var buttonsGroups = new []
-{
-    startButtonsGroup,
-    level2ButtonsGroup,
-};
+var buttonsGroupManager = ButtonsGroupManager.Initialize();
 
 var spendingMessageParser = new SpendingMessageParser();
 
@@ -130,16 +100,14 @@ async Task HandleMessage(Message msg)
                         return;
                     }
 
-                    var userCurrency = await currencyUserRepository!.Get(new UserKey(userId));
-
-                    var command = new CreateSpendingCommand
+                    var request = new CreateSpendingRequest
                     {
                         Amount = parsingResult.Amount,
-                        Currency = userCurrency,
+                        TelegramUserId = userId,
                         Date = parsingResult.Date ?? DateTimeOffset.Now,
                         Description = parsingResult.Description
                     };
-                    await mediator.SendCommandAsync(command, cancellationToken);
+                    await gatewayService.CreateSpendingAsync(request, cancellationToken);
                     await bot.SendTextMessageAsync(user.Id, "Done", entities: msg.Entities);
                     break;
                 default:
@@ -154,6 +122,7 @@ async Task HandleCommand(long userId, string command)
     switch (command)
     {
         case "/start":
+            var startButtonsGroup = buttonsGroupManager.StartButtonsGroup;
             await bot.SendTextMessageAsync(
                 userId,
                 startButtonsGroup.Text,
@@ -168,7 +137,7 @@ async Task HandleCommand(long userId, string command)
 
 async Task HandleButton(CallbackQuery query)
 {
-    var targetButtonsGroup = buttonsGroups.First(g => g.Id.ToString() == query.Data);
+    var targetButtonsGroup = buttonsGroupManager.GetById(query.Data);
 
     await bot.AnswerCallbackQueryAsync(query.Id);
 
@@ -181,4 +150,23 @@ async Task HandleButton(CallbackQuery query)
         ParseMode.Html,
         replyMarkup: targetButtonsGroup.MarkUp
     );
+}
+
+IServiceProvider InitializeDependencies()
+{
+    var configuration = AppConfigurationBuilder.Build();
+
+    var builder = new HostBuilder()
+        .ConfigureServices((_, services) =>
+        {
+            var assemblyNamesForScan = new [] { "SpendingTracker.Application" };
+            var assembliesForScan = assemblyNamesForScan.Select(Assembly.Load).ToArray();
+            services.AddLogging(configure => configure.AddConsole())
+                .AddInfrastructure(configuration)
+                .AddDispatcher(assembliesForScan)
+                .AddGenericSubDomain(configuration);
+
+            services.AddScoped<GatewayService>();
+        }).UseConsoleLifetime();
+    return builder.Build().Services;
 }

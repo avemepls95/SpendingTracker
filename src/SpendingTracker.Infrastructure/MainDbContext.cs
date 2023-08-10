@@ -12,8 +12,11 @@ namespace SpendingTracker.Infrastructure
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .ApplyConfiguration(new SpendingConfiguration())
-                .ApplyConfiguration(new CurrencyConfiguration());
+                .ApplyConfiguration(new StoredSpendingConfiguration())
+                .ApplyConfiguration(new StoredCurrencyConfiguration())
+                .ApplyConfiguration(new StoredUserConfiguration())
+                .ApplyConfiguration(new StoredTelegramUserConfiguration())
+                .ApplyConfiguration(new TelegramUserCurrentOperationConfiguration());
         }
     }
 }

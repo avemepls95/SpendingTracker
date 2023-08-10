@@ -1,8 +1,8 @@
 ﻿namespace SpendingTracker.Common.Primitives
 {
-    public class UserKey : CustomKey<UserKey, long>
+    public class UserKey : CustomKey<UserKey, Guid>
     {
-        public UserKey(long value) : base(value)
+        public UserKey(Guid value) : base(value)
         {
         }
     }

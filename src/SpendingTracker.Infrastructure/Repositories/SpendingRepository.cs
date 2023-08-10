@@ -1,9 +1,9 @@
-﻿using SpendingTracker.Domain;
+﻿using SpendingTracker.Infrastructure.Abstractions.Model;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
 
 namespace SpendingTracker.Infrastructure.Repositories
 {
-    public class SpendingRepository : ISpendingRepository
+    internal class SpendingRepository : ISpendingRepository
     {
         private readonly MainDbContext _dbContext;
 
@@ -12,9 +12,9 @@ namespace SpendingTracker.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task CreateAsync(Spending ticket, CancellationToken cancellationToken)
+        public async Task CreateAsync(StoredSpending spending, CancellationToken cancellationToken)
         {
-            await _dbContext.Set<Spending>().AddAsync(ticket, cancellationToken);
+            await _dbContext.Set<StoredSpending>().AddAsync(spending, cancellationToken);
         }
     }
 }

@@ -12,11 +12,6 @@ namespace SpendingTracker.GenericSubDomain
             var optionsSection = configuration.GetSection(nameof(SystemUserContextOptions));
             services.Configure<SystemUserContextOptions>(optionsSection);
 
-            services
-                .AddScoped<IUserContextFactory, SystemUserContextFactory>()
-                .AddScoped<ICurrentUserProvider, CurrentUserProvider>();
-            services.AddScoped<UserContextFactoryProvider>();
-
             return services;
         }
     }

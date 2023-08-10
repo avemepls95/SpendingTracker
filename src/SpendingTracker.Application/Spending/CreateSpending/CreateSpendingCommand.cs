@@ -1,5 +1,5 @@
-﻿using SpendingTracker.Dispatcher.DataTransfer.Dispatcher.Interfaces;
-using SpendingTracker.Domain;
+﻿using SpendingTracker.Common.Primitives;
+using SpendingTracker.Dispatcher.DataTransfer.Dispatcher.Interfaces;
 
 namespace SpendingTracker.Application.Spending.CreateSpending;
 
@@ -7,7 +7,7 @@ public class CreateSpendingCommand : ICommand
 {
     public double Amount { get; set; }
 
-    public Currency Currency { get; set; }
+    public UserKey UserKey { get; set; }
 
     public DateTimeOffset Date { get; set; }
 

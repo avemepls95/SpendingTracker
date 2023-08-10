@@ -4,9 +4,14 @@ namespace SpendingTracker.Domain
 {
     public sealed class User
     {
-        public User(long id)
+        public User(Guid id)
         {
             Id = new UserKey(id);
+        }
+
+        public User(UserKey id)
+        {
+            Id = id;
         }
 
         public UserKey Id { get; }
@@ -14,6 +19,6 @@ namespace SpendingTracker.Domain
         public Currency Currency { get; set; }
 
         // TODO: Возможно, следует задать настройки системного юзера отдельно
-        public static User Default => new User(-1);
+        // public static User Default => new User(-1);
     }
 }

@@ -1,21 +1,21 @@
 ﻿using SpendingTracker.Common.Primitives;
-using SpendingTracker.Domain;
 
 namespace SpendingTracker.Infrastructure.Abstractions.Model;
 
 public class StoredUser : EntityObject<StoredUser, UserKey>
 {
-    public StoredUser(Guid id)
+    public StoredUser(UserKey id, Guid currencyId)
     {
-        Id = new UserKey(id);
+        Id = id;
+        CurrencyId = currencyId;
     }
 
     public UserKey Id { get; }
+    public Guid CurrencyId { get; set; }
+    public StoredCurrency Currency { get; set; }
+    public string FirstName { get; set; }
+    public string? LastName { get; set; }
 
-    public Currency Currency { get; set; }
-
-    // TODO: Возможно, следует задать настройки системного юзера отдельно
-    // public static StoredUser Default => new StoredUser(-1);
     public override UserKey GetKey()
     {
         return Id;

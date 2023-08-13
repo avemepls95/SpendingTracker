@@ -1,13 +1,21 @@
-﻿using SpendingTracker.Common.Primitives;
-using SpendingTracker.Domain;
+﻿using SpendingTracker.Domain;
+using SpendingTracker.Infrastructure.Abstractions.Model;
 using SpendingTracker.Infrastructure.Factories.Abstractions;
 
 namespace SpendingTracker.Infrastructure.Factories;
 
 internal class UserFactory : IUserFactory
 {
-    public User Create(UserKey userId)
+    private readonly ICurrencyFactory _currencyFactory;
+
+    public UserFactory(ICurrencyFactory currencyFactory)
     {
-        return new User(userId);
+        _currencyFactory = currencyFactory;
+    }
+
+    public User Create(StoredUser user)
+    {
+        var currency = _currencyFactory.Create(user.Currency);
+        return new User(user.Id, currency);
     }
 }

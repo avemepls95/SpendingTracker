@@ -4,7 +4,7 @@ using SpendingTracker.Infrastructure.Abstractions.Repositories;
 
 namespace SpendingTracker.Application.UserCurrency.GetUserCurrency;
 
-public class GetUserCurrencyQueryHandler : QueryHandler<GetUserCurrencyQuery, Currency>
+internal class GetUserCurrencyQueryHandler : QueryHandler<GetUserCurrencyQuery, Currency>
 {
     private readonly IUserCurrencyRepository _userCurrencyRepository;
 

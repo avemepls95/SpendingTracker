@@ -16,7 +16,7 @@ namespace SpendingTracker.Infrastructure
                 .ApplyConfiguration(new StoredCurrencyConfiguration())
                 .ApplyConfiguration(new StoredUserConfiguration())
                 .ApplyConfiguration(new StoredTelegramUserConfiguration())
-                .ApplyConfiguration(new TelegramUserCurrentOperationConfiguration());
+                .ApplyConfiguration(new StoredTelegramUserCurrentButtonGroupConfiguration());
         }
     }
 }

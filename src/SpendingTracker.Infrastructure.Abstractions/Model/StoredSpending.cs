@@ -9,6 +9,7 @@ public class StoredSpending : EntityObject<StoredSpending, Guid>
 
     public double Amount { get; set; }
 
+    public Guid CurrencyId { get; set; }
     public StoredCurrency Currency { get; set; }
 
     public DateTimeOffset Date { get; set; }

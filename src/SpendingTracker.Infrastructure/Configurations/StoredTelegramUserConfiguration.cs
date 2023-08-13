@@ -11,10 +11,14 @@ namespace SpendingTracker.Infrastructure.Configurations
         {
             base.Configure(builder);
 
-            builder.ToTable("User");
+            builder.ToTable("TelegramUser");
 
             builder.HasKey(e => e.Id);
             builder.Property(e => e.Id).ValueGeneratedNever();
+            
+            builder.Property(i => i.UserId)
+                .ValueGeneratedNever()
+                .HasConversion(v => v.Value, v => new UserKey(v));
         }
     }
 }

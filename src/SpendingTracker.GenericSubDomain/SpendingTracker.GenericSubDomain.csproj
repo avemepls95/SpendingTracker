@@ -9,6 +9,7 @@
     <ItemGroup>
       <ProjectReference Include="..\SpendingTracker.Common\SpendingTracker.Common.csproj" />
       <ProjectReference Include="..\SpendingTracker.Domain\SpendingTracker.Domain.csproj" />
+      <ProjectReference Include="..\SpendingTracker.Infrastructure.Abstractions\SpendingTracker.Infrastructure.Abstractions.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -16,5 +17,6 @@
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
       <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
     </ItemGroup>
+
 
 </Project>

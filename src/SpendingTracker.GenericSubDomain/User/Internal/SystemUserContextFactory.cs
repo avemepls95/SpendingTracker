@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using SpendingTracker.GenericSubDomain.User.Abstractions;
 
 namespace SpendingTracker.GenericSubDomain.User.Internal
 {
@@ -16,16 +17,15 @@ namespace SpendingTracker.GenericSubDomain.User.Internal
 
         public string Key => nameof(SystemUserContextFactory);
 
-        public async Task<IUserContext> CreateUserContextAsync(CancellationToken cancellationToken)
+        public async Task<UserContext> CreateUserContextAsync(CancellationToken cancellationToken)
         {
-            var result = await _memoryCache.GetOrCreateAsync<IUserContext>(
-                nameof(SystemUserContextFactory),
-                async cacheEntry =>
+            var result = await _memoryCache.GetOrCreateAsync<UserContext>(
+                nameof(SystemUserContextFactory), cacheEntry =>
                 {
                     cacheEntry.AbsoluteExpirationRelativeToNow = _options.CurrentValue.CacheAbsoluteExpirationRelativeToNow;
 
-                    var user = Common.User.Default;
-                    return new SystemUserContext(user);
+                    var systemUserId = Domain.User.SystemUserId;
+                    return Task.FromResult(new UserContext(systemUserId));
                 });
 
             return result;

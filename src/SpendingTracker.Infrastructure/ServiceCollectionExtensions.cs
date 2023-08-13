@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SpendingTracker.Infrastructure.Abstractions;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
+using SpendingTracker.Infrastructure.Factories;
+using SpendingTracker.Infrastructure.Factories.Abstractions;
 using SpendingTracker.Infrastructure.Repositories;
 using SpendingTracker.Infrastructure.Services;
 
@@ -17,14 +19,20 @@ namespace SpendingTracker.Infrastructure
             services
                 .AddSingleton(connectionsStrings)
                 .AddDbContextPool<MainDbContext>(
-                    o => o.UseNpgsql(connectionsStrings.DbConnectionString));
+                    o => o.UseNpgsql(connectionsStrings.DbConnectionString).EnableSensitiveDataLogging());
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddServices();
 
-            services.AddScoped<ISpendingRepository, SpendingRepository>();
-            services.AddScoped<IUserCurrencyRepository, UserCurrencyRepository>();
-            services.AddScoped<IUserRepository, UserRepository>();
+            services
+                .AddScoped<ISpendingRepository, SpendingRepository>()
+                .AddScoped<IUserCurrencyRepository, UserCurrencyRepository>()
+                .AddScoped<IUserRepository, UserRepository>()
+                .AddScoped<ICurrencyRepository, CurrencyRepository>();
+
+            services
+                .AddSingleton<ICurrencyFactory, CurrencyFactory>()
+                .AddSingleton<IUserFactory, UserFactory>();
 
             return services;
         }

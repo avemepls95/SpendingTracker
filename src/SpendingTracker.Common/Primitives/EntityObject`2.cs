@@ -27,8 +27,8 @@
 
         public DateTimeOffset CreatedDate { get; private set; }
         public UserKey CreatedBy { get; private set; }
-        public DateTimeOffset ModifiedDate { get; private set; }
-        public UserKey ModifiedBy { get; private set; }
+        public DateTimeOffset? ModifiedDate { get; private set; }
+        public UserKey? ModifiedBy { get; private set; }
 
         void IModificationInfoAccessor.SetCreated(DateTimeOffset now, UserKey createdBy)
         {

@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SpendingTracker.Common.Primitives;
 using SpendingTracker.GenericSubDomain.User;
+using SpendingTracker.GenericSubDomain.User.Abstractions;
+using SpendingTracker.GenericSubDomain.User.Internal;
 
 namespace SpendingTracker.Infrastructure.Services
 {
     internal sealed class ModificationInfoEntityService
     {
-        private readonly UserContextFactoryProvider _userContextFactoryProvider;
+        private readonly IUserContextFactoryProvider _userContextFactoryProvider;
 
         public ModificationInfoEntityService(
-            UserContextFactoryProvider userContextFactoryProvider)
+            IUserContextFactoryProvider userContextFactoryProvider)
         {
             _userContextFactoryProvider = userContextFactoryProvider;
         }
@@ -20,7 +22,7 @@ namespace SpendingTracker.Infrastructure.Services
             var userContextFactory = _userContextFactoryProvider.GetSuitableFactory();
 
             var userContext = await userContextFactory.CreateUserContextAsync(cancellationToken);
-            return userContext.CurrentUser.Id;
+            return userContext.UserId;
         }
 
         public async Task SetModificationInfoAsync(
@@ -34,7 +36,7 @@ namespace SpendingTracker.Infrastructure.Services
             if (!targetEntries.Any())
                 return;
 
-            var now = DateTimeOffset.Now;
+            var now = DateTimeOffset.UtcNow;
             var userId = await GetCurrentUserIdAsync(cancellationToken);
 
             foreach (var entry in targetEntries)

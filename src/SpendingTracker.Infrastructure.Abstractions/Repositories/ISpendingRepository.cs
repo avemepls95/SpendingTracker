@@ -1,9 +1,9 @@
-﻿using SpendingTracker.Infrastructure.Abstractions.Model;
+﻿using SpendingTracker.Domain;
 
 namespace SpendingTracker.Infrastructure.Abstractions.Repositories
 {
     public interface ISpendingRepository
     {
-        Task CreateAsync(StoredSpending spending, CancellationToken cancellationToken = default);
+        Task CreateAsync(Spending spending, CancellationToken cancellationToken = default);
     }
 }

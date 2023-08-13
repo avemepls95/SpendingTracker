@@ -22,46 +22,54 @@ namespace SpendingTracker.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("SpendingTracker.Domain.Currency", b =>
+            modelBuilder.Entity("SpendingTracker.Infrastructure.Abstractions.Model.StoredCurrency", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)");
 
-                    b.Property<long>("CreatedBy")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<long>("ModifiedBy")
-                        .HasColumnType("bigint");
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("boolean");
 
-                    b.Property<DateTimeOffset>("ModifiedDate")
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Currency", (string)null);
                 });
 
-            modelBuilder.Entity("SpendingTracker.Domain.Spending", b =>
+            modelBuilder.Entity("SpendingTracker.Infrastructure.Abstractions.Model.StoredSpending", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("ActionSource")
+                        .HasColumnType("integer");
+
                     b.Property<double>("Amount")
                         .HasColumnType("double precision");
 
-                    b.Property<long>("CreatedBy")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -76,10 +84,10 @@ namespace SpendingTracker.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<long>("ModifiedBy")
-                        .HasColumnType("bigint");
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uuid");
 
-                    b.Property<DateTimeOffset>("ModifiedDate")
+                    b.Property<DateTimeOffset?>("ModifiedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
@@ -89,11 +97,130 @@ namespace SpendingTracker.Infrastructure.Migrations
                     b.ToTable("Spending", (string)null);
                 });
 
-            modelBuilder.Entity("SpendingTracker.Domain.Spending", b =>
+            modelBuilder.Entity("SpendingTracker.Infrastructure.Abstractions.Model.StoredTelegramUser", b =>
                 {
-                    b.HasOne("SpendingTracker.Domain.Currency", "Currency")
+                    b.Property<long>("Id")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TelegramUser", (string)null);
+                });
+
+            modelBuilder.Entity("SpendingTracker.Infrastructure.Abstractions.Model.StoredTelegramUserCurrentButtonGroup", b =>
+                {
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("UserId");
+
+                    b.HasIndex("UserId", "GroupId")
+                        .IsUnique();
+
+                    b.ToTable("TelegramUserCurrentButtonGroup", (string)null);
+                });
+
+            modelBuilder.Entity("SpendingTracker.Infrastructure.Abstractions.Model.StoredUser", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CurrencyId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CurrencyId")
+                        .IsUnique();
+
+                    b.ToTable("User", (string)null);
+                });
+
+            modelBuilder.Entity("SpendingTracker.Infrastructure.Abstractions.Model.StoredSpending", b =>
+                {
+                    b.HasOne("SpendingTracker.Infrastructure.Abstractions.Model.StoredCurrency", "Currency")
                         .WithMany()
                         .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Currency");
+                });
+
+            modelBuilder.Entity("SpendingTracker.Infrastructure.Abstractions.Model.StoredTelegramUser", b =>
+                {
+                    b.HasOne("SpendingTracker.Infrastructure.Abstractions.Model.StoredUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SpendingTracker.Infrastructure.Abstractions.Model.StoredTelegramUserCurrentButtonGroup", b =>
+                {
+                    b.HasOne("SpendingTracker.Infrastructure.Abstractions.Model.StoredTelegramUser", null)
+                        .WithOne()
+                        .HasForeignKey("SpendingTracker.Infrastructure.Abstractions.Model.StoredTelegramUserCurrentButtonGroup", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SpendingTracker.Infrastructure.Abstractions.Model.StoredUser", b =>
+                {
+                    b.HasOne("SpendingTracker.Infrastructure.Abstractions.Model.StoredCurrency", "Currency")
+                        .WithOne()
+                        .HasForeignKey("SpendingTracker.Infrastructure.Abstractions.Model.StoredUser", "CurrencyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

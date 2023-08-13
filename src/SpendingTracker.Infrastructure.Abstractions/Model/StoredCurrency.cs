@@ -22,6 +22,11 @@ public class StoredCurrency : EntityObject<StoredCurrency, Guid>
     /// </summary>
     public string Title { get; set; }
 
+    /// <summary>
+    /// Является ли валюта дефолтной.
+    /// </summary>
+    public bool IsDefault { get; set; }
+
     public override Guid GetKey()
     {
         return Id;

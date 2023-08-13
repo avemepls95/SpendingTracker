@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SpendingTracker.Infrastructure.Abstractions.Repositories;
+using SpendingTracker.Infrastructure.Repositories;
 
 namespace SpendingTracker.Infrastructure.Services
 {
@@ -7,7 +9,8 @@ namespace SpendingTracker.Infrastructure.Services
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services
-                .AddScoped<ModificationInfoEntityService>();
+                .AddScoped<ModificationInfoEntityService>()
+                .AddScoped<ITelegramUserCurrentButtonGroupRepository, TelegramUserCurrentButtonGroupRepository>();
 
             return services;
         }

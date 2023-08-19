@@ -4,7 +4,7 @@ using SpendingTracker.Common.Primitives;
 
 namespace SpendingTracker.Infrastructure.Configurations
 {
-    internal class EntityObjectConfiguration<T, TKey> : IEntityTypeConfiguration<T>
+    public class EntityObjectConfiguration<T, TKey> : IEntityTypeConfiguration<T>
         where T : EntityObject<T, TKey>
     {
         public virtual void Configure(EntityTypeBuilder<T> builder)

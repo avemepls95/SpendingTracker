@@ -4,10 +4,10 @@ namespace SpendingTracker.TelegramBot.Buttons;
 
 public class ButtonGroup
 {
-    public string Text { get; }
+    public string DefaultText { get; }
     public ButtonsGroupOperation Operation { get; } = ButtonsGroupOperation.None;
     public int Id { get; }
-    public ButtonGroup Next { get; protected set; }
+    public ButtonGroup Next { get; protected init; }
 
     private readonly List<Button[]> _buttons = new();
     public InlineKeyboardMarkup Markup
@@ -17,15 +17,15 @@ public class ButtonGroup
                 .ToArray());
     }
 
-    public ButtonGroup(int id, string text)
+    public ButtonGroup(int id, string defaultText)
     {
-        if (string.IsNullOrWhiteSpace(text))
+        if (string.IsNullOrWhiteSpace(defaultText))
         {
-            throw new ArgumentNullException(nameof(text));
+            throw new ArgumentNullException(nameof(defaultText));
         }
 
         Id = id;
-        Text = text;
+        DefaultText = defaultText;
     }
     
     public ButtonGroup(int id, ButtonsGroupOperation operation, string? text = null, ButtonGroup? next = null)
@@ -39,7 +39,7 @@ public class ButtonGroup
         Operation = operation;
         Next = next;
 
-        Text = string.IsNullOrWhiteSpace(text)
+        DefaultText = string.IsNullOrWhiteSpace(text)
             ? ButtonsGroupTextProvider.GetText(operation)
             : text;
     }

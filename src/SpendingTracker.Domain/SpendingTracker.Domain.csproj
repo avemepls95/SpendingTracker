@@ -10,4 +10,5 @@
       <ProjectReference Include="..\SpendingTracker.Common\SpendingTracker.Common.csproj" />
     </ItemGroup>
 
+
 </Project>

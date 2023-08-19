@@ -20,13 +20,7 @@ internal class UserRepository : IUserRepository
 
     public async Task<User> GetByTelegramId(long telegramId, CancellationToken cancellationToken)
     {
-        var storedUser = await _dbContext.Set<StoredTelegramUser>()
-            .Include(u => u.User)
-                .ThenInclude(u => u.Currency)
-            .Where(u => u.Id == telegramId)
-            .Select(u => u.User)
-            .FirstOrDefaultAsync(cancellationToken);
-
+        var storedUser = await FindStoredUserByTelegramId(telegramId, cancellationToken);
         if (storedUser is null)
         {
             throw new ArgumentException($"Не найдено пользователя Телеграм с идентификатором {telegramId}");
@@ -34,6 +28,30 @@ internal class UserRepository : IUserRepository
 
         var result = _userFactory.Create(storedUser);
         return result;
+    }
+
+    public async Task<User?> FindByTelegramId(long telegramId, CancellationToken cancellationToken)
+    {
+        var storedUser = await FindStoredUserByTelegramId(telegramId, cancellationToken);
+        if (storedUser is null)
+        {
+            return null;
+        }
+
+        var result = _userFactory.Create(storedUser);
+        return result;
+    }
+    
+    private async Task<StoredUser?> FindStoredUserByTelegramId(long telegramId, CancellationToken cancellationToken)
+    {
+        var storedUser = await _dbContext.Set<StoredTelegramUser>()
+            .Include(u => u.User)
+            .ThenInclude(u => u.Currency)
+            .Where(u => u.Id == telegramId)
+            .Select(u => u.User)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return storedUser;
     }
 
     public Task<UserKey> GetIdByTelegramId(long telegramId, CancellationToken cancellationToken = default)

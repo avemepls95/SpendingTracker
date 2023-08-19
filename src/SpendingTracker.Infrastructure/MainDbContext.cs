@@ -16,7 +16,10 @@ namespace SpendingTracker.Infrastructure
                 .ApplyConfiguration(new StoredCurrencyConfiguration())
                 .ApplyConfiguration(new StoredUserConfiguration())
                 .ApplyConfiguration(new StoredTelegramUserConfiguration())
-                .ApplyConfiguration(new StoredTelegramUserCurrentButtonGroupConfiguration());
+                .ApplyConfiguration(new StoredTelegramUserCurrentButtonGroupConfiguration())
+                .ApplyConfiguration(new CategoriesLinkConfiguration())
+                .ApplyConfiguration(new SpendingCategoryLinkConfiguration())
+                .ApplyConfiguration(new StoredCategoryConfiguration());
         }
     }
 }

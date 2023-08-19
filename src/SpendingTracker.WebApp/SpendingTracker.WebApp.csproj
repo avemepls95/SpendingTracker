@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SpendingTracker.Application\SpendingTracker.Application.csproj" />
+      <ProjectReference Include="..\SpendingTracker.GenericSubDomain\SpendingTracker.GenericSubDomain.csproj" />
+      <ProjectReference Include="..\SpendingTracker.Infrastructure\SpendingTracker.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="appsettings.Development.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+</Project>

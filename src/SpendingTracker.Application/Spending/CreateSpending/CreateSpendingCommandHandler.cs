@@ -18,15 +18,14 @@ internal class CreateSpendingCommandHandler : CommandHandler<CreateSpendingComma
 
     public override async Task Handle(CreateSpendingCommand command, CancellationToken cancellationToken)
     {
-        var spending = new Domain.Spending
-        {
-            Id = Guid.NewGuid(),
-            Amount = command.Amount,
-            Currency = command.User.Currency,
-            Date = command.Date,
-            Description = command.Description,
-            ActionSource = command.ActionSource
-        };
+        var spending = new Domain.Spending(
+            Guid.NewGuid(),
+            command.Amount,
+            command.User.Currency,
+            command.Date,
+            command.Description,
+            command.ActionSource);
+
         await _spendingRepository.CreateAsync(spending, cancellationToken);
         await _unitOfWork.SaveAsync(cancellationToken);
     }

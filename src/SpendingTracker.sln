@@ -21,6 +21,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpendingTracker.Infrastruct
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpendingTracker.GenericSubDomain", "SpendingTracker.GenericSubDomain\SpendingTracker.GenericSubDomain.csproj", "{AA480E50-14FC-4899-AAC5-6DFA0AF7E7AB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpendingTracker.WebApp", "SpendingTracker.WebApp\SpendingTracker.WebApp.csproj", "{769C77E3-B08F-4780-A40B-64FF286D5106}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{F52A81D6-AA00-4711-81DA-FC08C463B8ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,5 +63,13 @@ Global
 		{AA480E50-14FC-4899-AAC5-6DFA0AF7E7AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA480E50-14FC-4899-AAC5-6DFA0AF7E7AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA480E50-14FC-4899-AAC5-6DFA0AF7E7AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{769C77E3-B08F-4780-A40B-64FF286D5106}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{769C77E3-B08F-4780-A40B-64FF286D5106}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{769C77E3-B08F-4780-A40B-64FF286D5106}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{769C77E3-B08F-4780-A40B-64FF286D5106}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{769C77E3-B08F-4780-A40B-64FF286D5106} = {F52A81D6-AA00-4711-81DA-FC08C463B8ED}
+		{D2EF8475-1AF7-459E-AFA8-F0EC7109C50F} = {F52A81D6-AA00-4711-81DA-FC08C463B8ED}
 	EndGlobalSection
 EndGlobal

@@ -22,6 +22,11 @@ public class Currency : EntityObject<Currency, Guid>
     /// </summary>
     public string Title { get; set; }
 
+    /// <summary>
+    /// Признак удаленности.
+    /// </summary>
+    public bool IsDeleted { get; set; }
+
     public override Guid GetKey()
     {
         return Id;

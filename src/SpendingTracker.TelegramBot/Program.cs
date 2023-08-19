@@ -51,19 +51,26 @@ async Task HandleUpdateAsync(
     CancellationToken cancellationToken)
 {
     telegramUserIdStore.Id = null;
-    switch (update.Type)
+    try
     {
-        // A message was received
-        case UpdateType.Message:
-            await HandleMessage(update.Message!, cancellationToken);
-            break;
+        switch (update.Type)
+        {
+            // A message was received
+            case UpdateType.Message:
+                await HandleMessage(update.Message!, cancellationToken);
+                break;
 
-        // A button was pressed
-        case UpdateType.CallbackQuery:
-            await HandleButton(update.CallbackQuery!, cancellationToken);
-            break;
-        default:
-            throw new ArgumentOutOfRangeException();
+            // A button was pressed
+            case UpdateType.CallbackQuery:
+                await HandleButton(update.CallbackQuery!, cancellationToken);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine(e);
     }
 }
 
@@ -107,7 +114,7 @@ async Task HandleMessage(Message msg, CancellationToken cancellationToken)
                     return;
                 }
 
-                await bot.SendTextMessageAsync(user.Id, "Обработка...", cancellationToken: cancellationToken);
+                // await bot.SendTextMessageAsync(user.Id, "Обработка...", cancellationToken: cancellationToken);
                 var request = new CreateSpendingRequest
                 {
                     Amount = parsingResult.Amount,
@@ -116,14 +123,18 @@ async Task HandleMessage(Message msg, CancellationToken cancellationToken)
                     Description = parsingResult.Description
                 };
                 await gatewayService.CreateSpendingAsync(request, cancellationToken);
-                
+
+                var nextGroup = currentButtonsGroup.Next;
                 await bot.SendTextMessageAsync(
                     userId,
-                    currentButtonsGroup.Next.Text,
+                    nextGroup.DefaultText,
                     parseMode: ParseMode.Html,
-                    replyMarkup: currentButtonsGroup.Next.Markup,
+                    replyMarkup: nextGroup.Markup,
                     cancellationToken: cancellationToken
                 );
+                
+                await telegramUserCurrentButtonGroupService.Update(userId, nextGroup, cancellationToken);
+
                 break;
             case ButtonsGroupOperation.None:
                 return;
@@ -137,7 +148,7 @@ async Task HandleCommand(User user, string command, CancellationToken cancellati
 {
     switch (command)
     {
-        case "/start":
+        case "/menu":
             await gatewayService.ProcessStartButton(bot, user, cancellationToken);
             break;
     }
@@ -148,21 +159,43 @@ async Task HandleButton(CallbackQuery query, CancellationToken cancellationToken
     var userId = query.From.Id;
     telegramUserIdStore.Id = userId;
 
-    var buttonGroupId = Convert.ToInt32(query.Data);
-    var targetButtonsGroup = ButtonsGroupManager.GetInstance().GetById(buttonGroupId);
+    var buttonClickHandleData = ButtonClickHandleData.Deserialize(query.Data!);
+    var nextGroupId = buttonClickHandleData.NextGroupId;
+    var nextGroup = ButtonsGroupManager.GetInstance().GetById(nextGroupId);
 
+    var currentButtonsGroup = await telegramUserCurrentButtonGroupService.GetGroupByUserId(userId, cancellationToken);
+    
     await bot.AnswerCallbackQueryAsync(query.Id, cancellationToken: cancellationToken);
 
-    await bot.EditMessageTextAsync(
-        query.Message!.Chat.Id,
-        query.Message.MessageId,
-        targetButtonsGroup.Text,
-        ParseMode.Html,
-        replyMarkup: targetButtonsGroup.Markup,
-        cancellationToken: cancellationToken
-    );
+    if (currentButtonsGroup.Id != buttonClickHandleData.CurrentGroupId)
+    {
+        // Пользователь нажал на кнопку группы, на которой он сейчас не находится. Игнорируем.
+        return;
+    }
 
-    await telegramUserCurrentButtonGroupService.Update(userId, targetButtonsGroup, cancellationToken);
+    if (buttonClickHandleData.ShouldReplacePrevious)
+    {
+        await bot.EditMessageTextAsync(
+            query.Message!.Chat.Id,
+            query.Message.MessageId,
+            nextGroup.DefaultText,
+            ParseMode.Html,
+            replyMarkup: nextGroup.Markup,
+            cancellationToken: cancellationToken
+        );
+    }
+    else
+    {
+        await bot.SendTextMessageAsync(
+            userId,
+            nextGroup.DefaultText,
+            parseMode: ParseMode.Html,
+            replyMarkup: nextGroup.Markup,
+            cancellationToken: cancellationToken
+        );
+    }
+  
+    await telegramUserCurrentButtonGroupService.Update(userId, nextGroup, cancellationToken);
 }
 
 IServiceProvider InitializeDependencies()

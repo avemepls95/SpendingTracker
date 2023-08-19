@@ -20,7 +20,9 @@ public class SpendingMessageParser : ISpendingMessageParser
         var dateFormats = new[]
         {
             "d/M/yyyy", "dd/M/yyyy", "d/MM/yyyy", "dd/MM/yyyy",
-            "d.M.yyyy", "dd.M.yyyy", "d.MM.yyyy", "dd.MM.yyyy"
+            "d/M/yy", "dd/M/yy", "d/MM/yy", "dd/MM/yy",
+            "d.M.yyyy", "dd.M.yyyy", "d.MM.yyyy", "dd.MM.yyyy",
+            "d.M.yy", "dd.M.yy", "d.MM.yy", "dd.MM.yy"
         };
         var dateLines = lines.Where(l => DateTimeOffset.TryParseExact(l, dateFormats, null, DateTimeStyles.None, out _)).ToArray();
         if (dateLines.Length > 1)

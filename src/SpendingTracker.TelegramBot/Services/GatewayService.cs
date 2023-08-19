@@ -49,30 +49,31 @@ public class GatewayService
         User telegramUser,
         CancellationToken cancellationToken)
     {
-        var userIsExists = await _userRepository.IsTelegramUserExists(telegramUser.Id, cancellationToken);
-        if (userIsExists)
+        var user = await _userRepository.FindByTelegramId(telegramUser.Id, cancellationToken);
+        if (user == null)
         {
-            return;
+            await _mediator.SendCommandAsync(
+                new CreateUserByTelegramCommand
+                {
+                    TelegramUserId = telegramUser.Id,
+                    FirstName = telegramUser.FirstName,
+                    LastName = telegramUser.LastName,
+                    UserName = telegramUser.Username,
+                },
+                cancellationToken);
+
+            user = await _userRepository.GetByTelegramId(telegramUser.Id, cancellationToken);
         }
 
-        var startButtonsGroup = ButtonsGroupManager.GetInstance().Level1ButtonsGroup;
+        var startButtonsGroup = ButtonsGroupManager.GetInstance().StartButtonsGroup;
+        var text = $"Текущая валюта - {user.Currency.Title} ({user.Currency.Code})";
         await telegramBotClient.SendTextMessageAsync(
             telegramUser.Id,
-            startButtonsGroup.Text,
+            text,
             parseMode: ParseMode.Html,
             replyMarkup: startButtonsGroup.Markup,
             cancellationToken: cancellationToken
         );
-
-        await _mediator.SendCommandAsync(
-            new CreateUserByTelegramCommand
-            {
-                TelegramUserId = telegramUser.Id,
-                FirstName = telegramUser.FirstName,
-                LastName = telegramUser.LastName,
-                UserName = telegramUser.Username,
-            },
-            cancellationToken);
 
         await _telegramUserCurrentButtonGroupService.Update(telegramUser.Id, startButtonsGroup, cancellationToken);
     }

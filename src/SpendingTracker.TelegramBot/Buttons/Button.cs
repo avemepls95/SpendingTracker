@@ -6,12 +6,8 @@ public class Button
 {
     public string Title { get; }
     public InlineKeyboardButton TelegramButton { get; }
-    public ButtonGroup NavigationGroupByClick { get; }
-    // public ButtonGroup ParentGroup { get; }
 
-    public Button(string title, string url
-        // , ButtonGroup parentGroup
-        )
+    public Button(string title, string url, ButtonGroup group)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
@@ -25,13 +21,9 @@ public class Button
 
         Title = title;
         TelegramButton = new InlineKeyboardButton(title) { Url = url };
-        // ParentGroup = parentGroup;
     }
 
-    public Button(
-        string title,
-        ButtonGroup navigationGroupByClick)
-        // ButtonGroup parentGroup,)
+    public Button(string title, ButtonGroup navigationGroupByClick, ButtonGroup group, bool shouldEditPreviousMessage = true)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
@@ -43,10 +35,14 @@ public class Button
             throw new ArgumentNullException(nameof(navigationGroupByClick));
         }
 
-        NavigationGroupByClick = navigationGroupByClick;
-
         Title = title;
-        TelegramButton = InlineKeyboardButton.WithCallbackData(title, navigationGroupByClick.Id.ToString());
-        // ParentGroup = parentGroup;
+
+        var handleData = new ButtonClickHandleData
+        {
+            NextGroupId = navigationGroupByClick.Id,
+            ShouldReplacePrevious = shouldEditPreviousMessage,
+            CurrentGroupId = group.Id
+        };
+        TelegramButton = InlineKeyboardButton.WithCallbackData(title, handleData.Serialize());
     }
 }

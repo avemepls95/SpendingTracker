@@ -12,7 +12,7 @@ using SpendingTracker.Infrastructure;
 namespace SpendingTracker.Infrastructure.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20230816062457_Initial")]
+    [Migration("20230818072551_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -24,6 +24,66 @@ namespace SpendingTracker.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("SpendingTracker.Infrastructure.Abstractions.Model.Categories.CategoriesLink", b =>
+                {
+                    b.Property<Guid>("ChildId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ParentId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ChildId", "ParentId");
+
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("CategoriesLink", (string)null);
+                });
+
+            modelBuilder.Entity("SpendingTracker.Infrastructure.Abstractions.Model.Categories.SpendingCategoryLink", b =>
+                {
+                    b.Property<Guid>("SpendingId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("SpendingId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("SpendingCategoryLink", (string)null);
+                });
+
+            modelBuilder.Entity("SpendingTracker.Infrastructure.Abstractions.Model.Categories.StoredCategory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("ModifiedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Category", (string)null);
+                });
 
             modelBuilder.Entity("SpendingTracker.Infrastructure.Abstractions.Model.StoredCurrency", b =>
                 {
@@ -86,6 +146,9 @@ namespace SpendingTracker.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uuid");
@@ -182,10 +245,47 @@ namespace SpendingTracker.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CurrencyId")
-                        .IsUnique();
+                    b.HasIndex("CurrencyId");
 
                     b.ToTable("User", (string)null);
+                });
+
+            modelBuilder.Entity("SpendingTracker.Infrastructure.Abstractions.Model.Categories.CategoriesLink", b =>
+                {
+                    b.HasOne("SpendingTracker.Infrastructure.Abstractions.Model.Categories.StoredCategory", "Child")
+                        .WithMany("ChildCategoryLinks")
+                        .HasForeignKey("ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SpendingTracker.Infrastructure.Abstractions.Model.Categories.StoredCategory", "Parent")
+                        .WithMany("ParentCategoryLinks")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Child");
+
+                    b.Navigation("Parent");
+                });
+
+            modelBuilder.Entity("SpendingTracker.Infrastructure.Abstractions.Model.Categories.SpendingCategoryLink", b =>
+                {
+                    b.HasOne("SpendingTracker.Infrastructure.Abstractions.Model.Categories.StoredCategory", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SpendingTracker.Infrastructure.Abstractions.Model.StoredSpending", "Spending")
+                        .WithMany("CategoryLinks")
+                        .HasForeignKey("SpendingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Spending");
                 });
 
             modelBuilder.Entity("SpendingTracker.Infrastructure.Abstractions.Model.StoredSpending", b =>
@@ -222,12 +322,24 @@ namespace SpendingTracker.Infrastructure.Migrations
             modelBuilder.Entity("SpendingTracker.Infrastructure.Abstractions.Model.StoredUser", b =>
                 {
                     b.HasOne("SpendingTracker.Infrastructure.Abstractions.Model.StoredCurrency", "Currency")
-                        .WithOne()
-                        .HasForeignKey("SpendingTracker.Infrastructure.Abstractions.Model.StoredUser", "CurrencyId")
+                        .WithMany()
+                        .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Currency");
+                });
+
+            modelBuilder.Entity("SpendingTracker.Infrastructure.Abstractions.Model.Categories.StoredCategory", b =>
+                {
+                    b.Navigation("ChildCategoryLinks");
+
+                    b.Navigation("ParentCategoryLinks");
+                });
+
+            modelBuilder.Entity("SpendingTracker.Infrastructure.Abstractions.Model.StoredSpending", b =>
+                {
+                    b.Navigation("CategoryLinks");
                 });
 #pragma warning restore 612, 618
         }

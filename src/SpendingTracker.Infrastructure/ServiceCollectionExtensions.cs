@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using SpendingTracker.Infrastructure.Abstractions;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
 using SpendingTracker.Infrastructure.Factories;
@@ -16,10 +17,14 @@ namespace SpendingTracker.Infrastructure
         {
             var connectionsStrings = configuration.GetSection(nameof(ConnectionStrings)).Get<ConnectionStrings>()!;
 
+            var loggerFactory = LoggerFactory.Create(builder => { builder.AddConsole(); });
+            
             services
                 .AddSingleton(connectionsStrings)
                 .AddDbContextPool<MainDbContext>(
-                    o => o.UseNpgsql(connectionsStrings.DbConnectionString).EnableSensitiveDataLogging());
+                    o => o.UseNpgsql(connectionsStrings.DbConnectionString)
+                        .UseLoggerFactory(loggerFactory)
+                        .EnableSensitiveDataLogging());
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddServices();
@@ -32,6 +37,8 @@ namespace SpendingTracker.Infrastructure
 
             services
                 .AddSingleton<ICurrencyFactory, CurrencyFactory>()
+                .AddSingleton<ISpendingFactory, SpendingFactory>()
+                .AddSingleton<ICategoryFactory, CategoryFactory>()
                 .AddSingleton<IUserFactory, UserFactory>();
 
             return services;

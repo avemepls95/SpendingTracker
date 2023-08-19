@@ -17,12 +17,6 @@ namespace SpendingTracker.Infrastructure.Configurations
             builder.Property(i => i.Id)
                 .ValueGeneratedNever()
                 .HasConversion(v => v.Value, v => new UserKey(v));
-
-            builder
-                .HasOne(i => i.Currency)
-                .WithOne()
-                .HasForeignKey<StoredUser>(c => c.CurrencyId);
-
         }
     }
 }

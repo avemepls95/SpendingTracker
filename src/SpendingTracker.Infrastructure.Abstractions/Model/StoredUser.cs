@@ -16,6 +16,7 @@ public class StoredUser : EntityObject<StoredUser, UserKey>
     public StoredCurrency Currency { get; set; }
     public string FirstName { get; set; }
     public string? LastName { get; set; }
+    public bool IsDeleted { get; set; }
 
     public override UserKey GetKey()
     {

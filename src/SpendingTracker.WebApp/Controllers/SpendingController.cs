@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using SpendingTracker.Application.Spending.GetSpendings.Contracts;
+using SpendingTracker.Application.Handlers.Spending.GetSpendings.Contracts;
 using SpendingTracker.Dispatcher.Extensions;
 
 namespace SpendingTracker.WebApp.Controllers;

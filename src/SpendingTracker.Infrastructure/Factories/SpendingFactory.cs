@@ -31,7 +31,7 @@ internal class SpendingFactory : ISpendingFactory
             storedSpending.Description,
             storedSpending.ActionSource);
 
-        if (storedSpending.CategoryLinks != null)
+        if (storedSpending.CategoryLinks != null && storedSpending.CategoryLinks.Count != 0)
         {
             var categories = storedSpending.CategoryLinks.Select(l => _categoryFactory.Create(l.Category)).ToArray();
             spending.SetParentCategories(categories);

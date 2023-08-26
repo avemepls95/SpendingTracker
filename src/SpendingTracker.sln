@@ -4,8 +4,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpendingTracker.TelegramBot
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpendingTracker.Domain", "SpendingTracker.Domain\SpendingTracker.Domain.csproj", "{5C177ED6-D3E6-40C7-9A99-E40C3A19FA87}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpendingTracker.Application", "SpendingTracker.Application\SpendingTracker.Application.csproj", "{6E1F6BF4-8C4A-4597-B58E-9E73551D8DA9}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpendingTracker.Dispatcher", "SpendingTracker.Dispatcher\SpendingTracker.Dispatcher.csproj", "{59CDB69D-C589-48D5-A4F4-9B9453CBF38F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpendingTracker.Common", "SpendingTracker.Common\SpendingTracker.Common.csproj", "{50C4920B-A376-4DFE-80AF-4470B4AD70F4}"
@@ -25,6 +23,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpendingTracker.WebApp", "S
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{F52A81D6-AA00-4711-81DA-FC08C463B8ED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpendingTracker.TelegramBot.Internal", "SpendingTracker.TelegramBot.Internal\SpendingTracker.TelegramBot.Internal.csproj", "{66B523E2-5244-45E2-A954-BED52178CE59}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpendingTracker.Application", "SpendingTracker.Application\SpendingTracker.Application.csproj", "{DEFCCF6D-3757-4AE6-9E95-435720816503}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,10 +41,6 @@ Global
 		{5C177ED6-D3E6-40C7-9A99-E40C3A19FA87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C177ED6-D3E6-40C7-9A99-E40C3A19FA87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C177ED6-D3E6-40C7-9A99-E40C3A19FA87}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6E1F6BF4-8C4A-4597-B58E-9E73551D8DA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6E1F6BF4-8C4A-4597-B58E-9E73551D8DA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6E1F6BF4-8C4A-4597-B58E-9E73551D8DA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6E1F6BF4-8C4A-4597-B58E-9E73551D8DA9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{59CDB69D-C589-48D5-A4F4-9B9453CBF38F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{59CDB69D-C589-48D5-A4F4-9B9453CBF38F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59CDB69D-C589-48D5-A4F4-9B9453CBF38F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -67,9 +65,18 @@ Global
 		{769C77E3-B08F-4780-A40B-64FF286D5106}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{769C77E3-B08F-4780-A40B-64FF286D5106}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{769C77E3-B08F-4780-A40B-64FF286D5106}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66B523E2-5244-45E2-A954-BED52178CE59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66B523E2-5244-45E2-A954-BED52178CE59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66B523E2-5244-45E2-A954-BED52178CE59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66B523E2-5244-45E2-A954-BED52178CE59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEFCCF6D-3757-4AE6-9E95-435720816503}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEFCCF6D-3757-4AE6-9E95-435720816503}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEFCCF6D-3757-4AE6-9E95-435720816503}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEFCCF6D-3757-4AE6-9E95-435720816503}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{769C77E3-B08F-4780-A40B-64FF286D5106} = {F52A81D6-AA00-4711-81DA-FC08C463B8ED}
 		{D2EF8475-1AF7-459E-AFA8-F0EC7109C50F} = {F52A81D6-AA00-4711-81DA-FC08C463B8ED}
+		{66B523E2-5244-45E2-A954-BED52178CE59} = {F52A81D6-AA00-4711-81DA-FC08C463B8ED}
 	EndGlobalSection
 EndGlobal

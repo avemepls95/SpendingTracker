@@ -9,7 +9,9 @@ using SpendingTracker.GenericSubDomain;
 using SpendingTracker.GenericSubDomain.User.Abstractions;
 using SpendingTracker.Infrastructure;
 using SpendingTracker.TelegramBot;
-using SpendingTracker.TelegramBot.Buttons;
+using SpendingTracker.TelegramBot.Internal;
+using SpendingTracker.TelegramBot.Internal.Abstractions;
+using SpendingTracker.TelegramBot.Internal.Buttons;
 using SpendingTracker.TelegramBot.Services;
 using SpendingTracker.TelegramBot.Services.Abstractions;
 using SpendingTracker.TelegramBot.Services.Model;
@@ -26,6 +28,7 @@ var gatewayService = serviceProvider.GetService<GatewayService>()!;
 var telegramUserCurrentButtonGroupService = serviceProvider.GetService<ITelegramUserCurrentButtonGroupService>()!;
 var telegramUserIdStore = serviceProvider.GetService<ITelegramUserIdStore>()!;
 var spendingMessageParser = new SpendingMessageParser();
+var buttonsGroupManager = serviceProvider.GetService<IButtonsGroupManager>()!;
 
 Console.OutputEncoding = Encoding.UTF8;
 Console.WriteLine("Запущен бот " + bot.GetMeAsync().Result.FirstName);
@@ -161,7 +164,7 @@ async Task HandleButton(CallbackQuery query, CancellationToken cancellationToken
 
     var buttonClickHandleData = ButtonClickHandleData.Deserialize(query.Data!);
     var nextGroupId = buttonClickHandleData.NextGroupId;
-    var nextGroup = ButtonsGroupManager.GetInstance().GetById(nextGroupId);
+    var nextGroup = await buttonsGroupManager.GetById(nextGroupId);
 
     var currentButtonsGroup = await telegramUserCurrentButtonGroupService.GetGroupByUserId(userId, cancellationToken);
     
@@ -171,6 +174,18 @@ async Task HandleButton(CallbackQuery query, CancellationToken cancellationToken
     {
         // Пользователь нажал на кнопку группы, на которой он сейчас не находится. Игнорируем.
         return;
+    }
+    
+    var currentGroup = await buttonsGroupManager.GetById(buttonClickHandleData.CurrentGroupId);
+    if (currentGroup.Operation == ButtonsGroupOperation.ChangeCurrency && !string.IsNullOrEmpty(buttonClickHandleData.Id))
+    {
+        var selectedCurrencyCode = buttonClickHandleData.Id;
+        await gatewayService.ChangeUserCurrency(userId, selectedCurrencyCode, cancellationToken);
+        await bot.SendTextMessageAsync(
+            userId,
+            $"Валюта {selectedCurrencyCode} выбрана в качестве валюты по-умолчанию",
+            cancellationToken: cancellationToken
+        );
     }
 
     if (buttonClickHandleData.ShouldReplacePrevious)
@@ -212,7 +227,8 @@ IServiceProvider InitializeDependencies()
                 .AddDispatcher(assembliesForScan)
                 .AddGenericSubDomain(configuration)
                 .AddMemoryCache()
-                .AddServices();
+                .AddServices()
+                .AddTelegramBotWrappingServices();
         }).UseConsoleLifetime();
     return builder.Build().Services;
 }

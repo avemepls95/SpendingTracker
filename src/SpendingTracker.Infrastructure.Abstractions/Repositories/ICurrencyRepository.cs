@@ -4,5 +4,6 @@ namespace SpendingTracker.Infrastructure.Abstractions.Repositories;
 
 public interface ICurrencyRepository
 {
-    Task<Currency> GetDefaultAsync(CancellationToken cancellationToken);
+    Task<Currency> GetDefaultAsync(CancellationToken cancellationToken = default);
+    Task<Currency[]> GetAll(CancellationToken cancellationToken = default);
 }

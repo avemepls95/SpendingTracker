@@ -18,6 +18,11 @@ public class StoredCurrency : EntityObject<StoredCurrency, Guid>
     public string Code { get; set; }
 
     /// <summary>
+    /// Иконка страны
+    /// </summary>
+    public string CountryIcon { get; set; }
+
+    /// <summary>
     /// Человекопонятное название.
     /// </summary>
     public string Title { get; set; }
@@ -26,6 +31,11 @@ public class StoredCurrency : EntityObject<StoredCurrency, Guid>
     /// Является ли валюта дефолтной.
     /// </summary>
     public bool IsDefault { get; set; }
+
+    /// <summary>
+    /// Признак удаленности.
+    /// </summary>
+    public bool IsDeleted { get; set; }
 
     public override Guid GetKey()
     {

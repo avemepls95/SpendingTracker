@@ -18,7 +18,7 @@ internal class CategoryFactory : ICategoryFactory
         
         if (storedCategory.ParentCategoryLinks.Any())
         {
-            var parentCategories = storedCategory.ParentCategoryLinks.Select(l => Create(l.Child)).ToArray();
+            var parentCategories = storedCategory.ParentCategoryLinks.Select(l => Create(l.Parent)).ToArray();
             result.SetParentCategories(parentCategories);
         }
 

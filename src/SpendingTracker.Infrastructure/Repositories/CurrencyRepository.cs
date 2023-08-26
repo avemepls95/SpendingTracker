@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SpendingTracker.Common.Primitives;
 using SpendingTracker.Domain;
 using SpendingTracker.Infrastructure.Abstractions.Model;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
@@ -21,8 +20,16 @@ internal class CurrencyRepository : ICurrencyRepository
     public Task<Currency> GetDefaultAsync(CancellationToken cancellationToken)
     {
         return _dbContext.Set<StoredCurrency>()
-            .Where(c => c.IsDefault)
+            .Where(c => !c.IsDeleted && c.IsDefault)
             .Select(c => _currencyFactory.Create(c))
             .FirstAsync(cancellationToken);
+    }
+
+    public Task<Currency[]> GetAll(CancellationToken cancellationToken)
+    {
+        return _dbContext.Set<StoredCurrency>()
+            .Where(c => !c.IsDeleted)
+            .Select(c => _currencyFactory.Create(c))
+            .ToArrayAsync(cancellationToken);
     }
 }

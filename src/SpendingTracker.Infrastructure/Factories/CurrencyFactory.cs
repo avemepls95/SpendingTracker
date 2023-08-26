@@ -12,7 +12,8 @@ internal class CurrencyFactory : ICurrencyFactory
         {
             Id = storedCurrency.Id,
             Code = storedCurrency.Code,
-            Title = storedCurrency.Title
+            Title = storedCurrency.Title,
+            CountryIcon = storedCurrency.CountryIcon
         };
     }
 }

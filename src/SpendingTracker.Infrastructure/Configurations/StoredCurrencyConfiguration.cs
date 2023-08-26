@@ -16,6 +16,8 @@ namespace SpendingTracker.Infrastructure.Configurations
             builder.Property(e => e.Id).ValueGeneratedNever();
 
             builder.Property(e => e.Code).HasMaxLength(3);
+            builder.HasIndex(e => e.Code).IsUnique();
+
             builder.Property(e => e.Title).HasMaxLength(100);
             builder.Property(e => e.IsDefault);
         }

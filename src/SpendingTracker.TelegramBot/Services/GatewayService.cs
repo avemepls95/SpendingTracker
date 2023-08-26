@@ -1,10 +1,12 @@
 ﻿using MediatR;
-using SpendingTracker.Application.Spending.CreateSpending;
-using SpendingTracker.Application.User.CreateUserByTelegramId;
+using SpendingTracker.Application.Handlers.Spending.CreateSpending.Contracts;
+using SpendingTracker.Application.Handlers.User.CreateUserByTelegramId.Contracts;
+using SpendingTracker.Application.Handlers.UserCurrency.ChangeUserCurrency.Contracts;
 using SpendingTracker.Dispatcher.Extensions;
 using SpendingTracker.Domain;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
-using SpendingTracker.TelegramBot.Buttons;
+using SpendingTracker.TelegramBot.Internal.Abstractions;
+using SpendingTracker.TelegramBot.Internal.Buttons;
 using SpendingTracker.TelegramBot.Services.Abstractions;
 using SpendingTracker.TelegramBot.Services.Model;
 using Telegram.Bot;
@@ -18,15 +20,18 @@ public class GatewayService
     private readonly IMediator _mediator;
     private readonly IUserRepository _userRepository;
     private readonly ITelegramUserCurrentButtonGroupService _telegramUserCurrentButtonGroupService;
+    private readonly IButtonsGroupManager _buttonsGroupManager;
 
     public GatewayService(
         IMediator mediator,
         IUserRepository userRepository,
-        ITelegramUserCurrentButtonGroupService telegramUserCurrentButtonGroupService)
+        ITelegramUserCurrentButtonGroupService telegramUserCurrentButtonGroupService,
+        IButtonsGroupManager buttonsGroupManager)
     {
         _mediator = mediator;
         _userRepository = userRepository;
         _telegramUserCurrentButtonGroupService = telegramUserCurrentButtonGroupService;
+        _buttonsGroupManager = buttonsGroupManager;
     }
 
     public async Task CreateSpendingAsync(CreateSpendingRequest request, CancellationToken cancellationToken)
@@ -65,8 +70,8 @@ public class GatewayService
             user = await _userRepository.GetByTelegramId(telegramUser.Id, cancellationToken);
         }
 
-        var startButtonsGroup = ButtonsGroupManager.GetInstance().StartButtonsGroup;
-        var text = $"Текущая валюта - {user.Currency.Title} ({user.Currency.Code})";
+        var startButtonsGroup = _buttonsGroupManager.StartGroup;
+        var text = $"Текущая валюта - {user.Currency.Title}{user.Currency.CountryIcon} ({user.Currency.Code})";
         await telegramBotClient.SendTextMessageAsync(
             telegramUser.Id,
             text,
@@ -76,5 +81,17 @@ public class GatewayService
         );
 
         await _telegramUserCurrentButtonGroupService.Update(telegramUser.Id, startButtonsGroup, cancellationToken);
+    }
+    
+    public async Task ChangeUserCurrency(long telegramUserId, string currencyCode,CancellationToken cancellationToken)
+    {
+        var user = await _userRepository.GetByTelegramId(telegramUserId, cancellationToken);
+        var command = new ChangeUserCurrencyCommand
+        {
+            UserId = user.Id,
+            CurrenctCode = currencyCode
+        };
+
+        await _mediator.SendCommandAsync(command, cancellationToken);
     }
 }

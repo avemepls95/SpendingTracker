@@ -10,17 +10,22 @@ public class Currency : EntityObject<Currency, Guid>
     /// <summary>
     /// Идентификатор.
     /// </summary>
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
     /// <summary>
     /// Кодовое обозначение.
     /// </summary>
-    public string Code { get; set; }
+    public string Code { get; init; }
+
+    /// <summary>
+    /// Иконка страны
+    /// </summary>
+    public string CountryIcon { get; set; }
 
     /// <summary>
     /// Человекопонятное название.
     /// </summary>
-    public string Title { get; set; }
+    public string Title { get; init; }
 
     /// <summary>
     /// Признак удаленности.

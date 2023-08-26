@@ -19,12 +19,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SpendingTracker.Application\SpendingTracker.Application.csproj" />
-      <ProjectReference Include="..\SpendingTracker.GenericSubDomain\SpendingTracker.GenericSubDomain.csproj" />
-      <ProjectReference Include="..\SpendingTracker.Infrastructure\SpendingTracker.Infrastructure.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Update="appsettings.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
@@ -32,7 +26,9 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
-
-
-
+    
+    <ItemGroup>
+      <ProjectReference Include="..\SpendingTracker.TelegramBot.Internal\SpendingTracker.TelegramBot.Internal.csproj" />
+    </ItemGroup>
+    
 </Project>

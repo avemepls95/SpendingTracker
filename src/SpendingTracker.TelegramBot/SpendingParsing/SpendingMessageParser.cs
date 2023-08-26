@@ -54,7 +54,7 @@ public class SpendingMessageParser : ISpendingMessageParser
         var date = dateLines.Any()
             ? DateTimeOffset.ParseExact(dateLines.First(), dateFormats, null, DateTimeStyles.None).ToUniversalTime()
             : null as DateTimeOffset?;
-
+        
         var amount = double.Parse(amountLines.First());
         var description = descriptionLines.First();
 

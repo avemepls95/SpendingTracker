@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -24,7 +25,8 @@ namespace SpendingTracker.Infrastructure
                 .AddDbContextPool<MainDbContext>(
                     o => o.UseNpgsql(connectionsStrings.DbConnectionString)
                         .UseLoggerFactory(loggerFactory)
-                        .EnableSensitiveDataLogging());
+                        .EnableSensitiveDataLogging()
+                        .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored)));
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddServices();
@@ -33,7 +35,8 @@ namespace SpendingTracker.Infrastructure
                 .AddScoped<ISpendingRepository, SpendingRepository>()
                 .AddScoped<IUserCurrencyRepository, UserCurrencyRepository>()
                 .AddScoped<IUserRepository, UserRepository>()
-                .AddScoped<ICurrencyRepository, CurrencyRepository>();
+                .AddScoped<ICurrencyRepository, CurrencyRepository>()
+                .AddScoped<ICategoryRepository, CategoryRepository>();
 
             services
                 .AddSingleton<ICurrencyFactory, CurrencyFactory>()

@@ -40,4 +40,24 @@ internal class UserCurrencyRepository : IUserCurrencyRepository
             .Select(c => _currencyFactory.Create(c))
             .FirstAsync(cancellationToken);
     }
+
+    public async Task ChangeUserCurrency(UserKey userId, string currencyCode, CancellationToken cancellationToken)
+    {
+        var storedCurrency = await _dbContext.Set<StoredCurrency>().FirstOrDefaultAsync(
+            c => !c.IsDeleted && c.Code.ToUpper() == currencyCode,
+            cancellationToken);
+
+        if (storedCurrency is null)
+        {
+            throw new ArgumentException($"Не найдена валюта с кодом {currencyCode}");
+        }
+
+        var user = await _dbContext.Set<StoredUser>().FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        if (user is null)
+        {
+            throw new ArgumentException($"Не найден пользователь с идентификатором {userId}");
+        }
+
+        user.Currency = storedCurrency;
+    }
 }

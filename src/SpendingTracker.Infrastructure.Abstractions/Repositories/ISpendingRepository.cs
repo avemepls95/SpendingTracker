@@ -1,5 +1,6 @@
 ﻿using SpendingTracker.Common.Primitives;
 using SpendingTracker.Domain;
+using SpendingTracker.Domain.Categories;
 
 namespace SpendingTracker.Infrastructure.Abstractions.Repositories
 {
@@ -11,6 +12,11 @@ namespace SpendingTracker.Infrastructure.Abstractions.Repositories
             UserKey userKey,
             DateTimeOffset? dateFrom,
             DateTimeOffset? dateTo,
+            CancellationToken cancellationToken = default);
+
+        Task AddExistToCategories(
+            Guid spendingId,
+            Category[] categories,
             CancellationToken cancellationToken = default);
     }
 }

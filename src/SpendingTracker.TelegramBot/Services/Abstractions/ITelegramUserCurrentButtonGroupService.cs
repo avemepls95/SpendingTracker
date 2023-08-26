@@ -1,4 +1,4 @@
-﻿using SpendingTracker.TelegramBot.Buttons;
+﻿using SpendingTracker.TelegramBot.Internal.Buttons;
 
 namespace SpendingTracker.TelegramBot.Services.Abstractions;
 

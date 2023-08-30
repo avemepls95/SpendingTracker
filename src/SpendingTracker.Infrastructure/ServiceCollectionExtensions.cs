@@ -17,13 +17,17 @@ namespace SpendingTracker.Infrastructure
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             var connectionsStrings = configuration.GetSection(nameof(ConnectionStrings)).Get<ConnectionStrings>()!;
+            if (string.IsNullOrWhiteSpace(connectionsStrings.SpendingTrackerDb))
+            {
+                connectionsStrings.SpendingTrackerDb = Environment.GetEnvironmentVariable("CONNECTION-STRINGS_SPENDING-TRACKER-DB");
+            }
 
             var loggerFactory = LoggerFactory.Create(builder => { builder.AddConsole(); });
             
             services
                 .AddSingleton(connectionsStrings)
                 .AddDbContextPool<MainDbContext>(
-                    o => o.UseNpgsql(connectionsStrings.DbConnectionString)
+                    o => o.UseNpgsql(connectionsStrings.SpendingTrackerDb)
                         .UseLoggerFactory(loggerFactory)
                         .EnableSensitiveDataLogging()
                         .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored)));

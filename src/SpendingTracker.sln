@@ -13,6 +13,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SoluitionItems", "SoluitionItems", "{9CA16F2A-49DE-4546-ABF9-4FC70CB3B93F}"
 	ProjectSection(SolutionItems) = preProject
 		..\TODO.txt = ..\TODO.txt
+		..\docker-compose.yml = ..\docker-compose.yml
+		..\Docker notes.txt = ..\Docker notes.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpendingTracker.Infrastructure.Abstractions", "SpendingTracker.Infrastructure.Abstractions\SpendingTracker.Infrastructure.Abstractions.csproj", "{D8E8017D-C73F-4528-A234-6B4B63DF4FF1}"

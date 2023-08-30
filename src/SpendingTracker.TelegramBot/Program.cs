@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -230,5 +231,14 @@ IServiceProvider InitializeDependencies()
                 .AddServices()
                 .AddTelegramBotWrappingServices();
         }).UseConsoleLifetime();
-    return builder.Build().Services;
+
+    var host = builder.Build();
+    
+    var context = host.Services.GetRequiredService<MainDbContext>();
+    if (context.Database.GetPendingMigrations().Any())
+    {
+        context.Database.Migrate();
+    }
+    
+    return host.Services;
 }

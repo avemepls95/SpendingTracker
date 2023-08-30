@@ -2,9 +2,10 @@
 
 public class ButtonsGroupTextProvider
 {
-    private static Dictionary<ButtonsGroupOperation, string> operationTextDict = new()
+    private static readonly Dictionary<ButtonsGroupOperation, string> OperationTextDict = new()
     {
         { ButtonsGroupOperation.CreateSpending, @"Введите трату в формате
+
 Cумма
 Описание
 Дата (опционально)" }
@@ -12,7 +13,7 @@ Cумма
 
     public static string GetText(ButtonsGroupOperation operation)
     {
-        if (operationTextDict.TryGetValue(operation, out var result))
+        if (OperationTextDict.TryGetValue(operation, out var result))
         {
             return result;
         }

@@ -2,6 +2,6 @@
 {
     public sealed class ConnectionStrings
     {
-        public string DbConnectionString { get; set; }
+        public string? SpendingTrackerDb { get; set; }
     }
 }

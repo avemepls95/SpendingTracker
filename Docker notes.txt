@@ -1,0 +1,13 @@
+docker build --rm -t avemepls/spending-tracker_telegram-bot:latest .
+docker push avemepls/spending-tracker_telegram-bot:latest
+
+scp docker-compose.yml root@45.132.18.28:/src/spending-tracker
+
+docker push avemepls/spending-tracker_telegram-bot:latest
+docker pull avemepls/spending-tracker_telegram-bot
+
+$ docker run --rm -i -p 5000:5000 -p 5001:5001 \
+-e ASPNETCORE_HTTP_PORT=https://+:5001 \
+-e ASPNETCORE_URLS=https://+:5000 \
+-e ASPNETCORE_ENVIRONMENT='Development' \
+avemepls/spending-tracker

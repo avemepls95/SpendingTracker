@@ -1,5 +1,12 @@
 using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using SpendingTracker.Application;
+using SpendingTracker.Application.CustomFilters;
+using SpendingTracker.BearerTokenAuth;
 using SpendingTracker.Dispatcher.Extensions;
 using SpendingTracker.GenericSubDomain;
 using SpendingTracker.Infrastructure;
@@ -7,21 +14,8 @@ using SpendingTracker.Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var assemblyNamesForScan = new [] { "SpendingTracker.Application" };
-var assembliesForScan = assemblyNamesForScan.Select(Assembly.Load).ToArray();
-var configuration = AppConfigurationBuilder.Build();
-builder.Services
-    .AddDispatcher(assembliesForScan)
-    .AddGenericSubDomain(configuration)
-    .AddInfrastructure(configuration)
-    .AddMemoryCache()
-    .AddLogging(configure => configure.AddConsole());
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
+ConfigureServices(builder.Services);
+    
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -31,10 +25,42 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
+app
+    .UseHttpsRedirection()
+    .UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
+
+static void ConfigureServices(IServiceCollection serviceCollection)
+{
+    var assemblyNamesForScan = new [] { "SpendingTracker.Application" };
+    var assembliesForScan = assemblyNamesForScan.Select(Assembly.Load).ToArray();
+    var configuration = AppConfigurationBuilder.Build();
+
+    serviceCollection.AddDispatcher(assembliesForScan)
+        .AddGenericSubDomain(configuration)
+        .AddInfrastructure(configuration)
+        .AddApplicationLayer()
+        .AddMemoryCache()
+        .AddLogging(configure => configure.AddConsole())
+        .AddMvc()
+        .AddNewtonsoftJson(SetJsonConfiguration);
+    
+    var oAuthOptions = configuration.GetSection(nameof(OAuthOptions)).Get<OAuthOptions>();
+    serviceCollection.AddJwtBearerTokenAuth(oAuthOptions);
+
+    serviceCollection.AddControllers();
+    serviceCollection.AddEndpointsApiExplorer();
+    serviceCollection.AddSwaggerGen();
+    serviceCollection.AddCors();
+    serviceCollection.TryAddEnumerable(ServiceDescriptor.Transient<IStartupFilter, CorsStartupFilter>());
+}
+
+static void SetJsonConfiguration(MvcNewtonsoftJsonOptions options)
+{
+    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+    options.SerializerSettings.Converters.Add(new StringEnumConverter());
+    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+}

@@ -8,20 +8,27 @@ namespace SpendingTracker.Application.Handlers.Spending.CreateSpending;
 internal class CreateSpendingCommandHandler : CommandHandler<CreateSpendingCommand>
 {
     private readonly ISpendingRepository _spendingRepository;
+    private readonly IUserRepository _userRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public CreateSpendingCommandHandler(ISpendingRepository spendingRepository, IUnitOfWork unitOfWork)
+    public CreateSpendingCommandHandler(
+        ISpendingRepository spendingRepository,
+        IUnitOfWork unitOfWork,
+        IUserRepository userRepository)
     {
         _spendingRepository = spendingRepository;
         _unitOfWork = unitOfWork;
+        _userRepository = userRepository;
     }
 
     public override async Task Handle(CreateSpendingCommand command, CancellationToken cancellationToken)
     {
+        var user = await _userRepository.GetById(command.UserId, cancellationToken);
+        
         var spending = new Domain.Spending(
             Guid.NewGuid(),
             command.Amount,
-            command.User.Currency,
+            user.Currency,
             command.Date,
             command.Description,
             command.ActionSource);

@@ -13,7 +13,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SoluitionItems", "SoluitionItems", "{9CA16F2A-49DE-4546-ABF9-4FC70CB3B93F}"
 	ProjectSection(SolutionItems) = preProject
 		..\TODO.txt = ..\TODO.txt
-		..\docker-compose.yml = ..\docker-compose.yml
 		..\Docker notes.txt = ..\Docker notes.txt
 	EndProjectSection
 EndProject
@@ -28,6 +27,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpendingTracker.TelegramBot.Internal", "SpendingTracker.TelegramBot.Internal\SpendingTracker.TelegramBot.Internal.csproj", "{66B523E2-5244-45E2-A954-BED52178CE59}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpendingTracker.Application", "SpendingTracker.Application\SpendingTracker.Application.csproj", "{DEFCCF6D-3757-4AE6-9E95-435720816503}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{89B797E0-03B9-4021-8F5F-FD4520193272}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpendingTracker.BearerTokenAuth", "SpendingTracker.BearerTokenAuth\SpendingTracker.BearerTokenAuth.csproj", "{4A28C648-B8B4-4574-BCC8-0828F8B939A0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,10 +78,16 @@ Global
 		{DEFCCF6D-3757-4AE6-9E95-435720816503}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DEFCCF6D-3757-4AE6-9E95-435720816503}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DEFCCF6D-3757-4AE6-9E95-435720816503}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A28C648-B8B4-4574-BCC8-0828F8B939A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A28C648-B8B4-4574-BCC8-0828F8B939A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A28C648-B8B4-4574-BCC8-0828F8B939A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A28C648-B8B4-4574-BCC8-0828F8B939A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{769C77E3-B08F-4780-A40B-64FF286D5106} = {F52A81D6-AA00-4711-81DA-FC08C463B8ED}
 		{D2EF8475-1AF7-459E-AFA8-F0EC7109C50F} = {F52A81D6-AA00-4711-81DA-FC08C463B8ED}
 		{66B523E2-5244-45E2-A954-BED52178CE59} = {F52A81D6-AA00-4711-81DA-FC08C463B8ED}
+		{AA480E50-14FC-4899-AAC5-6DFA0AF7E7AB} = {89B797E0-03B9-4021-8F5F-FD4520193272}
+		{4A28C648-B8B4-4574-BCC8-0828F8B939A0} = {89B797E0-03B9-4021-8F5F-FD4520193272}
 	EndGlobalSection
 EndGlobal

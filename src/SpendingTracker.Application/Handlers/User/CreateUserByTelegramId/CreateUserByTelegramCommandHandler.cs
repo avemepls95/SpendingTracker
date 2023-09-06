@@ -6,7 +6,7 @@ using SpendingTracker.Infrastructure.Abstractions.Repositories;
 
 namespace SpendingTracker.Application.Handlers.User.CreateUserByTelegramId;
 
-internal class CreateUserByTelegramCommandHandler : CommandHandler<CreateUserByTelegramCommand>
+internal class CreateUserByTelegramCommandHandler : CommandHandler<CreateUserByTelegramCommand, UserKey>
 {
     private readonly IUserRepository _userRepository;
     private readonly ICurrencyRepository _currencyRepository;
@@ -22,7 +22,7 @@ internal class CreateUserByTelegramCommandHandler : CommandHandler<CreateUserByT
         _unitOfWork = unitOfWork;
     }
 
-    public override async Task Handle(CreateUserByTelegramCommand command, CancellationToken cancellationToken)
+    public override async Task<UserKey> Handle(CreateUserByTelegramCommand command, CancellationToken cancellationToken)
     {
         var defaultCurrency = await _currencyRepository.GetDefaultAsync(cancellationToken);
         var userId = new UserKey(Guid.NewGuid());
@@ -33,7 +33,6 @@ internal class CreateUserByTelegramCommandHandler : CommandHandler<CreateUserByT
         };
 
         await _userRepository.Create(user, cancellationToken);
-        // await _unitOfWork.SaveAsync(cancellationToken);
 
         await _userRepository.CreateTelegramUser(
             command.TelegramUserId,
@@ -42,6 +41,9 @@ internal class CreateUserByTelegramCommandHandler : CommandHandler<CreateUserByT
             command.UserName,
             user.Id,
             cancellationToken);
+
         await _unitOfWork.SaveAsync(cancellationToken);
+
+        return userId;
     }
 }

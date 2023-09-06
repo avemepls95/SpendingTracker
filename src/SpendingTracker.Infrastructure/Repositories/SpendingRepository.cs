@@ -35,31 +35,24 @@ namespace SpendingTracker.Infrastructure.Repositories
             await _dbContext.Set<StoredSpending>().AddAsync(storedSpending, cancellationToken);
         }
 
-        public async Task<Spending[]> GetUserSpendings(
+        public async Task<Spending[]> GetUserSpendingsInRange(
             UserKey userKey,
-            DateTimeOffset? dateFrom,
-            DateTimeOffset? dateTo,
+            DateTimeOffset dateFrom,
+            DateTimeOffset dateTo,
             CancellationToken cancellationToken)
         {
-            var queryable = _dbContext.Set<StoredSpending>()
+            var dbSpendings = await _dbContext.Set<StoredSpending>()
                 .Include(s => s.Currency)
                 .Include(s => s.CategoryLinks)
                     .ThenInclude(l => l.Category)
                         .ThenInclude(c => c.ChildCategoryLinks)
                             .ThenInclude(l => l.Parent)
-                .Where(s => !s.IsDeleted && s.CreatedBy == userKey);
-
-            if (dateFrom.HasValue)
-            {
-                queryable = queryable.Where(s => dateFrom < s.Date);
-            }
-            
-            if (dateTo.HasValue)
-            {
-                queryable = queryable.Where(s => s.Date < dateTo);
-            }
-
-            var dbSpendings = await queryable.ToArrayAsync(cancellationToken);
+                .Where(s =>
+                    !s.IsDeleted
+                    && s.CreatedBy == userKey
+                    && dateFrom < s.Date
+                    && s.Date < dateTo)
+                .ToArrayAsync(cancellationToken);
             
             var result = dbSpendings
                 .Select(_spendingFactory.Create)

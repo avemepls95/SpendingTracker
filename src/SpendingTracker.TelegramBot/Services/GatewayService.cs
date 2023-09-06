@@ -2,6 +2,7 @@
 using SpendingTracker.Application.Handlers.Spending.CreateSpending.Contracts;
 using SpendingTracker.Application.Handlers.User.CreateUserByTelegramId.Contracts;
 using SpendingTracker.Application.Handlers.UserCurrency.ChangeUserCurrency.Contracts;
+using SpendingTracker.Common.Primitives;
 using SpendingTracker.Dispatcher.Extensions;
 using SpendingTracker.Domain;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
@@ -36,11 +37,11 @@ public class GatewayService
 
     public async Task CreateSpendingAsync(CreateSpendingRequest request, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.GetByTelegramId(request.TelegramUserId, cancellationToken);
+        var userId = await _userRepository.GetIdByTelegramId(request.TelegramUserId, cancellationToken);
         var command = new CreateSpendingCommand
         {
             Amount = request.Amount,
-            User = user,
+            UserId = userId,
             Date = request.Date,
             Description = request.Description,
             ActionSource = ActionSource.Telegram
@@ -55,9 +56,9 @@ public class GatewayService
         CancellationToken cancellationToken)
     {
         var user = await _userRepository.FindByTelegramId(telegramUser.Id, cancellationToken);
-        if (user == null)
+        if (user is null)
         {
-            await _mediator.SendCommandAsync(
+            await _mediator.SendCommandAsync<CreateUserByTelegramCommand, UserKey>(
                 new CreateUserByTelegramCommand
                 {
                     TelegramUserId = telegramUser.Id,

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SpendingTracker.Domain.Constants;
 using SpendingTracker.Infrastructure.Abstractions.Model;
 
 namespace SpendingTracker.Infrastructure.Configurations
@@ -14,6 +15,8 @@ namespace SpendingTracker.Infrastructure.Configurations
 
             builder.HasKey(e => e.Id);
             builder.Property(e => e.Id).ValueGeneratedNever();
+
+            builder.Property(e => e.Description).HasMaxLength(SpendingConstants.DescriptionMaxLength);
         }
     }
 }

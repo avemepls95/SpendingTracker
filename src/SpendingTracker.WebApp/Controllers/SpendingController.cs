@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using SpendingTracker.Application.Handlers.Spending.GetSpendings.Contracts;
+using SpendingTracker.Application.Handlers.Spending.GetSpendingsInRange.Contracts;
 using SpendingTracker.Dispatcher.Extensions;
 
 namespace SpendingTracker.WebApp.Controllers;
@@ -17,8 +17,8 @@ public class SpendingController : ControllerBase
     }
     
     [HttpGet(Name = "list")]
-    public Task<GetSpendingsQueryResponse> Get([FromQuery] GetSpendingsQuery query, CancellationToken cancellationToken)
+    public Task<GetSpendingsInRangeResponse> Get([FromQuery] GetSpendingsInRangeQuery inRangeQuery, CancellationToken cancellationToken)
     {
-        return _mediator.SendQueryAsync<GetSpendingsQuery, GetSpendingsQueryResponse>(query, cancellationToken);
+        return _mediator.SendQueryAsync<GetSpendingsInRangeQuery, GetSpendingsInRangeResponse>(inRangeQuery, cancellationToken);
     }
 }

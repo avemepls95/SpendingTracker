@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SpendingTracker.Application.Factories;
 using SpendingTracker.Application.Factories.Abstractions;
+using SpendingTracker.CurrencyRate;
 
 namespace SpendingTracker.Application
 {
@@ -9,7 +10,8 @@ namespace SpendingTracker.Application
         public static IServiceCollection AddApplicationLayer(this IServiceCollection services)
         {
             services
-                .AddSingleton<ICategoryFactory, CategoryFactory>();
+                .AddSingleton<ICategoryFactory, CategoryFactory>()
+                .AddCurrencyRates();
 
             return services;
         }

@@ -28,9 +28,9 @@ public class Currency : EntityObject<Currency, Guid>
     public string Title { get; init; }
 
     /// <summary>
-    /// Признак удаленности.
+    /// Является ли валюта дефолтной.
     /// </summary>
-    public bool IsDeleted { get; set; }
+    public bool IsDefault { get; set; }
 
     public override Guid GetKey()
     {

@@ -7,6 +7,8 @@ using Newtonsoft.Json.Serialization;
 using SpendingTracker.Application;
 using SpendingTracker.Application.CustomFilters;
 using SpendingTracker.BearerTokenAuth;
+using SpendingTracker.CurrencyRate;
+using SpendingTracker.CurrencyRate.BackgroundServices;
 using SpendingTracker.Dispatcher.Extensions;
 using SpendingTracker.GenericSubDomain;
 using SpendingTracker.Infrastructure;
@@ -43,6 +45,7 @@ static void ConfigureServices(IServiceCollection serviceCollection)
         .AddGenericSubDomain(configuration)
         .AddInfrastructure(configuration)
         .AddApplicationLayer()
+        .AddCurrencyRates()
         .AddMemoryCache()
         .AddLogging(configure => configure.AddConsole())
         .AddMvc()

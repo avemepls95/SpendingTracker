@@ -17,8 +17,12 @@ public class SpendingController : ControllerBase
     }
     
     [HttpGet(Name = "list")]
-    public Task<GetSpendingsInRangeResponse> Get([FromQuery] GetSpendingsInRangeQuery inRangeQuery, CancellationToken cancellationToken)
+    public Task<GetSpendingsInRangeResponse> Get(
+        [FromQuery] GetSpendingsInRangeQuery inRangeQuery,
+        CancellationToken cancellationToken)
     {
-        return _mediator.SendQueryAsync<GetSpendingsInRangeQuery, GetSpendingsInRangeResponse>(inRangeQuery, cancellationToken);
+        return _mediator.SendQueryAsync<GetSpendingsInRangeQuery, GetSpendingsInRangeResponse>(
+            inRangeQuery,
+            cancellationToken);
     }
 }

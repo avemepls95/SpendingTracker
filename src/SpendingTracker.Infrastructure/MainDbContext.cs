@@ -19,7 +19,8 @@ namespace SpendingTracker.Infrastructure
                 .ApplyConfiguration(new StoredTelegramUserCurrentButtonGroupConfiguration())
                 .ApplyConfiguration(new CategoriesLinkConfiguration())
                 .ApplyConfiguration(new SpendingCategoryLinkConfiguration())
-                .ApplyConfiguration(new StoredCategoryConfiguration());
+                .ApplyConfiguration(new StoredCategoryConfiguration())
+                .ApplyConfiguration(new StoredCurrencyRateByDayConfiguration());
         }
     }
 }

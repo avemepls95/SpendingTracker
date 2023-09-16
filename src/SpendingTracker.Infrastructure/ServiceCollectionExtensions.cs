@@ -32,6 +32,12 @@ namespace SpendingTracker.Infrastructure
                         .EnableSensitiveDataLogging()
                         .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored)));
 
+            services.AddDbContextFactory<MainDbContext>(options => options
+                .UseNpgsql(connectionsStrings.SpendingTrackerDb)
+                .UseLoggerFactory(loggerFactory)
+                .EnableSensitiveDataLogging()
+                .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored)));
+
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddServices();
 
@@ -40,7 +46,8 @@ namespace SpendingTracker.Infrastructure
                 .AddScoped<IUserCurrencyRepository, UserCurrencyRepository>()
                 .AddScoped<IUserRepository, UserRepository>()
                 .AddScoped<ICurrencyRepository, CurrencyRepository>()
-                .AddScoped<ICategoryRepository, CategoryRepository>();
+                .AddScoped<ICategoryRepository, CategoryRepository>()
+                .AddScoped<ICurrencyRateByDayRepository, CurrencyRateByDayRepository>();
 
             services
                 .AddSingleton<ICurrencyFactory, CurrencyFactory>()

@@ -14,6 +14,13 @@ namespace SpendingTracker.Infrastructure.Abstractions.Repositories
             DateTimeOffset dateTo,
             CancellationToken cancellationToken = default);
 
+        Task<Spending[]> GetUserSpendings(
+            UserKey userKey,
+            int offset,
+            int count,
+            CancellationToken cancellationToken = default);
+
+        
         Task AddExistToCategories(
             Guid spendingId,
             Category[] categories,

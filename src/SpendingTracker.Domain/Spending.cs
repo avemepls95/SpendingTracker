@@ -11,7 +11,8 @@ public class Spending : EntityObject<Spending, Guid>
         Currency currency,
         DateTimeOffset date,
         string description,
-        ActionSource actionSource)
+        ActionSource actionSource,
+        DateTimeOffset? createDate = null)
     {
         Id = id;
         Amount = amount;
@@ -19,6 +20,11 @@ public class Spending : EntityObject<Spending, Guid>
         Date = date;
         Description = description;
         ActionSource = actionSource;
+
+        if (createDate is not null)
+        {
+            CreatedDate = createDate.Value;
+        }
     }
     
     public Guid Id { get; init; }

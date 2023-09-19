@@ -61,6 +61,27 @@ namespace SpendingTracker.Infrastructure.Repositories
             return result;
         }
 
+        public async Task<Spending[]> GetUserSpendings(
+            UserKey userKey,
+            int offset,
+            int count,
+            CancellationToken cancellationToken)
+        {
+            var dbSpendings = await _dbContext.Set<StoredSpending>()
+                .Include(s => s.Currency)
+                .Where(s => !s.IsDeleted && s.CreatedBy == userKey)
+                .OrderBy(s => s.CreatedDate)
+                .Skip(offset)
+                .Take(count)
+                .ToArrayAsync(cancellationToken);
+            
+            var result = dbSpendings
+                .Select(_spendingFactory.Create)
+                .ToArray();
+            
+            return result;
+        }
+
         public async Task AddExistToCategories(Guid spendingId, Category[] categories, CancellationToken cancellationToken)
         {
             var spending = await _dbContext.Set<StoredSpending>()

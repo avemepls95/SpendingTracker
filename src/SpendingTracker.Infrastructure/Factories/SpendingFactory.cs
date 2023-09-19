@@ -29,7 +29,8 @@ internal class SpendingFactory : ISpendingFactory
             currency,
             storedSpending.Date,
             storedSpending.Description,
-            storedSpending.ActionSource);
+            storedSpending.ActionSource,
+            storedSpending.CreatedDate);
 
         if (storedSpending.CategoryLinks != null && storedSpending.CategoryLinks.Count != 0)
         {

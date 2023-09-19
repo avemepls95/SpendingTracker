@@ -22,7 +22,8 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-var bot = new TelegramBotClient("6133107700:AAFPgfpteJtzLfauIHkmobDp8JbNNxrIwm0");
+var telegramBotToken = Environment.GetEnvironmentVariable("TELEGRAM_TOKEN");
+var bot = new TelegramBotClient(telegramBotToken);
 Console.OutputEncoding = Encoding.UTF8;
 var serviceProvider = InitializeDependencies();
 var gatewayService = serviceProvider.GetService<GatewayService>()!;

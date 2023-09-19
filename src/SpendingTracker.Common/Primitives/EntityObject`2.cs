@@ -25,7 +25,7 @@
             return HashCode.Combine(0, GetKey());
         }
 
-        public DateTimeOffset CreatedDate { get; private set; }
+        public DateTimeOffset CreatedDate { get; protected set; }
         public UserKey CreatedBy { get; private set; }
         public DateTimeOffset? ModifiedDate { get; private set; }
         public UserKey? ModifiedBy { get; private set; }

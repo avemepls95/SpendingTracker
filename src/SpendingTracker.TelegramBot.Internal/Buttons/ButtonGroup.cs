@@ -4,8 +4,8 @@ namespace SpendingTracker.TelegramBot.Internal.Buttons;
 
 public class ButtonGroup
 {
-    public string DefaultText { get; }
-    public ButtonsGroupOperation Operation { get; } = ButtonsGroupOperation.None;
+    public string Text { get; private set; }
+    public ButtonsGroupType Type { get; } = ButtonsGroupType.None;
     public int Id { get; }
     public ButtonGroup Next { get; protected init; }
 
@@ -17,36 +17,43 @@ public class ButtonGroup
                 .ToArray());
     }
 
-    public ButtonGroup(int id, string defaultText)
+    public ButtonGroup(int id, string text)
     {
-        if (string.IsNullOrWhiteSpace(defaultText))
+        if (string.IsNullOrWhiteSpace(text))
         {
-            throw new ArgumentNullException(nameof(defaultText));
+            throw new ArgumentNullException(nameof(text));
         }
 
         Id = id;
-        DefaultText = defaultText;
+        Text = text;
     }
     
-    public ButtonGroup(int id, ButtonsGroupOperation operation, string? text = null, ButtonGroup? next = null)
+    public ButtonGroup(int id, ButtonsGroupType type, string? text = null, ButtonGroup? next = null)
     {
-        if (operation is ButtonsGroupOperation.None)
+        if (type is ButtonsGroupType.None)
         {
             return;
         }
 
         Id = id;
-        Operation = operation;
+        Type = type;
         Next = next;
 
-        DefaultText = string.IsNullOrWhiteSpace(text)
-            ? ButtonsGroupTextProvider.GetText(operation)
+        Text = string.IsNullOrWhiteSpace(text)
+            ? ButtonsGroupTextProvider.GetText(type)
             : text;
     }
     
     public ButtonGroup AddButtonsLayer(params Button[] buttons)
     {
         _buttons.Add(buttons);
+
+        return this;
+    }
+
+    public ButtonGroup SetText(string text)
+    {
+        Text = text;
 
         return this;
     }

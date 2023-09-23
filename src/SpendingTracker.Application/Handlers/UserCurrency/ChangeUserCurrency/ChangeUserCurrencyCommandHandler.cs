@@ -18,7 +18,7 @@ internal sealed class ChangeUserCurrencyCommandHandler : CommandHandler<ChangeUs
 
     public override async Task Handle(ChangeUserCurrencyCommand command, CancellationToken cancellationToken)
     {
-        await _userCurrencyRepository.ChangeUserCurrency(command.UserId, command.CurrenctCode, cancellationToken);
+        await _userCurrencyRepository.ChangeUserCurrency(command.UserId, command.CurrencyCode, cancellationToken);
         await _unitOfWork.SaveAsync(cancellationToken);
     }
 }

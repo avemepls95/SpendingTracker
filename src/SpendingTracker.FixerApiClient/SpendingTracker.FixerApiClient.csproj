@@ -17,12 +17,7 @@
 
     </ItemGroup>
     <ItemGroup>
-        <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
-            <HintPath>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\6.0.21\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
-        </Reference>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
     </ItemGroup>
-
-
-
 
 </Project>

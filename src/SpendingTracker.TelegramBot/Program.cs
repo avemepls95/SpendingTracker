@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using SpendingTracker.Application;
 using SpendingTracker.Dispatcher.Extensions;
 using SpendingTracker.GenericSubDomain;
@@ -13,6 +14,7 @@ using SpendingTracker.TelegramBot;
 using SpendingTracker.TelegramBot.Internal;
 using SpendingTracker.TelegramBot.Internal.Abstractions;
 using SpendingTracker.TelegramBot.Internal.Buttons;
+using SpendingTracker.TelegramBot.Internal.Buttons.ButtonContent;
 using SpendingTracker.TelegramBot.Services;
 using SpendingTracker.TelegramBot.Services.Abstractions;
 using SpendingTracker.TelegramBot.Services.Model;
@@ -108,10 +110,11 @@ async Task HandleMessage(Message msg, CancellationToken cancellationToken)
     {
         telegramUserIdStore.Id = userId;
         var currentButtonsGroup = await telegramUserCurrentButtonGroupService.GetGroupByUserId(userId, cancellationToken);
-        var currentOperation = currentButtonsGroup.Operation;
+        var currentOperation = currentButtonsGroup.Type;
         switch (currentOperation)
         {
-            case ButtonsGroupOperation.CreateSpending:
+            case ButtonsGroupType.CreateSpending:
+            case ButtonsGroupType.CreateAnotherSpending:
                 var spendingParseResult = spendingMessageParser.TryParse(messageText, out var parsingResult);
                 if (!spendingParseResult)
                 {
@@ -119,7 +122,6 @@ async Task HandleMessage(Message msg, CancellationToken cancellationToken)
                     return;
                 }
 
-                // await bot.SendTextMessageAsync(user.Id, "Обработка...", cancellationToken: cancellationToken);
                 var request = new CreateSpendingRequest
                 {
                     Amount = parsingResult.Amount,
@@ -132,7 +134,7 @@ async Task HandleMessage(Message msg, CancellationToken cancellationToken)
                 var nextGroup = currentButtonsGroup.Next;
                 await bot.SendTextMessageAsync(
                     userId,
-                    nextGroup.DefaultText,
+                    nextGroup.Text,
                     parseMode: ParseMode.Html,
                     replyMarkup: nextGroup.Markup,
                     cancellationToken: cancellationToken
@@ -141,7 +143,7 @@ async Task HandleMessage(Message msg, CancellationToken cancellationToken)
                 await telegramUserCurrentButtonGroupService.Update(userId, nextGroup, cancellationToken);
 
                 break;
-            case ButtonsGroupOperation.None:
+            case ButtonsGroupType.None:
                 return;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -165,8 +167,6 @@ async Task HandleButton(CallbackQuery query, CancellationToken cancellationToken
     telegramUserIdStore.Id = userId;
 
     var buttonClickHandleData = ButtonClickHandleData.Deserialize(query.Data!);
-    var nextGroupId = buttonClickHandleData.NextGroupId;
-    var nextGroup = await buttonsGroupManager.GetById(nextGroupId);
 
     var currentButtonsGroup = await telegramUserCurrentButtonGroupService.GetGroupByUserId(userId, cancellationToken);
     
@@ -177,25 +177,37 @@ async Task HandleButton(CallbackQuery query, CancellationToken cancellationToken
         // Пользователь нажал на кнопку группы, на которой он сейчас не находится. Игнорируем.
         return;
     }
-    
+
     var currentGroup = await buttonsGroupManager.GetById(buttonClickHandleData.CurrentGroupId);
-    if (currentGroup.Operation == ButtonsGroupOperation.ChangeCurrency && !string.IsNullOrEmpty(buttonClickHandleData.Id))
+    if (currentGroup.Type == ButtonsGroupType.ChangeCurrency
+        && buttonClickHandleData.Content is not null)
     {
-        var selectedCurrencyCode = buttonClickHandleData.Id;
+        var currencyButtonContent = CurrencyButtonContent.Deserialize(buttonClickHandleData.Content);
+        var selectedCurrencyCode = currencyButtonContent.Code;
+        var selectedCurrencyCountryCode = currencyButtonContent.CountryIcon;
         await gatewayService.ChangeUserCurrency(userId, selectedCurrencyCode, cancellationToken);
         await bot.SendTextMessageAsync(
             userId,
-            $"Валюта {selectedCurrencyCode} выбрана в качестве валюты по-умолчанию",
+            $"Валюта {selectedCurrencyCountryCode}{selectedCurrencyCode} выбрана в качестве валюты по-умолчанию",
             cancellationToken: cancellationToken
         );
     }
+    
+    if (buttonClickHandleData.Operation == ButtonOperation.DeleteLastSpending)
+    {
+        await gatewayService.DeleteLastSpending(userId, cancellationToken);
+        await bot.DeleteMessageAsync(query.Message!.Chat.Id, query.Message.MessageId, cancellationToken: cancellationToken);
+        await bot.SendTextMessageAsync(userId, $"✅ Трата удалена", cancellationToken: cancellationToken);
+    }
 
+    var nextGroupId = buttonClickHandleData.NextGroupId;
+    var nextGroup = await buttonsGroupManager.GetById(nextGroupId);
     if (buttonClickHandleData.ShouldReplacePrevious)
     {
         await bot.EditMessageTextAsync(
             query.Message!.Chat.Id,
             query.Message.MessageId,
-            nextGroup.DefaultText,
+            nextGroup.Text,
             ParseMode.Html,
             replyMarkup: nextGroup.Markup,
             cancellationToken: cancellationToken
@@ -205,7 +217,7 @@ async Task HandleButton(CallbackQuery query, CancellationToken cancellationToken
     {
         await bot.SendTextMessageAsync(
             userId,
-            nextGroup.DefaultText,
+            nextGroup.Text,
             parseMode: ParseMode.Html,
             replyMarkup: nextGroup.Markup,
             cancellationToken: cancellationToken

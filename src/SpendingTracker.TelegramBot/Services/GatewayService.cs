@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using SpendingTracker.Application.Handlers.Spending.CreateSpending.Contracts;
+using SpendingTracker.Application.Handlers.Spending.DeleteLastSpending.Contracts;
 using SpendingTracker.Application.Handlers.User.CreateUserByTelegramId.Contracts;
 using SpendingTracker.Application.Handlers.UserCurrency.ChangeUserCurrency.Contracts;
 using SpendingTracker.Common.Primitives;
@@ -84,14 +85,22 @@ public class GatewayService
         await _telegramUserCurrentButtonGroupService.Update(telegramUser.Id, startButtonsGroup, cancellationToken);
     }
     
-    public async Task ChangeUserCurrency(long telegramUserId, string currencyCode,CancellationToken cancellationToken)
+    public async Task ChangeUserCurrency(long telegramUserId, string currencyCode, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.GetByTelegramId(telegramUserId, cancellationToken);
+        var userId = await _userRepository.GetIdByTelegramId(telegramUserId, cancellationToken);
         var command = new ChangeUserCurrencyCommand
         {
-            UserId = user.Id,
-            CurrenctCode = currencyCode
+            UserId = userId,
+            CurrencyCode = currencyCode
         };
+
+        await _mediator.SendCommandAsync(command, cancellationToken);
+    }
+    
+    public async Task DeleteLastSpending(long telegramUserId, CancellationToken cancellationToken)
+    {
+        var userId = await _userRepository.GetIdByTelegramId(telegramUserId, cancellationToken);
+        var command = new DeleteLastSpendingCommand { UserId = userId };
 
         await _mediator.SendCommandAsync(command, cancellationToken);
     }

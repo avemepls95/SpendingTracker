@@ -2,22 +2,26 @@
 
 public class ButtonsGroupTextProvider
 {
-    private static readonly Dictionary<ButtonsGroupOperation, string> OperationTextDict = new()
+    private static readonly Dictionary<ButtonsGroupType, string> OperationTextDict = new()
     {
-        { ButtonsGroupOperation.CreateSpending, @"Введите трату в формате
+        { 
+            ButtonsGroupType.CreateSpending,
+@"Введите трату в формате
 
 Cумма
 Описание
-Дата (опционально)" }
+Дата (опционально)"
+        },
+        { ButtonsGroupType.CreateAnotherSpending, "Трата добавлена. Введите следующую, если необходимо" }
     };
 
-    public static string GetText(ButtonsGroupOperation operation)
+    public static string GetText(ButtonsGroupType type)
     {
-        if (OperationTextDict.TryGetValue(operation, out var result))
+        if (OperationTextDict.TryGetValue(type, out var result))
         {
             return result;
         }
 
-        throw new ArgumentException($"Не найден текст для операции {operation}");
+        throw new ArgumentException($"Не найден текст для операции {type}");
     }
 }

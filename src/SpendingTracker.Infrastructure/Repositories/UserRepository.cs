@@ -32,9 +32,9 @@ internal class UserRepository : IUserRepository
 
     public async Task<User> GetById(UserKey id, CancellationToken cancellationToken = default)
     {
-        var storedUser = await _dbContext.Set<StoredUser>().FirstOrDefaultAsync(
-            u => u.Id == id && !u.IsDeleted,
-            cancellationToken);
+        var storedUser = await _dbContext.Set<StoredUser>()
+            .Include(u => u.Currency)
+            .FirstOrDefaultAsync(u => u.Id == id && !u.IsDeleted, cancellationToken);
 
         if (storedUser is null)
         {

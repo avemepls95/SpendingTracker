@@ -25,5 +25,7 @@ namespace SpendingTracker.Infrastructure.Abstractions.Repositories
             Guid spendingId,
             Category[] categories,
             CancellationToken cancellationToken = default);
+
+        Task DeleteLastUserSpending(UserKey userId, CancellationToken cancellationToken = default);
     }
 }

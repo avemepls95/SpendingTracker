@@ -10,6 +10,6 @@ internal class ChangeUserCurrencyCommandValidator : AbstractValidator<ChangeUser
         RuleFor(c => c.UserId).NotEmpty();
         RuleFor(c => c.UserId.Value).NotEmpty();
 
-        RuleFor(c => c.CurrenctCode).NotEmpty();
+        RuleFor(c => c.CurrencyCode).NotEmpty();
     }
 }

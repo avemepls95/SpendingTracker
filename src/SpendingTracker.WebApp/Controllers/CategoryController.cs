@@ -21,7 +21,7 @@ namespace SpendingTracker.WebApp.Controllers;
 [ApiController]
 [Route("api/v1/category")]
 [Authorize(AuthenticationSchemes = BearerAuth.SchemeName)]
-public class CategoryController : Controller
+public class CategoryController : BaseController
 {
     private readonly IMediator _mediator;
     
@@ -86,13 +86,5 @@ public class CategoryController : Controller
         return _mediator.SendQueryAsync<GetUserCategoriesQuery, GetUserCategoriesResponseItem[]>(
             query,
             cancellationToken);
-    }
-
-    private UserKey GetCurrentUserId()
-    {
-        var userIdAsString = User.Claims.First(c => c.Type == "Id").Value;
-        var result = UserKey.Parse(userIdAsString);
-
-        return result;
     }
 }

@@ -6,5 +6,5 @@ namespace SpendingTracker.Application.Handlers.UserCurrency.ChangeUserCurrency.C
 public class ChangeUserCurrencyCommand : ICommand
 {
     public UserKey UserId { get; init; }
-    public string CurrenctCode { get; init; }
+    public string CurrencyCode { get; init; }
 }

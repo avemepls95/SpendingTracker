@@ -28,7 +28,8 @@ public class Button
         ButtonGroup navigationGroupByClick,
         ButtonGroup group,
         bool shouldEditPreviousMessage = true,
-        string? id = null)
+        ButtonContent.ButtonContent? content = null,
+        ButtonOperation? operation = null)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
@@ -49,9 +50,14 @@ public class Button
             CurrentGroupId = group.Id,
         };
 
-        if (id is not null)
+        if (content is not null)
         {
-            clickHandleData.Id = id;
+            clickHandleData.Content = content.Serialize();
+        }
+
+        if (operation is not null)
+        {
+            clickHandleData.Operation = operation;
         }
         
         TelegramButton = InlineKeyboardButton.WithCallbackData(title, clickHandleData.Serialize());

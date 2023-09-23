@@ -1,8 +1,7 @@
 ﻿namespace SpendingTracker.TelegramBot.Internal.Buttons;
 
-public enum ButtonsGroupOperation
+public enum ButtonOperation
 {
     None = 0,
-    CreateSpending,
-    ChangeCurrency
+    DeleteLastSpending,
 }

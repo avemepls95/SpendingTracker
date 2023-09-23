@@ -66,8 +66,7 @@ internal class CurrencyBackgroundService : BackgroundService
 
     private Task DelayToNextDay(DateTimeOffset now, CancellationToken cancellationToken)
     {
-        var tomorrowDate = now.Date.AddDays(1);
-        var remainingFromNextDayTimeSpan = tomorrowDate - now;
+        var remainingFromNextDayTimeSpan = TimeSpan.FromHours(24) - now.TimeOfDay;
         var delayTimeSpan = remainingFromNextDayTimeSpan.Add(TimeSpan.FromMinutes(10));
         return Task.Delay(delayTimeSpan, cancellationToken);
     }

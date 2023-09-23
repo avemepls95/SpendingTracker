@@ -2,8 +2,8 @@
 
 public class RecursiveButtonGroup : ButtonGroup
 {
-    public RecursiveButtonGroup(int id, ButtonsGroupOperation operation, string? text = null)
-        : base(id, operation, text)
+    public RecursiveButtonGroup(int id, ButtonsGroupType type, string? text = null)
+        : base(id, type, text)
     {
         Next = this;
     }

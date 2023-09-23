@@ -111,5 +111,15 @@ namespace SpendingTracker.Infrastructure.Repositories
             });
             spending.CategoryLinks!.AddRange(newCategoryLinks);
         }
+
+        public async Task DeleteLastUserSpending(UserKey userId, CancellationToken cancellationToken)
+        {
+            var lastUserSpending = await _dbContext.Set<StoredSpending>()
+                .Where(s => !s.IsDeleted && s.CreatedBy == userId)
+                .OrderByDescending(s => s.CreatedDate)
+                .FirstAsync(cancellationToken);
+
+            lastUserSpending.IsDeleted = true;
+        }
     }
 }

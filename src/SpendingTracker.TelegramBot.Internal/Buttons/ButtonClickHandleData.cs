@@ -6,17 +6,20 @@ namespace SpendingTracker.TelegramBot.Internal.Buttons;
 [Serializable]
 public record ButtonClickHandleData
 {
-    [JsonProperty("cg")]
+    [JsonProperty("1")]
     public int CurrentGroupId { get; init; }
 
-    [JsonProperty("ng")]
+    [JsonProperty("2")]
     public int NextGroupId { get; init; }
 
-    [JsonProperty("S")]
+    [JsonProperty("3")]
     public bool ShouldReplacePrevious { get; init; }
     
-    [JsonProperty("i")]
-    public string Id { get; set; }
+    [JsonProperty("4")]
+    public string? Content { get; set; }
+
+    [JsonProperty("5")]
+    public ButtonOperation? Operation { get; set; }
 
     public string Serialize()
     {

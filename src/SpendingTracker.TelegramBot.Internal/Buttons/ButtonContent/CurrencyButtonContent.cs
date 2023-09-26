@@ -1,8 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿namespace SpendingTracker.TelegramBot.Internal.Buttons.ButtonContent;
 
-namespace SpendingTracker.TelegramBot.Internal.Buttons.ButtonContent;
-
-[Serializable]
 public class CurrencyButtonContent : ButtonContent
 {
     public CurrencyButtonContent(string code, string countryIcon)
@@ -11,20 +8,22 @@ public class CurrencyButtonContent : ButtonContent
         CountryIcon = countryIcon;
     }
 
-    [JsonProperty("c")]
     public string Code { get; }
-
-    [JsonProperty("i")]
     public string CountryIcon { get; }
     
     public static CurrencyButtonContent Deserialize(string data)
     {
-        var result = JsonConvert.DeserializeObject<CurrencyButtonContent>(data);
-        if (result == null)
-        {
-            throw new ArgumentException("Не удалось десериализовать объект");
-        }
+        var propertiesAsString = data.Split(",");
+        var code = propertiesAsString[0];
+        var countryIcon = propertiesAsString[1];
+
+        var result = new CurrencyButtonContent(code, countryIcon);
         
         return result;
+    }
+
+    public override string Serialize()
+    {
+        return $"{Code},{CountryIcon}";
     }
 }

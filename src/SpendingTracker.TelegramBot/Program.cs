@@ -178,14 +178,14 @@ async Task HandleButton(CallbackQuery query, CancellationToken cancellationToken
         return;
     }
 
-    var currentGroup = await buttonsGroupManager.GetById(buttonClickHandleData.CurrentGroupId);
-    if (currentGroup.Type == ButtonsGroupType.ChangeCurrency
-        && buttonClickHandleData.Content is not null)
+    if (currentButtonsGroup.Type == ButtonsGroupType.ChangeCurrency
+        && !string.IsNullOrWhiteSpace(buttonClickHandleData.Content))
     {
         var currencyButtonContent = CurrencyButtonContent.Deserialize(buttonClickHandleData.Content);
         var selectedCurrencyCode = currencyButtonContent.Code;
         var selectedCurrencyCountryCode = currencyButtonContent.CountryIcon;
         await gatewayService.ChangeUserCurrency(userId, selectedCurrencyCode, cancellationToken);
+        await bot.DeleteMessageAsync(query.Message!.Chat.Id, query.Message.MessageId, cancellationToken: cancellationToken);
         await bot.SendTextMessageAsync(
             userId,
             $"Валюта {selectedCurrencyCountryCode}{selectedCurrencyCode} выбрана в качестве валюты по-умолчанию",
@@ -201,7 +201,7 @@ async Task HandleButton(CallbackQuery query, CancellationToken cancellationToken
     }
 
     var nextGroupId = buttonClickHandleData.NextGroupId;
-    var nextGroup = await buttonsGroupManager.GetById(nextGroupId);
+    var nextGroup = await buttonsGroupManager.ConstructById(nextGroupId, currentButtonsGroup.Id);
     if (buttonClickHandleData.ShouldReplacePrevious)
     {
         await bot.EditMessageTextAsync(

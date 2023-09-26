@@ -33,7 +33,7 @@ internal class ButtonsGroupManager : IButtonsGroupManager
         var settingsGroup = new ButtonGroup(_incrementalGroupId++, "Выберите настройку");
         settingsGroup
             .AddButtonsLayer(new Button("Валюта", CurrenciesGroup, settingsGroup))
-            .AddButtonsLayer(new Button("Назад", StartGroup, settingsGroup));
+            .AddButtonsLayer(new Button("В меню", StartGroup, settingsGroup));
 
         var createAnotherSpendingGroup = new RecursiveButtonGroup(_incrementalGroupId++, ButtonsGroupType.CreateAnotherSpending);
         var createSpendingGroup = new ButtonGroup(_incrementalGroupId++, ButtonsGroupType.CreateSpending, next: createAnotherSpendingGroup);
@@ -71,7 +71,7 @@ internal class ButtonsGroupManager : IButtonsGroupManager
         };
     }
 
-    public async Task<ButtonGroup> GetById(int id)
+    public async Task<ButtonGroup> ConstructById(int id, int? returnGroupId)
     {
         var targetButtonGroup = _groups.FirstOrDefault(g => g.Id == id);
         if (targetButtonGroup is null)
@@ -83,14 +83,25 @@ internal class ButtonsGroupManager : IButtonsGroupManager
         {
             targetButtonGroup.ClearButtons();
 
+            var returnGroup = StartGroup;
+
+            if (returnGroupId is not null)
+            {
+                returnGroup = _groups.FirstOrDefault(g => g.Id == returnGroupId);
+                if (returnGroup is null)
+                {
+                    throw new ArgumentException($"Не найдена группа кнопок с идентификатором {id}");
+                }
+            }
+            
             var telegramUserId = _telegramUserIdStore.Id!.Value;
-            var currencyButtons = await GetCurrencyButtonsForUser(telegramUserId);
+            var currencyButtons = await GetCurrencyButtonsForUser(telegramUserId, returnGroup);
             foreach (var currencyButton in currencyButtons)
             {
                 targetButtonGroup.AddButtonsLayer(currencyButton);
             }
-
-            targetButtonGroup.AddButtonsLayer(new Button("В меню", StartGroup, targetButtonGroup));
+            
+            targetButtonGroup.AddButtonsLayer(new Button("Назад", returnGroup, targetButtonGroup));
         }
 
         if (targetButtonGroup.Type == ButtonsGroupType.CreateAnotherSpending)
@@ -100,7 +111,7 @@ internal class ButtonsGroupManager : IButtonsGroupManager
 
             var text = string.Join(Environment.NewLine,
                 $"Трата добавлена. Введите следующую, если необходимо",
-                "-----------------------------------------------------------------------------------------",
+                "-----------------------------------------",
                 $"Текущая валюта: {user.Currency.CountryIcon}{user.Currency.Code}");
             targetButtonGroup.SetText(text);
         }
@@ -108,7 +119,7 @@ internal class ButtonsGroupManager : IButtonsGroupManager
         return targetButtonGroup;
     }
     
-    private async Task<Button[]> GetCurrencyButtonsForUser(long telegramUserId)
+    private async Task<Button[]> GetCurrencyButtonsForUser(long telegramUserId, ButtonGroup returnGroup)
     {
         var user = await _userRepository.GetByTelegramId(telegramUserId);
         var currencies = await _currencyRepository.GetAll();
@@ -119,7 +130,7 @@ internal class ButtonsGroupManager : IButtonsGroupManager
             .Select(c => 
                 new Button(
                     $"{c.CountryIcon}{c.Code} ({c.Title})",
-                    StartGroup,
+                    returnGroup,
                     CurrenciesGroup,
                     shouldEditPreviousMessage: false,
                     content: new CurrencyButtonContent(c.Code, c.CountryIcon)))

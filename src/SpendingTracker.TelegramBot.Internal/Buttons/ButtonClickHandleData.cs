@@ -1,37 +1,47 @@
-﻿using System.Text.Json;
-using Newtonsoft.Json;
+﻿using System.Text;
 
 namespace SpendingTracker.TelegramBot.Internal.Buttons;
 
-[Serializable]
 public record ButtonClickHandleData
 {
-    [JsonProperty("1")]
     public int CurrentGroupId { get; init; }
-
-    [JsonProperty("2")]
     public int NextGroupId { get; init; }
-
-    [JsonProperty("3")]
     public bool ShouldReplacePrevious { get; init; }
-    
-    [JsonProperty("4")]
     public string? Content { get; set; }
-
-    [JsonProperty("5")]
     public ButtonOperation? Operation { get; set; }
 
     public string Serialize()
     {
-        return JsonConvert.SerializeObject(this);
+        var shouldReplacePreviousAsString = ShouldReplacePrevious ? "1" : "0";
+        var resultBuilder = new StringBuilder($"{CurrentGroupId};{NextGroupId};{shouldReplacePreviousAsString};{Content}");
+
+        if (Operation.HasValue)
+        {
+            resultBuilder.Append($";{(int)Operation}");
+        }
+
+        return resultBuilder.ToString();
     }
     
     public static ButtonClickHandleData Deserialize(string data)
     {
-        var result = JsonConvert.DeserializeObject<ButtonClickHandleData>(data);
-        if (result == null)
+        var propertiesAsString = data.Split(";");
+        var currentGroupId = int.Parse(propertiesAsString[0]);
+        var nextGroupId = int.Parse(propertiesAsString[1]);
+        var shouldReplacePrevious = int.Parse(propertiesAsString[2]) == 1;
+        var content = propertiesAsString[3];
+
+        var result = new ButtonClickHandleData
         {
-            throw new ArgumentException("Не удалось десериализовать объект");
+            CurrentGroupId = currentGroupId,
+            NextGroupId = nextGroupId,
+            ShouldReplacePrevious = shouldReplacePrevious,
+            Content = content
+        };
+
+        if (propertiesAsString.Length > 4)
+        {
+            result.Operation = (ButtonOperation)int.Parse(propertiesAsString[4]);
         }
         
         return result;

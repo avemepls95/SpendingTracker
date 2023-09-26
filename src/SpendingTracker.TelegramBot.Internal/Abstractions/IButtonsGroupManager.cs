@@ -5,5 +5,5 @@ namespace SpendingTracker.TelegramBot.Internal.Abstractions;
 public interface IButtonsGroupManager
 {
     public ButtonGroup StartGroup { get; }
-    Task<ButtonGroup> GetById(int id);
+    Task<ButtonGroup> ConstructById(int id, int? returnGroupId = null);
 }

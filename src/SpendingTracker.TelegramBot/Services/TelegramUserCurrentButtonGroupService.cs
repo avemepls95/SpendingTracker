@@ -25,7 +25,7 @@ internal class TelegramUserCurrentButtonGroupService : ITelegramUserCurrentButto
     public async Task<ButtonGroup> GetGroupByUserId(long id, CancellationToken cancellationToken)
     {
         var groupId = await _telegramUserCurrentButtonGroupRepository.GetIdByUserId(id, cancellationToken);
-        var group = await _buttonsGroupManager.GetById(groupId);
+        var group = await _buttonsGroupManager.ConstructById(groupId);
         return group;
     }
 

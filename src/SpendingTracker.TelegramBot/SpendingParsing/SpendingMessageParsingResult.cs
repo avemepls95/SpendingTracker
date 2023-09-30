@@ -2,21 +2,30 @@
 
 public class SpendingMessageParsingResult
 {
-    public double Amount { get; }
-    public DateTimeOffset? Date { get; }
-    public string Description { get; }
+    public bool IsSuccess { get; init; }
+    public double Amount { get; private init; }
+    public DateTimeOffset? Date { get; private init; }
+    public string Description { get; private init; }
 
-    public string ErrorMessage { get; set; }
+    public string? ErrorMessage { get; private init; }
 
-    public SpendingMessageParsingResult(string errorMessage)
+    public static SpendingMessageParsingResult Fail(string? errorMessage)
     {
-        ErrorMessage = errorMessage;
+        return new SpendingMessageParsingResult
+        {
+            IsSuccess = false,
+            ErrorMessage = errorMessage
+        };
     }
 
-    public SpendingMessageParsingResult(double amount, string description, DateTimeOffset? date = null)
+    public static SpendingMessageParsingResult Success(double amount, string description, DateTimeOffset? date = null)
     {
-        Amount = amount;
-        Description = description;
-        Date = date;
+        return new SpendingMessageParsingResult
+        {
+            IsSuccess = true,
+            Amount = amount,
+            Description = description,
+            Date = date
+        };
     }
 }

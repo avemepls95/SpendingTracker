@@ -2,5 +2,5 @@
 
 public interface ISpendingMessageParser
 {
-    bool TryParse(string message, out SpendingMessageParsingResult? result);
+    SpendingMessageParsingResult Parse(string message);
 }

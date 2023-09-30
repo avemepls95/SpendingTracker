@@ -27,7 +27,8 @@ internal class SpendingFactory : ISpendingFactory
             storedSpending.Id,
             storedSpending.Amount,
             currency,
-            storedSpending.Date,
+            DateTime.Now, 
+            // storedSpending.Date,
             storedSpending.Description,
             storedSpending.ActionSource,
             storedSpending.CreatedDate);

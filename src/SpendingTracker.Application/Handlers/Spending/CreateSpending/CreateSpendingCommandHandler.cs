@@ -29,7 +29,7 @@ internal class CreateSpendingCommandHandler : CommandHandler<CreateSpendingComma
             Guid.NewGuid(),
             command.Amount,
             user.Currency,
-            command.Date,
+            command.Date.ToUniversalTime(),
             command.Description,
             command.ActionSource);
 

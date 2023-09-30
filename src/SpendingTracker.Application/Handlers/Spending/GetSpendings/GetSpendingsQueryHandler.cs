@@ -26,7 +26,6 @@ internal class GetSpendingsQueryHandler : QueryHandler<GetSpendingsQuery, GetSpe
 
         var result = spendings
             .Select(SpendingConverter.ConvertToDto)
-            .OrderByDescending(s => s.Date)
             .ToArray();
 
         return result;

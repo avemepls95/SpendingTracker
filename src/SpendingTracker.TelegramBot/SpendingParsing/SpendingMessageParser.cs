@@ -1,10 +1,10 @@
-﻿using System.Globalization;
+﻿using SpendingTracker.TelegramBot.SpendingParsing.Internal;
 
 namespace SpendingTracker.TelegramBot.SpendingParsing;
 
 public class SpendingMessageParser : ISpendingMessageParser
 {
-    public bool TryParse(string message, out SpendingMessageParsingResult result)
+    public SpendingMessageParsingResult Parse(string message)
     {
         var lines = message.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
         if (lines.Length < 2)
@@ -12,53 +12,45 @@ public class SpendingMessageParser : ISpendingMessageParser
             lines = message.Split("\n", StringSplitOptions.RemoveEmptyEntries);
             if (lines.Length < 2)
             {
-                result = new SpendingMessageParsingResult("Недостаточно данных. Проверьте корректность указанных данных");
-                return false;    
+                return SpendingMessageParsingResult.Fail(
+                    "Недостаточно данных. Как минимум, должны быть указаны сумма и описание траты на разных строках");
             }
         }
 
-        var dateFormats = new[]
+        if (lines.Length > 3)
         {
-            "d/M/yyyy", "dd/M/yyyy", "d/MM/yyyy", "dd/MM/yyyy",
-            "d/M/yy", "dd/M/yy", "d/MM/yy", "dd/MM/yy",
-            "d.M.yyyy", "dd.M.yyyy", "d.MM.yyyy", "dd.MM.yyyy",
-            "d.M.yy", "dd.M.yy", "d.MM.yy", "dd.MM.yy"
-        };
-        var dateLines = lines.Where(l => DateTimeOffset.TryParseExact(l, dateFormats, null, DateTimeStyles.None, out _)).ToArray();
-        if (dateLines.Length > 1)
-        {
-            result = new SpendingMessageParsingResult("Количество дат больше одной. Требуется одна дата в качестве даты траты");
-            return false;
+            return SpendingMessageParsingResult.Fail("Слишком много строк с данными.");
         }
 
-        var amountLines = lines.Where(l => double.TryParse(l, out _)).ToArray();
-        if (amountLines.Length != 1)
+        var amountLine = lines[0];
+        var amountParseResult = SpendingMessagePartParser.ParseAmount(amountLine);
+        if (!amountParseResult.IsSuccess)
         {
-            result = new SpendingMessageParsingResult("Некорректное количество сумм. Числовое значение суммы траты должно быть одно");
-            return false;
+            return SpendingMessageParsingResult.Fail(amountParseResult.ErrorMessage);
         }
-      
-        var descriptionLines = lines
-            .Where(l =>
-                !double.TryParse(l, out _)
-                && !float.TryParse(l, out _)
-                && !DateTimeOffset.TryParseExact(l, dateFormats, null, DateTimeStyles.None, out _)
-                && !TimeSpan.TryParse(l, out _))
-            .ToArray();
-        if (descriptionLines.Length != 1)
-        {
-            result = new SpendingMessageParsingResult("Некорректное количество описаний. Описание траты должно быть одно (на одной строке)");
-            return false;
-        }
-
-        var date = dateLines.Any()
-            ? DateTimeOffset.ParseExact(dateLines.First(), dateFormats, null, DateTimeStyles.None).ToUniversalTime()
-            : null as DateTimeOffset?;
         
-        var amount = double.Parse(amountLines.First());
-        var description = descriptionLines.First();
+        var descriptionLine = lines[1];
+        var descriptionParseResult = SpendingMessagePartParser.ParseDescription(descriptionLine);
+        if (!descriptionParseResult.IsSuccess)
+        {
+            return SpendingMessageParsingResult.Fail(descriptionParseResult.ErrorMessage);
+        }
 
-        result = new SpendingMessageParsingResult(amount, description, date);
-        return true;
+        if (lines.Length == 2)
+        {
+            return SpendingMessageParsingResult.Success(amountParseResult.Result, descriptionParseResult.Result);
+        }
+        
+        var dateLine = lines[2];
+        var dateParseResult = SpendingMessagePartParser.ParseDate(dateLine);
+        if (!dateParseResult.IsSuccess)
+        {
+            return SpendingMessageParsingResult.Fail(dateParseResult.ErrorMessage);
+        }
+
+        return SpendingMessageParsingResult.Success(
+            amountParseResult.Result,
+            descriptionParseResult.Result,
+            dateParseResult.Result);
     }
 }

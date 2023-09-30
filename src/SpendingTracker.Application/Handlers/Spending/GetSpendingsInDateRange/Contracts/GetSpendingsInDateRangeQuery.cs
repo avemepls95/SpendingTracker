@@ -6,6 +6,6 @@ namespace SpendingTracker.Application.Handlers.Spending.GetSpendingsInDateRange.
 public class GetSpendingsInDateRangeQuery : IQuery<GetSpendingsInDateRangeResponse>
 {
     public UserKey UserId { get; set; }
-    public DateTimeOffset DateFrom { get; set; }
-    public DateTimeOffset DateTo { get; set; }
+    public DateOnly DateFrom { get; set; }
+    public DateOnly DateTo { get; set; }
 }

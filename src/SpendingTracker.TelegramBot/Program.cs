@@ -115,19 +115,24 @@ async Task HandleMessage(Message msg, CancellationToken cancellationToken)
         {
             case ButtonsGroupType.CreateSpending:
             case ButtonsGroupType.CreateAnotherSpending:
-                var spendingParseResult = spendingMessageParser.TryParse(messageText, out var parsingResult);
-                if (!spendingParseResult)
+                var spendingMessageParsingResult = spendingMessageParser.Parse(messageText);
+                if (!spendingMessageParsingResult.IsSuccess)
                 {
-                    await bot.SendTextMessageAsync(user.Id, parsingResult.ErrorMessage, entities: msg.Entities, cancellationToken: cancellationToken);
+                    await bot.SendTextMessageAsync(
+                        user.Id,
+                        spendingMessageParsingResult.ErrorMessage,
+                        entities: msg.Entities,
+                        cancellationToken: cancellationToken);
+
                     return;
                 }
 
                 var request = new CreateSpendingRequest
                 {
-                    Amount = parsingResult.Amount,
+                    Amount = spendingMessageParsingResult.Amount,
                     TelegramUserId = userId,
-                    Date = parsingResult.Date ?? DateTimeOffset.UtcNow,
-                    Description = parsingResult.Description
+                    Date = spendingMessageParsingResult.Date ?? DateTimeOffset.UtcNow,
+                    Description = spendingMessageParsingResult.Description
                 };
                 await gatewayService.CreateSpendingAsync(request, cancellationToken);
 

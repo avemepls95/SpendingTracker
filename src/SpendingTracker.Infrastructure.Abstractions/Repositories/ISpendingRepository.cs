@@ -10,8 +10,8 @@ namespace SpendingTracker.Infrastructure.Abstractions.Repositories
 
         Task<Spending[]> GetUserSpendingsInRange(
             UserKey userKey,
-            DateTimeOffset dateFrom,
-            DateTimeOffset dateTo,
+            DateOnly dateFrom,
+            DateOnly dateTo,
             CancellationToken cancellationToken = default);
 
         Task<Spending[]> GetUserSpendings(

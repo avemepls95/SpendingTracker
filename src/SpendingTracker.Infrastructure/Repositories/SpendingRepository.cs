@@ -37,8 +37,8 @@ namespace SpendingTracker.Infrastructure.Repositories
 
         public async Task<Spending[]> GetUserSpendingsInRange(
             UserKey userKey,
-            DateTimeOffset dateFrom,
-            DateTimeOffset dateTo,
+            DateOnly dateFrom,
+            DateOnly dateTo,
             CancellationToken cancellationToken)
         {
             var dbSpendings = await _dbContext.Set<StoredSpending>()
@@ -50,8 +50,8 @@ namespace SpendingTracker.Infrastructure.Repositories
                 .Where(s =>
                     !s.IsDeleted
                     && s.CreatedBy == userKey
-                    && dateFrom < s.Date
-                    && s.Date < dateTo)
+                    && dateFrom.DayNumber < s.Date.Day
+                    && s.Date.Day + 1 < dateTo.DayNumber)
                 .ToArrayAsync(cancellationToken);
             
             var result = dbSpendings
@@ -70,7 +70,7 @@ namespace SpendingTracker.Infrastructure.Repositories
             var dbSpendings = await _dbContext.Set<StoredSpending>()
                 .Include(s => s.Currency)
                 .Where(s => !s.IsDeleted && s.CreatedBy == userKey)
-                .OrderBy(s => s.CreatedDate)
+                .OrderByDescending(s => s.Date)
                 .Skip(offset)
                 .Take(count)
                 .ToArrayAsync(cancellationToken);

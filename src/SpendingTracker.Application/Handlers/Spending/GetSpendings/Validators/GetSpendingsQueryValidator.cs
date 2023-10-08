@@ -9,8 +9,8 @@ internal class GetSpendingsQueryValidator : AbstractValidator<GetSpendingsQuery>
     {
         RuleFor(q => q.UserId).NotEmpty();
         RuleFor(q => q.UserId.Value).NotEmpty();
-
-        RuleFor(q => q.Offset).NotEmpty();
+        
+        RuleFor(q => q.Offset).Must(o => o >= 0);
         RuleFor(q => q.Count).NotEmpty();
     }
 }

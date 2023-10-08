@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SpendingTracker.GenericSubDomain.Common;
 using SpendingTracker.GenericSubDomain.User;
 using SpendingTracker.GenericSubDomain.User.Abstractions;
 using SpendingTracker.GenericSubDomain.User.Internal;
@@ -8,7 +9,9 @@ namespace SpendingTracker.GenericSubDomain
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddGenericSubDomain(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddGenericSubDomain(
+            this IServiceCollection services,
+            IConfiguration configuration)
         {
             var systemUserContextOptions = configuration.GetSection(nameof(SystemUserContextOptions));
             services.Configure<SystemUserContextOptions>(systemUserContextOptions);
@@ -23,6 +26,8 @@ namespace SpendingTracker.GenericSubDomain
 
             services.AddScoped<ITelegramUserIdStore, TelegramUserIdStore>();
             services.AddScoped<IUserContextFactoryProvider, UserContextFactoryProvider>();
+
+            services.AddSingleton<IJsonSerializer, NewtonsoftJsonSerializer>();
 
             return services;
         }

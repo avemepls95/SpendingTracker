@@ -1,6 +1,4 @@
-﻿using SpendingTracker.Common.Primitives;
-
-namespace SpendingTracker.WebApp.Contracts.DeleteCategory;
+﻿namespace SpendingTracker.WebApp.Contracts.DeleteCategory;
 
 public class DeleteCategoryRequest
 {

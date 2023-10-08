@@ -8,7 +8,6 @@ using SpendingTracker.Dispatcher.Extensions;
 using SpendingTracker.Domain;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
 using SpendingTracker.TelegramBot.Internal.Abstractions;
-using SpendingTracker.TelegramBot.Internal.Buttons;
 using SpendingTracker.TelegramBot.Services.Abstractions;
 using SpendingTracker.TelegramBot.Services.Model;
 using Telegram.Bot;
@@ -100,7 +99,11 @@ public class GatewayService
     public async Task DeleteLastSpending(long telegramUserId, CancellationToken cancellationToken)
     {
         var userId = await _userRepository.GetIdByTelegramId(telegramUserId, cancellationToken);
-        var command = new DeleteLastSpendingCommand { UserId = userId };
+        var command = new DeleteLastSpendingCommand
+        {
+            UserId = userId,
+            ActionSource = ActionSource.Telegram
+        };
 
         await _mediator.SendCommandAsync(command, cancellationToken);
     }

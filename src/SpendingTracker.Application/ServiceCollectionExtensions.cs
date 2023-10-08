@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SpendingTracker.Application.ExceptionDescriptors;
 using SpendingTracker.Application.Factories;
 using SpendingTracker.Application.Factories.Abstractions;
 using SpendingTracker.CurrencyRate;
@@ -11,6 +12,7 @@ namespace SpendingTracker.Application
         {
             services
                 .AddSingleton<ICategoryFactory, CategoryFactory>()
+                .AddExceptionDescriptors()
                 .AddCurrencyRates();
 
             return services;

@@ -1,4 +1,4 @@
-﻿namespace SpendingTracker.Infrastructure.Abstractions.Model.Categories;
+﻿namespace SpendingTracker.Infrastructure.Abstractions.Models.Stored.Categories;
 
 public class CategoriesLink
 {

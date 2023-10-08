@@ -1,6 +1,6 @@
 ﻿using SpendingTracker.Common.Primitives;
 
-namespace SpendingTracker.Infrastructure.Abstractions.Model.Categories;
+namespace SpendingTracker.Infrastructure.Abstractions.Models.Stored.Categories;
 
 public class StoredCategory : EntityObject<StoredCategory, Guid>
 {

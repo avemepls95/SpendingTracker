@@ -1,7 +1,6 @@
 ﻿using SpendingTracker.Common.Primitives;
-using SpendingTracker.Infrastructure.Abstractions.Model.Categories;
 
-namespace SpendingTracker.Infrastructure.Abstractions.Model;
+namespace SpendingTracker.Infrastructure.Abstractions.Models;
 
 public class StoredUser : EntityObject<StoredUser, UserKey>
 {

@@ -1,10 +1,12 @@
-﻿using SpendingTracker.Common.Primitives;
-using SpendingTracker.Dispatcher.DataTransfer.Dispatcher.Interfaces;
+﻿using SpendingTracker.Application.Handlers.Common;
+using SpendingTracker.Common.Primitives;
+using SpendingTracker.Domain;
 
 namespace SpendingTracker.Application.Handlers.Category.DeleteCategory.Contracts;
 
-public class DeleteCategoryCommand : ICommand
+public class DeleteCategoryCommand : ISpendingTrackerCommand
 {
-    public UserKey InitiatorId { get; set; }
-    public Guid Id { get; set; }
+    public UserKey InitiatorId { get; init; }
+    public Guid Id { get; init; }
+    public ActionSource ActionSource { get; init; }
 }

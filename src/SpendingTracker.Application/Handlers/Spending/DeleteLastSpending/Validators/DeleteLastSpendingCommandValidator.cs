@@ -8,5 +8,6 @@ internal sealed class DeleteLastSpendingCommandValidator : AbstractValidator<Del
     public DeleteLastSpendingCommandValidator()
     {
         RuleFor(c => c.UserId).NotEmpty();
+        RuleFor(c => c.ActionSource).NotEmpty();
     }
 }

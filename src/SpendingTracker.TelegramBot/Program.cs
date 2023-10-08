@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using SpendingTracker.Application;
 using SpendingTracker.Dispatcher.Extensions;
 using SpendingTracker.GenericSubDomain;
@@ -131,7 +130,7 @@ async Task HandleMessage(Message msg, CancellationToken cancellationToken)
                 {
                     Amount = spendingMessageParsingResult.Amount,
                     TelegramUserId = userId,
-                    Date = spendingMessageParsingResult.Date ?? DateTimeOffset.UtcNow,
+                    Date = spendingMessageParsingResult.Date ?? DateTimeOffset.UtcNow.UtcDateTime,
                     Description = spendingMessageParsingResult.Description
                 };
                 await gatewayService.CreateSpendingAsync(request, cancellationToken);
@@ -244,6 +243,7 @@ IServiceProvider InitializeDependencies()
             services.AddLogging(configure => configure.AddConsole())
                 .AddInfrastructure(configuration)
                 .AddDispatcher(assembliesForScan)
+                .AddFluentValidation(assembliesForScan)
                 .AddGenericSubDomain(configuration)
                 .AddMemoryCache()
                 .AddServices()

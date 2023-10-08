@@ -4,5 +4,5 @@ public enum ActionSource
 {
     None = 0,
     Telegram,
-    Site
+    Api
 }

@@ -1,10 +1,14 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SpendingTracker.Application.Handlers.Spending.DeleteSpending.Contracts;
 using SpendingTracker.Application.Handlers.Spending.GetSpendings.Contracts;
+using SpendingTracker.Application.Handlers.Spending.UpdateSpending.Contracts;
 using SpendingTracker.BearerTokenAuth;
-using SpendingTracker.Common.Primitives;
 using SpendingTracker.Dispatcher.Extensions;
+using SpendingTracker.Domain;
+using SpendingTracker.WebApp.Contracts.DeleteSpending;
+using SpendingTracker.WebApp.Contracts.UpdateSpending;
 
 namespace SpendingTracker.WebApp.Controllers;
 
@@ -36,5 +40,33 @@ public class SpendingController : BaseController
         return _mediator.SendQueryAsync<GetSpendingsQuery, GetSpendingsResponseItem[]>(
             query,
             cancellationToken);
+    }
+    
+    [HttpPost("delete")]
+    public Task Delete([FromBody] DeleteSpendingRequest request, CancellationToken cancellationToken)
+    {
+        var command = new DeleteSpendingCommand
+        {
+            Id = request.Id,
+            ActionSource = ActionSource.Api
+        };
+
+        return _mediator.SendCommandAsync(command, cancellationToken);
+    }
+    
+    [HttpPost("update")]
+    public Task Delete([FromBody] UpdateSpendingRequest request, CancellationToken cancellationToken)
+    {
+        var command = new UpdateSpendingCommand
+        {
+            Id = request.Id,
+            Amount = request.Amount,
+            Date = request.Date,
+            Description = request.Description,
+            CurrencyId = request.CurrencyId,
+            ActionSource = ActionSource.Api
+        };
+
+        return _mediator.SendCommandAsync(command, cancellationToken);
     }
 }

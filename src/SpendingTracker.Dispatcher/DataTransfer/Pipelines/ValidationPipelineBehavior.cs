@@ -1,9 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using FluentValidation;
-using FluentValidation.Results;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using SpendingTracker.Common;
 using SpendingTracker.Dispatcher.DataTransfer.Dispatcher.Interfaces;
 
 namespace SpendingTracker.Dispatcher.DataTransfer.Pipelines
@@ -27,15 +25,16 @@ namespace SpendingTracker.Dispatcher.DataTransfer.Pipelines
             RequestHandlerDelegate<TResponse> next,
             CancellationToken cancellationToken)
         {
-            if (!(request is IValidated validateObject))
+            if (request is not IValidated validateObject)
                 return await next();
 
             IEnumerable<IValidator> validators = GetValidators(validateObject.InnerRequest);
 
             foreach (var validator in validators)
             {
-                ValidationResult validationResult = await validator.ValidateAsync(
-                    validateObject.InnerRequest,
+                var validationContext = new ValidationContext<dynamic>(validateObject.InnerRequest);
+                var validationResult = await validator.ValidateAsync(
+                    validationContext,
                     cancellationToken);
 
                 if (validationResult.IsValid)
@@ -47,7 +46,7 @@ namespace SpendingTracker.Dispatcher.DataTransfer.Pipelines
                     Environment.NewLine,
                     validationResult.Errors.Select(e => e.ErrorMessage));
 
-                throw new SpendingTrackerException(message);
+                throw new ValidationException(message);
             }
 
             return await next();

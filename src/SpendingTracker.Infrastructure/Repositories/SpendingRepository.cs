@@ -2,8 +2,9 @@
 using SpendingTracker.Common.Primitives;
 using SpendingTracker.Domain;
 using SpendingTracker.Domain.Categories;
-using SpendingTracker.Infrastructure.Abstractions.Model;
-using SpendingTracker.Infrastructure.Abstractions.Model.Categories;
+using SpendingTracker.Infrastructure.Abstractions.Models;
+using SpendingTracker.Infrastructure.Abstractions.Models.Request;
+using SpendingTracker.Infrastructure.Abstractions.Models.Stored.Categories;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
 using SpendingTracker.Infrastructure.Factories.Abstractions;
 
@@ -120,6 +121,38 @@ namespace SpendingTracker.Infrastructure.Repositories
                 .FirstAsync(cancellationToken);
 
             lastUserSpending.IsDeleted = true;
+        }
+
+        public async Task DeleteSpending(Guid spendingId, CancellationToken cancellationToken)
+        {
+            var lastUserSpending = await _dbContext.Set<StoredSpending>()
+                .Where(s => !s.IsDeleted && s.Id == spendingId)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (lastUserSpending == null)
+            {
+                throw new ArgumentException($"Не найдена трата с идентификатором {spendingId}");
+            }
+
+            lastUserSpending.IsDeleted = true;
+        }
+
+        public async Task UpdateSpending(UpdateSpendingModel model, CancellationToken cancellationToken)
+        {
+            var lastUserSpending = await _dbContext.Set<StoredSpending>()
+                .Where(s => !s.IsDeleted && s.Id == model.Id)
+                .OrderByDescending(s => s.CreatedDate)
+                .FirstAsync(cancellationToken);
+            
+            if (lastUserSpending == null)
+            {
+                throw new ArgumentException($"Не найдена трата с идентификатором {model.Id}");
+            }
+
+            lastUserSpending.CurrencyId = model.CurrencyId;
+            lastUserSpending.Amount = model.Amount;
+            lastUserSpending.Description = model.Description;
+            lastUserSpending.Date = model.Date;
         }
     }
 }

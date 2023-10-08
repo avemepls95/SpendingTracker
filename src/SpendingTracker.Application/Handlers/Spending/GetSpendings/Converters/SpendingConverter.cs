@@ -10,12 +10,7 @@ public static class SpendingConverter
         {
             Id = spending.Id,
             Amount = spending.Amount,
-            Currency = new CurrencyDto
-            {
-                Code = spending.Currency.Code,
-                FlagEmojiCode = spending.Currency.CountryIcon,
-                Description = spending.Description
-            },
+            CurrencyId = spending.Currency.Id,
             Date = spending.Date,
             Description = spending.Description,
             CreateDate = spending.CreatedDate

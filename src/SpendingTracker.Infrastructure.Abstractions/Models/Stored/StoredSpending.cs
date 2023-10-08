@@ -1,8 +1,8 @@
 ﻿using SpendingTracker.Common.Primitives;
 using SpendingTracker.Domain;
-using SpendingTracker.Infrastructure.Abstractions.Model.Categories;
+using SpendingTracker.Infrastructure.Abstractions.Models.Stored.Categories;
 
-namespace SpendingTracker.Infrastructure.Abstractions.Model;
+namespace SpendingTracker.Infrastructure.Abstractions.Models;
 
 public class StoredSpending : EntityObject<StoredSpending, Guid>
 {

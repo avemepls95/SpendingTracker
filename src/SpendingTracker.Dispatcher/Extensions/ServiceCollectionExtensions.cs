@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Reflection;
 using FluentValidation;
 using MediatR;
@@ -23,8 +22,6 @@ namespace SpendingTracker.Dispatcher.Extensions
 
         /// <summary>
         /// Добавление слоя промежуточной валидации с помощью FluentValidator
-        /// Пример использования:
-        /// school-medportal-integration-service / Common / Validators
         /// </summary>
         public static IServiceCollection AddFluentValidation(this IServiceCollection services, Assembly[] assembliesForScan)
         {

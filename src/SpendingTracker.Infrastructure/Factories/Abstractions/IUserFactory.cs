@@ -1,5 +1,5 @@
 ﻿using SpendingTracker.Domain;
-using SpendingTracker.Infrastructure.Abstractions.Model;
+using SpendingTracker.Infrastructure.Abstractions.Models;
 
 namespace SpendingTracker.Infrastructure.Factories.Abstractions;
 

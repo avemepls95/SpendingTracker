@@ -6,9 +6,9 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using SpendingTracker.Application;
 using SpendingTracker.Application.CustomFilters;
+using SpendingTracker.Application.Middleware.ExceptionHandling;
 using SpendingTracker.BearerTokenAuth;
 using SpendingTracker.CurrencyRate;
-using SpendingTracker.CurrencyRate.BackgroundServices;
 using SpendingTracker.Dispatcher.Extensions;
 using SpendingTracker.GenericSubDomain;
 using SpendingTracker.Infrastructure;
@@ -29,7 +29,8 @@ if (app.Environment.IsDevelopment())
 
 app
     .UseHttpsRedirection()
-    .UseAuthorization();
+    .UseAuthorization()
+    .UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapControllers();
 
@@ -41,7 +42,9 @@ static void ConfigureServices(IServiceCollection serviceCollection)
     var assembliesForScan = assemblyNamesForScan.Select(Assembly.Load).ToArray();
     var configuration = AppConfigurationBuilder.Build();
 
-    serviceCollection.AddDispatcher(assembliesForScan)
+    serviceCollection
+        .AddDispatcher(assembliesForScan)
+        .AddFluentValidation(assembliesForScan)
         .AddGenericSubDomain(configuration)
         .AddInfrastructure(configuration)
         .AddApplicationLayer()

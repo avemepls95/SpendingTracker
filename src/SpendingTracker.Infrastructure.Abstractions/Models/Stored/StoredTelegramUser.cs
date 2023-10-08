@@ -1,6 +1,6 @@
 ﻿using SpendingTracker.Common.Primitives;
 
-namespace SpendingTracker.Infrastructure.Abstractions.Model;
+namespace SpendingTracker.Infrastructure.Abstractions.Models;
 
 public class StoredTelegramUser : EntityObject<StoredTelegramUser, long>
 {

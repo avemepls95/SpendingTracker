@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SpendingTracker.Domain;
-using SpendingTracker.Infrastructure.Abstractions.Models;
+using SpendingTracker.Infrastructure.Abstractions.Models.Stored;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
 using SpendingTracker.Infrastructure.Factories.Abstractions;
 

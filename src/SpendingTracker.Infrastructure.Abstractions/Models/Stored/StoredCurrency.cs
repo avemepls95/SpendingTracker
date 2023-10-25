@@ -1,6 +1,6 @@
 ﻿using SpendingTracker.Common.Primitives;
 
-namespace SpendingTracker.Infrastructure.Abstractions.Models;
+namespace SpendingTracker.Infrastructure.Abstractions.Models.Stored;
 
 /// <summary>
 /// Валюта.

@@ -1,4 +1,4 @@
-﻿namespace SpendingTracker.Infrastructure.Abstractions.Models;
+﻿namespace SpendingTracker.Infrastructure.Abstractions.Models.Stored;
 
 public class StoredTelegramUserCurrentButtonGroup
 {

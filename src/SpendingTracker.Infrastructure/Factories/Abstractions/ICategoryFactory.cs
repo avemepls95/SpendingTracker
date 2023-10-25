@@ -5,5 +5,5 @@ namespace SpendingTracker.Infrastructure.Factories.Abstractions;
 
 internal interface ICategoryFactory
 {
-    Category Create(StoredCategory storedCategory);
+    Category Create(StoredCategory storedCategory, StoredSpendingCategoryLink[] userCategoryLinks = null);
 }

@@ -21,9 +21,9 @@ internal class StoredCategoryConfiguration : EntityObjectConfiguration<StoredCat
             .HasConversion(v => v.Value, v => new UserKey(v));
         
         builder.Property(e => e.Title).HasMaxLength(100);
-        builder.HasMany(c => c.ChildCategoryLinks)
-            .WithOne(l => l.Child);
-        builder.HasMany(c => c.ParentCategoryLinks)
-            .WithOne(l => l.Parent);
+        // builder.HasMany(c => c.ChildCategoryLinks)
+        //     .WithOne(l => l.Child);
+        // builder.HasMany(c => c.ParentCategoryLinks)
+        //     .WithOne(l => l.Parent);
     }
 }

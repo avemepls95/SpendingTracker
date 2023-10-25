@@ -1,6 +1,6 @@
 ﻿namespace SpendingTracker.Infrastructure.Abstractions.Models.Stored.Categories;
 
-public class SpendingCategoryLink
+public class StoredSpendingCategoryLink
 {
     public Guid SpendingId { get; set; }
 

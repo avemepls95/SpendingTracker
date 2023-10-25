@@ -31,7 +31,8 @@ internal class CreateSpendingCommandHandler : CommandHandler<CreateSpendingComma
             user.Currency,
             command.Date.ToUniversalTime(),
             command.Description,
-            command.ActionSource);
+            command.ActionSource,
+            categoryIds: Array.Empty<Guid>());
 
         await _spendingRepository.CreateAsync(spending, cancellationToken);
         await _unitOfWork.SaveAsync(cancellationToken);

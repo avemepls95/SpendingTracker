@@ -15,30 +15,32 @@ public class Category : EntityObject<Category, Guid>
     public UserKey OwnerId { get; }
     public string Title { get; }
 
+    private List<Category> _childs { get; } = new();
     /// <summary>
     /// Категории, которые включены в текущую.
     /// </summary>
-    public Category[] ChildCategories { get; private set; } = Array.Empty<Category>();
+    public Category[] Childs => _childs.ToArray();
 
+    private List<Category> _parents { get; } = new();
     /// <summary>
     /// Категории, в которые включена текущая.
     /// </summary>
-    public Category[] ParentCategories { get; set; } = Array.Empty<Category>();
+    public Category[] Parents => _parents.ToArray();
 
-    public Category SetChildCategories(Category[] categories)
+    public Category AddChild(Category child)
     {
-        ChildCategories = categories;
+        _childs.Add(child);
 
         return this;
     }
     
-    public Category SetParentCategories(Category[] categories)
+    public Category AddParent(Category child)
     {
-        ParentCategories = categories;
+        _parents.Add(child);
 
         return this;
     }
-
+    
     public override Guid GetKey()
     {
         return Id;

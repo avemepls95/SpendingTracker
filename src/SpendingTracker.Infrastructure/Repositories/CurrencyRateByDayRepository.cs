@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SpendingTracker.Infrastructure.Abstractions.Models;
+using SpendingTracker.Infrastructure.Abstractions.Models.Stored;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
 
 namespace SpendingTracker.Infrastructure.Repositories;

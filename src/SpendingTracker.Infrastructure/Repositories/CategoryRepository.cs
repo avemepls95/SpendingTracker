@@ -125,7 +125,7 @@ internal class CategoryRepository : ICategoryRepository
 
     private async Task AddChildCategoryInternal(Guid parentId, Guid childId, CancellationToken cancellationToken)
     {
-        var linkAlreadyExists = await _dbContext.Set<CategoriesLink>().AnyAsync(
+        var linkAlreadyExists = await _dbContext.Set<StoredCategoriesLink>().AnyAsync(
             l => l.ParentId == parentId && l.ChildId == childId,
             cancellationToken);
 
@@ -134,12 +134,12 @@ internal class CategoryRepository : ICategoryRepository
             throw new ArgumentException($"У категории {parentId} уже есть дочерняя категория {childId}");
         }
 
-        var categoriesLink = new CategoriesLink
+        var categoriesLink = new StoredCategoriesLink
         {
             ChildId = childId,
             ParentId = parentId
         };
-        await _dbContext.Set<CategoriesLink>().AddAsync(categoriesLink, cancellationToken);
+        await _dbContext.Set<StoredCategoriesLink>().AddAsync(categoriesLink, cancellationToken);
     }
 
     public async Task<Category> GetById(Guid id, CancellationToken cancellationToken)
@@ -160,8 +160,8 @@ internal class CategoryRepository : ICategoryRepository
     public async Task<Category[]> GetByIds(Guid[] ids, CancellationToken cancellationToken)
     {
         var dbCategories = await _dbContext.Set<StoredCategory>()
-            .AsNoTracking()
             .Where(c => ids.Contains(c.Id) && !c.IsDeleted)
+            .AsNoTracking()
             .ToArrayAsync(cancellationToken);
 
         if (dbCategories.Length != ids.Length)
@@ -171,7 +171,7 @@ internal class CategoryRepository : ICategoryRepository
             throw new KeyNotFoundException($"Некоторые категория не найдены. Идентификаторы: {notFoundCategoryIdsAsString}");
         }
 
-        var result = dbCategories.Select(_categoryFactory.Create).ToArray();
+        var result = dbCategories.Select(c => _categoryFactory.Create(c)).ToArray();
         return result;
     }
 
@@ -180,8 +180,52 @@ internal class CategoryRepository : ICategoryRepository
         var dbCategories = await _dbContext.Set<StoredCategory>()
             .Where(c => c.OwnerId == userId && !c.IsDeleted)
             .ToArrayAsync(cancellationToken);
-
-        var result = dbCategories.Select(_categoryFactory.Create).ToArray();
+        
+        var result = dbCategories.Select(c => _categoryFactory.Create(c)).ToArray();
         return result;
+    }
+    
+    public async Task<Category[]> GetUserCategoriesTree(UserKey userId, CancellationToken cancellationToken)
+    {
+        var dbCategories = await _dbContext.Set<StoredCategory>()
+            .Where(c => c.OwnerId == userId && !c.IsDeleted)
+            .ToArrayAsync(cancellationToken);
+        var dbCategoryIds = dbCategories.Select(c => c.Id).ToArray();
+
+        var dbCategoryLinks = await _dbContext.Set<StoredCategoriesLink>()
+            .Where(l => dbCategoryIds.Contains(l.ChildId) || dbCategoryIds.Contains(l.ParentId))
+            .ToArrayAsync(cancellationToken);
+
+        var result = new List<Category>();
+        var firstLevelDbCategories = dbCategories
+            .Where(c => !dbCategoryLinks.Any(l => l.ParentId == c.Id))
+            .ToArray();
+        foreach (var firstLevelDbCategory in firstLevelDbCategories)
+        {
+            var category = _categoryFactory.Create(firstLevelDbCategory);
+            result.Add(category);
+            ProcessCategory(category);
+        }
+
+        return result.ToArray();
+
+        void ProcessCategory(Category category)
+        {
+            var linksWhereCategoryChild = dbCategoryLinks.Where(l => l.ChildId == category.Id).ToArray();
+            if (linksWhereCategoryChild.Length == 0)
+            {
+                return;
+            }
+
+            foreach (var linkWhereCategoryChild in linksWhereCategoryChild)
+            {
+                var dbParent = dbCategories.First(c => c.Id == linkWhereCategoryChild.ParentId);
+                var parent = _categoryFactory.Create(dbParent);
+                parent.AddChild(category);
+                category.AddParent(parent);
+
+                ProcessCategory(parent);
+            }
+        }
     }
 }

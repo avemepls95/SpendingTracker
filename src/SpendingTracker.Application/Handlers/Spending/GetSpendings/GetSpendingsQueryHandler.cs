@@ -8,24 +8,28 @@ namespace SpendingTracker.Application.Handlers.Spending.GetSpendings;
 internal class GetSpendingsQueryHandler : QueryHandler<GetSpendingsQuery, GetSpendingsResponseItem[]>
 {
     private readonly ISpendingRepository _spendingRepository;
+    private readonly ICategoryRepository _categoryRepository;
 
-    public GetSpendingsQueryHandler(ISpendingRepository spendingRepository)
+    public GetSpendingsQueryHandler(ISpendingRepository spendingRepository, ICategoryRepository categoryRepository)
     {
         _spendingRepository = spendingRepository;
+        _categoryRepository = categoryRepository;
     }
 
     public override async Task<GetSpendingsResponseItem[]> HandleAsync(
-        GetSpendingsQuery inDateRangeQuery,
+        GetSpendingsQuery query,
         CancellationToken cancellationToken)
     {
         var spendings = await _spendingRepository.GetUserSpendings(
-            inDateRangeQuery.UserId,
-            inDateRangeQuery.Offset,
-            inDateRangeQuery.Count,
+            query.UserId,
+            query.Offset,
+            query.Count,
             cancellationToken);
 
+        var categoriesTree = await _categoryRepository.GetUserCategoriesTree(query.UserId, cancellationToken);
+
         var result = spendings
-            .Select(SpendingConverter.ConvertToDto)
+            .Select(s => SpendingConverter.ConvertToDto(s, categoriesTree))
             .ToArray();
 
         return result;

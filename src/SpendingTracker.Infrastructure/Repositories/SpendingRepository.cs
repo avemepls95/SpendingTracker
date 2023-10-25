@@ -2,8 +2,8 @@
 using SpendingTracker.Common.Primitives;
 using SpendingTracker.Domain;
 using SpendingTracker.Domain.Categories;
-using SpendingTracker.Infrastructure.Abstractions.Models;
 using SpendingTracker.Infrastructure.Abstractions.Models.Request;
+using SpendingTracker.Infrastructure.Abstractions.Models.Stored;
 using SpendingTracker.Infrastructure.Abstractions.Models.Stored.Categories;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
 using SpendingTracker.Infrastructure.Factories.Abstractions;
@@ -44,10 +44,6 @@ namespace SpendingTracker.Infrastructure.Repositories
         {
             var dbSpendings = await _dbContext.Set<StoredSpending>()
                 .Include(s => s.Currency)
-                .Include(s => s.CategoryLinks)
-                    .ThenInclude(l => l.Category)
-                        .ThenInclude(c => c.ChildCategoryLinks)
-                            .ThenInclude(l => l.Parent)
                 .Where(s =>
                     !s.IsDeleted
                     && s.CreatedBy == userKey
@@ -55,8 +51,15 @@ namespace SpendingTracker.Infrastructure.Repositories
                     && s.Date.Day + 1 < dateTo.DayNumber)
                 .ToArrayAsync(cancellationToken);
             
+            var spendingIds = dbSpendings.Select(s => s.Id).ToArray();
+
+            var categoryIds = await _dbContext.Set<StoredSpendingCategoryLink>()
+                .Where(l => spendingIds.Contains(l.SpendingId))
+                .Select(l => l.CategoryId)
+                .ToArrayAsync(cancellationToken);
+            
             var result = dbSpendings
-                .Select(_spendingFactory.Create)
+                .Select(s => _spendingFactory.Create(s, categoryIds))
                 .ToArray();
             
             return result;
@@ -75,9 +78,23 @@ namespace SpendingTracker.Infrastructure.Repositories
                 .Skip(offset)
                 .Take(count)
                 .ToArrayAsync(cancellationToken);
+
+            var spendingIds = dbSpendings.Select(s => s.Id).ToArray();
+
+            var allCategoryLinks = await _dbContext.Set<StoredSpendingCategoryLink>()
+                .Where(l => spendingIds.Contains(l.SpendingId))
+                .ToArrayAsync(cancellationToken);
             
             var result = dbSpendings
-                .Select(_spendingFactory.Create)
+                .Select(s =>
+                {
+                    var categories = allCategoryLinks
+                        .Where(link => link.SpendingId == s.Id)
+                        .Select(link => link.CategoryId)
+                        .ToArray();
+                        
+                    return _spendingFactory.Create(s, categories);
+                })
                 .ToArray();
             
             return result;
@@ -86,7 +103,6 @@ namespace SpendingTracker.Infrastructure.Repositories
         public async Task AddExistToCategories(Guid spendingId, Category[] categories, CancellationToken cancellationToken)
         {
             var spending = await _dbContext.Set<StoredSpending>()
-                .Include(s => s.CategoryLinks)
                 .FirstOrDefaultAsync(s => s.Id == spendingId, cancellationToken);
 
             if (spending is null)
@@ -95,7 +111,7 @@ namespace SpendingTracker.Infrastructure.Repositories
             }
 
             var categoryIds = categories.Select(c => c.Id).ToArray();
-            var existsLinkIds = await _dbContext.Set<SpendingCategoryLink>()
+            var existsLinkIds = await _dbContext.Set<StoredSpendingCategoryLink>()
                 .Where(l => l.SpendingId == spendingId && categoryIds.Contains(l.SpendingId))
                 .Select(l => l.CategoryId)
                 .ToArrayAsync(cancellationToken);
@@ -105,12 +121,12 @@ namespace SpendingTracker.Infrastructure.Repositories
                 throw new ArgumentException($"Трата {spending.Id} уже входит в следующие категории: {existsLinkIds}");
             }
 
-            var newCategoryLinks = categories.Select(c => new SpendingCategoryLink
+            var newCategoryLinks = categories.Select(c => new StoredSpendingCategoryLink
             {
                 SpendingId = spendingId,
                 CategoryId = c.Id,
             });
-            spending.CategoryLinks!.AddRange(newCategoryLinks);
+            await _dbContext.Set<StoredSpendingCategoryLink>().AddRangeAsync(newCategoryLinks, cancellationToken);
         }
 
         public async Task DeleteLastUserSpending(UserKey userId, CancellationToken cancellationToken)

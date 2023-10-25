@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SpendingTracker.Infrastructure.Abstractions.Models;
+using SpendingTracker.Infrastructure.Abstractions.Models.Stored;
 
 namespace SpendingTracker.Infrastructure.Configurations
 {

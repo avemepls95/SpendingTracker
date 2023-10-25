@@ -4,9 +4,9 @@ using SpendingTracker.Infrastructure.Abstractions.Models.Stored.Categories;
 
 namespace SpendingTracker.Infrastructure.Configurations;
 
-internal class CategoriesLinkConfiguration : IEntityTypeConfiguration<CategoriesLink>
+internal class CategoriesLinkConfiguration : IEntityTypeConfiguration<StoredCategoriesLink>
 {
-    public void Configure(EntityTypeBuilder<CategoriesLink> builder)
+    public void Configure(EntityTypeBuilder<StoredCategoriesLink> builder)
     {
         builder.ToTable("CategoriesLink");
 

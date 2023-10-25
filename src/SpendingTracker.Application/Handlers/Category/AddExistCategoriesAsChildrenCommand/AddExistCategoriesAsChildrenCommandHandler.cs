@@ -16,7 +16,9 @@ internal class AddExistCategoriesAsChildrenCommandHandler : CommandHandler<Contr
         _unitOfWork = unitOfWork;
     }
 
-    public override async Task Handle(Contracts.AddExistCategoriesAsChildrenCommand command, CancellationToken cancellationToken)
+    public override async Task Handle(
+        Contracts.AddExistCategoriesAsChildrenCommand command,
+        CancellationToken cancellationToken)
     {
         var parentCategory = await _categoryRepository.GetById(command.ParentId, cancellationToken);
         var parentCategoryUserId = parentCategory.OwnerId;

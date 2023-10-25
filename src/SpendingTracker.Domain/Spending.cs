@@ -1,5 +1,4 @@
 ﻿using SpendingTracker.Common.Primitives;
-using SpendingTracker.Domain.Categories;
 
 namespace SpendingTracker.Domain;
 
@@ -12,6 +11,7 @@ public class Spending : EntityObject<Spending, Guid>
         DateTimeOffset date,
         string description,
         ActionSource actionSource,
+        Guid[] categoryIds,
         DateTimeOffset? createDate = null)
     {
         Id = id;
@@ -20,6 +20,7 @@ public class Spending : EntityObject<Spending, Guid>
         Date = date;
         Description = description;
         ActionSource = actionSource;
+        CategoryIds = categoryIds;
 
         if (createDate is not null)
         {
@@ -27,32 +28,22 @@ public class Spending : EntityObject<Spending, Guid>
         }
     }
     
-    public Guid Id { get; init; }
+    public Guid Id { get; }
 
-    public double Amount { get; init; }
+    public double Amount { get; }
 
-    public Currency Currency { get; init; }
+    public Currency Currency { get; }
 
-    public DateTimeOffset Date { get; init; }
+    public DateTimeOffset Date { get; }
 
-    public string Description { get; init; }
+    public string Description { get; }
 
-    public ActionSource ActionSource { get; init; }
+    public ActionSource ActionSource { get; }
 
-    /// <summary>
-    /// Категории, в которые включена трата.
-    /// </summary>
-    public Category[] ParentCategories { get; private set; }
+    public Guid[] CategoryIds { get; }
 
     public override Guid GetKey()
     {
         return Id;
-    }
-
-    public Spending SetParentCategories(Category[] categories)
-    {
-        ParentCategories = categories;
-
-        return this;
     }
 }

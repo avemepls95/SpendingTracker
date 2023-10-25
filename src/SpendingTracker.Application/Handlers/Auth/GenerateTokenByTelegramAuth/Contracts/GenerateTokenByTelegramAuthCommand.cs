@@ -1,8 +1,8 @@
 ﻿using SpendingTracker.Dispatcher.DataTransfer.Dispatcher.Interfaces;
 
-namespace SpendingTracker.Application.Handlers.Auth.AuthByTelegram.Contracts;
+namespace SpendingTracker.Application.Handlers.Auth.GenerateTokenByTelegramAuth.Contracts;
 
-public class AuthByTelegramCommand : ICommand<AuthByTelegramResponse>
+public class GenerateTokenByTelegramAuthCommand : ICommand<GenerateTokenByTelegramAuthResponse>
 {
     public long UserId { get; init; }
     public string FirstName { get; init; }

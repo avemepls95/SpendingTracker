@@ -8,7 +8,6 @@ namespace SpendingTracker.BearerTokenAuth
         public string SecretKey { get; set; }
         public string Issuer { get; set; }
         public int AccessTokenLifetimeInMinutes { get; set; }
-        public int SessionTimeInHours { get; set; }
 
         public OAuthOptions()
         {

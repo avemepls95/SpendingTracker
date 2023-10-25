@@ -8,4 +8,5 @@ public class GetSpendingsResponseItem
     public DateTimeOffset Date { get; init; }
     public string Description { get; init; }
     public DateTimeOffset CreateDate { get; set; }
+    public CategoryDto[] Categories { get; set; }
 }

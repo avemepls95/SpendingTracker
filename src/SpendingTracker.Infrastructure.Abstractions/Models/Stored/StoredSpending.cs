@@ -1,8 +1,7 @@
 ﻿using SpendingTracker.Common.Primitives;
 using SpendingTracker.Domain;
-using SpendingTracker.Infrastructure.Abstractions.Models.Stored.Categories;
 
-namespace SpendingTracker.Infrastructure.Abstractions.Models;
+namespace SpendingTracker.Infrastructure.Abstractions.Models.Stored;
 
 public class StoredSpending : EntityObject<StoredSpending, Guid>
 {
@@ -13,7 +12,6 @@ public class StoredSpending : EntityObject<StoredSpending, Guid>
     public DateTimeOffset Date { get; set; }
     public string Description { get; set; }
     public ActionSource ActionSource { get; set; }
-    public List<SpendingCategoryLink>? CategoryLinks { get; set; }
     public bool IsDeleted { get; set; }
 
     public override Guid GetKey()

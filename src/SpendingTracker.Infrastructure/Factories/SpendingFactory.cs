@@ -1,5 +1,5 @@
 ﻿using SpendingTracker.Domain;
-using SpendingTracker.Infrastructure.Abstractions.Models;
+using SpendingTracker.Infrastructure.Abstractions.Models.Stored;
 using SpendingTracker.Infrastructure.Factories.Abstractions;
 
 namespace SpendingTracker.Infrastructure.Factories;
@@ -7,15 +7,13 @@ namespace SpendingTracker.Infrastructure.Factories;
 internal class SpendingFactory : ISpendingFactory
 {
     private readonly ICurrencyFactory _currencyFactory;
-    private readonly ICategoryFactory _categoryFactory;
 
-    public SpendingFactory(ICurrencyFactory currencyFactory, ICategoryFactory categoryFactory)
+    public SpendingFactory(ICurrencyFactory currencyFactory)
     {
         _currencyFactory = currencyFactory;
-        _categoryFactory = categoryFactory;
     }
 
-    public Spending Create(StoredSpending storedSpending)
+    public Spending Create(StoredSpending storedSpending, Guid[] categoryIds)
     {
         if (storedSpending.Currency is null)
         {
@@ -27,18 +25,12 @@ internal class SpendingFactory : ISpendingFactory
             storedSpending.Id,
             storedSpending.Amount,
             currency,
-            DateTime.Now, 
-            // storedSpending.Date,
+            storedSpending.Date,
             storedSpending.Description,
             storedSpending.ActionSource,
+            categoryIds,
             storedSpending.CreatedDate);
 
-        if (storedSpending.CategoryLinks != null && storedSpending.CategoryLinks.Count != 0)
-        {
-            var categories = storedSpending.CategoryLinks.Select(l => _categoryFactory.Create(l.Category)).ToArray();
-            spending.SetParentCategories(categories);
-        }
-        
         return spending;
     }
 }

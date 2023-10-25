@@ -1,45 +1,55 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SpendingTracker.Application.Handlers.Auth.AuthByTelegram.Contracts;
+using SpendingTracker.Application.Handlers.Auth.GenerateTokenByTelegramAuth.Contracts;
+using SpendingTracker.Application.Handlers.Auth.RefreshTokenByTelegramAuth.Contracts;
 using SpendingTracker.BearerTokenAuth;
 using SpendingTracker.Dispatcher.Extensions;
+using SpendingTracker.WebApp.Contracts.RefreshAuthToken;
 
 namespace SpendingTracker.WebApp.Controllers;
 
 [ApiController]
 [Route("api/v1/auth")]
-public class AuthController
+public class AuthController : BaseController
 {
     private readonly IMediator _mediator;
-
+ 
     public AuthController(IMediator mediator)
     {
         _mediator = mediator;
     }
     
     [HttpPost]
-    [Route("telegram/get-token")]
-    public async Task<AuthByTelegramResponse> AuthByTelegram(
-        [FromBody] AuthByTelegramCommand command,
+    [Route("token/generate/telegram")]
+    public async Task<GenerateTokenByTelegramAuthResponse> GenerateTokenByTelegramAuth(
+        [FromBody] GenerateTokenByTelegramAuthCommand command,
         CancellationToken cancellationToken)
     {
-        var tokenInformation = await _mediator.SendCommandAsync<AuthByTelegramCommand, AuthByTelegramResponse>(
+        var result = await _mediator.SendCommandAsync<GenerateTokenByTelegramAuthCommand, GenerateTokenByTelegramAuthResponse>(
             command,
             cancellationToken);
 
-        return tokenInformation;
+        return result;
     }
-    //
-    // [HttpPost]
-    // [Route("telegram/refresh-token")]
-    // public Task<TokenInformation> RefreshTokenAsync(string refreshToken, CancellationToken cancellationToken)
-    // {
-    //     var refreshTokenTask = _tokenGenerator.RefreshAsync(
-    //         refreshToken,
-    //         _basicAuthCredentials.UserName,
-    //         _basicAuthCredentials.Password,
-    //         cancellationToken);
-    //
-    //     return refreshTokenTask;
-    // }
+    
+    [HttpPost]
+    [Authorize(AuthenticationSchemes = BearerAuth.SchemeName)]
+    [Route("token/refresh")]
+    public async Task<RefreshTokenByTelegramAuthResponse> RefreshTokenAsync(
+        [FromBody] RefreshAuthTokenRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new RefreshTokenByTelegramAuthCommand
+        {
+            RefreshToken = request.RefreshToken,
+            UserId = GetCurrentUserId()
+        };
+
+        var result = await _mediator.SendCommandAsync<RefreshTokenByTelegramAuthCommand, RefreshTokenByTelegramAuthResponse>(
+            command,
+            cancellationToken);
+
+        return result;
+    }
 }

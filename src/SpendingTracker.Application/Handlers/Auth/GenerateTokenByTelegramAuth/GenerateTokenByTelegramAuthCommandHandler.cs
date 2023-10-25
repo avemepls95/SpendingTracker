@@ -1,22 +1,22 @@
 ﻿using MediatR;
-using SpendingTracker.Application.Handlers.Auth.AuthByTelegram.Contracts;
+using SpendingTracker.Application.Handlers.Auth.GenerateTokenByTelegramAuth.Contracts;
 using SpendingTracker.Application.Handlers.User.CreateUserByTelegramId.Contracts;
-using SpendingTracker.BearerTokenAuth;
 using SpendingTracker.BearerTokenAuth.Abstractions;
 using SpendingTracker.Common.Primitives;
 using SpendingTracker.Dispatcher.DataTransfer.Dispatcher;
 using SpendingTracker.Dispatcher.Extensions;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
 
-namespace SpendingTracker.Application.Handlers.Auth.AuthByTelegram;
+namespace SpendingTracker.Application.Handlers.Auth.GenerateTokenByTelegramAuth;
 
-internal sealed class AuthByTelegramCommandHandler : CommandHandler<AuthByTelegramCommand, AuthByTelegramResponse>
+internal sealed class GenerateTokenByTelegramAuthCommandHandler
+    : CommandHandler<GenerateTokenByTelegramAuthCommand, GenerateTokenByTelegramAuthResponse>
 {
     private readonly ITokenGenerator _tokenGenerator;
     private readonly IUserRepository _userRepository;
     private readonly IMediator _mediator;
 
-    public AuthByTelegramCommandHandler(
+    public GenerateTokenByTelegramAuthCommandHandler(
         ITokenGenerator tokenGenerator,
         IUserRepository userRepository,
         IMediator mediator)
@@ -26,8 +26,8 @@ internal sealed class AuthByTelegramCommandHandler : CommandHandler<AuthByTelegr
         _mediator = mediator;
     }
 
-    public override async Task<AuthByTelegramResponse> Handle(
-        AuthByTelegramCommand command,
+    public override async Task<GenerateTokenByTelegramAuthResponse> Handle(
+        GenerateTokenByTelegramAuthCommand command,
         CancellationToken cancellationToken)
     {
         var id = await _userRepository.FindIdByTelegramId(command.UserId, cancellationToken);
@@ -45,7 +45,7 @@ internal sealed class AuthByTelegramCommandHandler : CommandHandler<AuthByTelegr
     
         var tokenInformation = _tokenGenerator.Create(id.Value);
 
-        return new AuthByTelegramResponse
+        return new GenerateTokenByTelegramAuthResponse
         {
             TokenInformation = tokenInformation,
             Id = id,

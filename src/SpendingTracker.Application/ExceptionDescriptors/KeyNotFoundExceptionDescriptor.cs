@@ -10,13 +10,13 @@ namespace SpendingTracker.Application.ExceptionDescriptors
             return ex is KeyNotFoundException;
         }
 
-        public HttpStatusCode StatusCode => HttpStatusCode.NotFound;
+        public HttpStatusCode StatusCode => HttpStatusCode.BadRequest;
 
         public ErrorResult Handle(Exception ex)
         {
             var errors = new[]
             {
-                new ErrorProperty(nameof(HttpStatusCode.NotFound), ex.Message)
+                new ErrorProperty(nameof(HttpStatusCode.BadRequest), ex.Message)
             };
 
             return new ErrorResult(errors);

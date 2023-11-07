@@ -170,5 +170,91 @@ namespace SpendingTracker.Infrastructure.Repositories
             lastUserSpending.Description = model.Description;
             lastUserSpending.Date = model.Date;
         }
+
+        public async Task<Spending> GetById(Guid id, CancellationToken cancellationToken)
+        {
+            var dbSpending = await _dbContext.Set<StoredSpending>().FirstOrDefaultAsync(
+                s => s.Id == id&& !s.IsDeleted,
+                cancellationToken);
+
+            if (dbSpending is null)
+            {
+                throw new KeyNotFoundException($"Не найдена трата с идентификатором {id}");
+            }
+            
+            var categoryIds = await _dbContext.Set<StoredSpendingCategoryLink>()
+                .Where(l => l.SpendingId == id)
+                .Select(l => l.CategoryId)
+                .ToArrayAsync(cancellationToken);
+
+            return _spendingFactory.Create(dbSpending, categoryIds);
+        }
+
+        public async Task AddToCategory(
+            Guid spendingId,
+            Guid categoryId,
+            CancellationToken cancellationToken)
+        {
+            var isSpendingExists = await _dbContext.Set<StoredSpending>().AnyAsync(
+                s => s.Id == spendingId,
+                cancellationToken);
+
+            if (!isSpendingExists)
+            {
+                throw new KeyNotFoundException($"Не найдена трата с идентификатором {spendingId}");
+            }
+            
+            var isCategoryExists = _dbContext.Set<StoredCategory>().Local.Any(s => s.Id == categoryId);
+            if (!isCategoryExists)
+            {
+                isCategoryExists = await _dbContext.Set<StoredCategory>().AnyAsync(
+                    s => s.Id == categoryId,
+                    cancellationToken);
+
+                if (!isCategoryExists)
+                {
+                    throw new KeyNotFoundException($"Не найдена категория с идентификатором {categoryId}");
+                }
+            }
+
+            var link = new StoredSpendingCategoryLink
+            {
+                SpendingId = spendingId,
+                CategoryId = categoryId
+            };
+
+            await _dbContext.Set<StoredSpendingCategoryLink>().AddAsync(link, cancellationToken);
+        }
+
+        public async Task RemoveFromCategory(Guid spendingId, Guid categoryId, CancellationToken cancellationToken)
+        {
+            var isLinkExists = await _dbContext.Set<StoredSpendingCategoryLink>().AnyAsync(
+                s => s.SpendingId == spendingId && s.CategoryId == categoryId,
+                cancellationToken);
+
+            if (!isLinkExists)
+            {
+                throw new KeyNotFoundException($"Трата {spendingId} не входит в категорию {categoryId}");
+            }
+
+            var link = new StoredSpendingCategoryLink
+            {
+                SpendingId = spendingId,
+                CategoryId = categoryId,
+            };
+            _dbContext.Set<StoredSpendingCategoryLink>().Attach(link);
+
+            _dbContext.Set<StoredSpendingCategoryLink>().Remove(link);
+        }
+
+        public Task<bool> IsSpendingHasCategory(
+            Guid spendingId,
+            Guid categoryId,
+            CancellationToken cancellationToken)
+        {
+            return _dbContext.Set<StoredSpendingCategoryLink>().AnyAsync(
+                l => l.SpendingId == spendingId && l.CategoryId == categoryId,
+                cancellationToken);
+        }
     }
 }

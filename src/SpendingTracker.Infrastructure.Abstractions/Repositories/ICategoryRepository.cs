@@ -9,10 +9,12 @@ public interface ICategoryRepository
     Task CreateCategories(Category[] newCategories, CancellationToken cancellationToken = default);
     Task DeleteCategory(Category category, CancellationToken cancellationToken = default);
     Task AddChildCategory(Category parent, Category child, CancellationToken cancellationToken = default);
-    Task AddChildrenCategories(Category parent, Category[] children, CancellationToken cancellationToken = default);
     Task AddChildCategory(Guid parentId, Guid childId, CancellationToken cancellationToken = default);
     Task<Category> GetById(Guid id, CancellationToken cancellationToken = default);
     Task<Category[]> GetByIds(Guid[] ids, CancellationToken cancellationToken = default);
     Task<Category[]> GetUserCategories(UserKey userId, CancellationToken cancellationToken = default);
     Task<Category[]> GetUserCategoriesTree(UserKey userId, CancellationToken cancellationToken = default);
+    Task<bool> UserHasByTitle(UserKey userId, string title, CancellationToken cancellationToken = default);
+    Task<bool> UserHasById(UserKey userId, Guid categoryId, CancellationToken cancellationToken = default);
+    Task RemoveChildFromParent(Guid childId, Guid parentId, CancellationToken cancellationToken = default);
 }

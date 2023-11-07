@@ -1,18 +1,17 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using SpendingTracker.Application.Handlers.Category;
-using SpendingTracker.Application.Handlers.Category.AddExistCategoriesAsChildrenCommand.Contracts;
-using SpendingTracker.Application.Handlers.Category.AddNewCategoryAsChild.Contracts;
-using SpendingTracker.Application.Handlers.Category.CreateCategory;
+using SpendingTracker.Application.Handlers.Category.AddExistCategoryAsChildren.Contracts;
+using SpendingTracker.Application.Handlers.Category.AddNewCategoryAsParent.Contracts;
 using SpendingTracker.Application.Handlers.Category.CreateCategory.Contracts;
 using SpendingTracker.Application.Handlers.Category.DeleteCategory.Contracts;
 using SpendingTracker.Application.Handlers.Category.GetUserCategories.Contracts;
+using SpendingTracker.Application.Handlers.Category.RemoveChildCategoryFromParent.Contracts;
 using SpendingTracker.BearerTokenAuth;
-using SpendingTracker.Common.Primitives;
 using SpendingTracker.Dispatcher.Extensions;
+using SpendingTracker.Domain;
+using SpendingTracker.WebApp.Contracts.AddExistCategoryAsChildren;
+using SpendingTracker.WebApp.Contracts.AddNewCategoryAsParent;
 using SpendingTracker.WebApp.Contracts.CreateCategory;
 using SpendingTracker.WebApp.Contracts.DeleteCategory;
 
@@ -58,17 +57,40 @@ public class CategoryController : BaseController
         return _mediator.SendCommandAsync(command, cancellationToken);
     }
     
-    [HttpPost("child/add-as-new")]
-    public Task AddChildCategory(
-        [FromBody] AddNewCategoryAsChildCommand command,
+    [HttpPost("parent/add-as-new")]
+    public Task AddNewCategoryAsParent(
+        [FromBody] AddNewCategoryAsParentRequest request,
         CancellationToken cancellationToken)
     {
+        var command = new AddNewCategoryAsParentCommand
+        {
+            UserId = GetCurrentUserId(),
+            ChildId = request.ChildId,
+            NewParentTitle = request.NewParentTitle,
+            ActionSource = ActionSource.Api
+        };
+
         return _mediator.SendCommandAsync(command, cancellationToken);
     }
     
-    [HttpPost("child/add-exist-list")]
-    public Task AddExistCategoriesAsChildren(
-        [FromBody] AddExistCategoriesAsChildrenCommand command,
+    [HttpPost("child/add-exist")]
+    public Task AddExistCategoryAsChildren(
+        [FromBody] AddExistCategoryAsChildrenRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new AddExistCategoryAsChildrenCommand
+        {
+            UserId = GetCurrentUserId(),
+            ParentId = request.ParentId,
+            ChildId = request.ChildId,
+            ActionSource = ActionSource.Api
+        };
+        return _mediator.SendCommandAsync(command, cancellationToken);
+    }
+    
+    [HttpPost("remove-child-from-parent")]
+    public Task RemoveChildCategoryFromParent(
+        [FromBody] RemoveChildCategoryFromParentCommand command,
         CancellationToken cancellationToken)
     {
         return _mediator.SendCommandAsync(command, cancellationToken);

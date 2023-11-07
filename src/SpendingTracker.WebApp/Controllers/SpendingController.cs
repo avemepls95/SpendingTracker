@@ -1,13 +1,19 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SpendingTracker.Application.Handlers.Spending.AddSpendingToExistCategory.Contracts;
+using SpendingTracker.Application.Handlers.Spending.AddSpendingToNewCategory.Contracts;
 using SpendingTracker.Application.Handlers.Spending.DeleteSpending.Contracts;
 using SpendingTracker.Application.Handlers.Spending.GetSpendings.Contracts;
+using SpendingTracker.Application.Handlers.Spending.RemoveSpendingFromCategory.Contracts;
 using SpendingTracker.Application.Handlers.Spending.UpdateSpending.Contracts;
 using SpendingTracker.BearerTokenAuth;
 using SpendingTracker.Dispatcher.Extensions;
 using SpendingTracker.Domain;
+using SpendingTracker.WebApp.Contracts.AddSpendingToExistCategory;
+using SpendingTracker.WebApp.Contracts.AddSpendingToNewCategory;
 using SpendingTracker.WebApp.Contracts.DeleteSpending;
+using SpendingTracker.WebApp.Contracts.RemoveFromCategory;
 using SpendingTracker.WebApp.Contracts.UpdateSpending;
 
 namespace SpendingTracker.WebApp.Controllers;
@@ -65,6 +71,50 @@ public class SpendingController : BaseController
             Description = request.Description,
             CurrencyId = request.CurrencyId,
             ActionSource = ActionSource.Api
+        };
+
+        return _mediator.SendCommandAsync(command, cancellationToken);
+    }
+
+    [HttpPost("add-to-exist-category")]
+    public Task AddToExistCategory(
+        [FromBody] AddSpendingToExistCategoryRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new AddSpendingToExistCategoryCommand
+        {
+            UserId = GetCurrentUserId(),
+            SpendingId = request.SpendingId,
+            CategoryId = request.CategoryId
+        };
+
+        return _mediator.SendCommandAsync(command, cancellationToken);
+    }
+    
+    [HttpPost("add-to-new-category")]
+    public Task AddToNewCategory(
+        [FromBody] AddSpendingToNewCategoryRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new AddSpendingToNewCategoryCommand
+        {
+            UserId = GetCurrentUserId(),
+            SpendingId = request.SpendingId,
+            NewCategoryTitle = request.NewCategoryTitle
+        };
+
+        return _mediator.SendCommandAsync(command, cancellationToken);
+    }
+    
+    [HttpPost("remove-from-category")]
+    public Task RemoveSpendingFromCategory(
+        [FromBody] RemoveSpendingFromCategoryRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new RemoveSpendingFromCategoryCommand
+        {
+            SpendingId = request.SpendingId,
+            CategoryId = request.CategoryId
         };
 
         return _mediator.SendCommandAsync(command, cancellationToken);

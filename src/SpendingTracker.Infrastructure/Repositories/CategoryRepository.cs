@@ -111,13 +111,17 @@ internal class CategoryRepository : ICategoryRepository
 
     public async Task AddChildCategory(Guid parentId, Guid childId, CancellationToken cancellationToken)
     {
-        var parentCategory = await _dbContext.Set<StoredCategory>().FirstOrDefaultAsync(
-            c => c.Id == parentId,
-            cancellationToken);
-
-        if (parentCategory is null)
+        var isCategoryExists = _dbContext.Set<StoredCategory>().Local.Any(s => s.Id == parentId);
+        if (!isCategoryExists)
         {
-            throw new ArgumentException($"Родительская категория с идентификатором {parentId} не найдена");
+            isCategoryExists = await _dbContext.Set<StoredCategory>().AnyAsync(
+                s => s.Id == parentId,
+                cancellationToken);
+
+            if (!isCategoryExists)
+            {
+                throw new KeyNotFoundException($"Родительская категория с идентификатором {parentId} не найдена");
+            }
         }
 
         await AddChildCategoryInternal(parentId, childId, cancellationToken);
@@ -196,11 +200,17 @@ internal class CategoryRepository : ICategoryRepository
             .Where(l => dbCategoryIds.Contains(l.ChildId) || dbCategoryIds.Contains(l.ParentId))
             .ToArrayAsync(cancellationToken);
 
+        var spendingCategoryIds = await _dbContext.Set<StoredSpendingCategoryLink>()
+            .Where(l => l.Spending.CreatedBy == userId)
+            .Select(l => l.CategoryId)
+            .Distinct()
+            .ToArrayAsync(cancellationToken);
+        
         var result = new List<Category>();
-        var firstLevelDbCategories = dbCategories
-            .Where(c => !dbCategoryLinks.Any(l => l.ParentId == c.Id))
+        var spendingDbCategories = dbCategories
+            .Where(c => spendingCategoryIds.Contains(c.Id))
             .ToArray();
-        foreach (var firstLevelDbCategory in firstLevelDbCategories)
+        foreach (var firstLevelDbCategory in spendingDbCategories)
         {
             var category = _categoryFactory.Create(firstLevelDbCategory);
             result.Add(category);
@@ -227,5 +237,45 @@ internal class CategoryRepository : ICategoryRepository
                 ProcessCategory(parent);
             }
         }
+    }
+
+    public Task<bool> UserHasByTitle(UserKey userId, string title, CancellationToken cancellationToken)
+    {
+        return _dbContext.Set<StoredCategory>().AnyAsync(
+            c =>
+                !c.IsDeleted
+                && c.OwnerId == userId
+                && EF.Functions.ILike(c.Title, title),
+            cancellationToken);
+    }
+
+    public Task<bool> UserHasById(UserKey userId, Guid categoryId, CancellationToken cancellationToken)
+    {
+        return _dbContext.Set<StoredCategory>().AnyAsync(
+            c =>
+                !c.IsDeleted
+                && c.OwnerId == userId
+                && c.Id == categoryId,
+            cancellationToken);
+    }
+
+    public async Task RemoveChildFromParent(Guid childId, Guid parentId, CancellationToken cancellationToken)
+    {
+        var linkExists = await _dbContext.Set<StoredCategoriesLink>().AnyAsync(
+            l => l.ParentId == parentId && l.ChildId == childId,
+            cancellationToken);
+
+        if (!linkExists)
+        {
+            throw new ArgumentException($"Не найдена связь дочерней категории {childId} с родительской {parentId}");
+        }
+
+        var categoriesLink = new StoredCategoriesLink
+        {
+            ChildId = childId,
+            ParentId = parentId
+        };
+        _dbContext.Set<StoredCategoriesLink>().Attach(categoriesLink);
+        _dbContext.Set<StoredCategoriesLink>().Remove(categoriesLink);
     }
 }

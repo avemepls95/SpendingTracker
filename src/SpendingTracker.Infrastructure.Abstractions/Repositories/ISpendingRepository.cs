@@ -31,5 +31,16 @@ namespace SpendingTracker.Infrastructure.Abstractions.Repositories
         Task DeleteSpending(Guid spendingId, CancellationToken cancellationToken = default);
 
         Task UpdateSpending(UpdateSpendingModel model, CancellationToken cancellationToken = default);
+
+        Task<Spending> GetById(Guid id, CancellationToken cancellationToken = default);
+
+        Task AddToCategory(Guid spendingId, Guid categoryId, CancellationToken cancellationToken = default);
+
+        Task RemoveFromCategory(Guid spendingId, Guid categoryId, CancellationToken cancellationToken = default);
+
+        Task<bool> IsSpendingHasCategory(
+            Guid spendingId,
+            Guid categoryId,
+            CancellationToken cancellationToken = default);
     }
 }

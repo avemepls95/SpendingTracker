@@ -3,13 +3,10 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using SpendingTracker.Dispatcher.DataTransfer.Dispatcher.Interfaces;
+using SpendingTracker.GenericSubDomain.Validation;
 
 namespace SpendingTracker.Dispatcher.DataTransfer.Pipelines
 {
-    /// <summary>
-    /// Валидатор для медиатра
-    /// в случае ошибки валидации получим исключение <see cref="SchoolValidationException"/>
-    /// </summary>
     [ExcludeFromCodeCoverage]
     public sealed class ValidationPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     {
@@ -46,7 +43,7 @@ namespace SpendingTracker.Dispatcher.DataTransfer.Pipelines
                     Environment.NewLine,
                     validationResult.Errors.Select(e => e.ErrorMessage));
 
-                throw new ValidationException(message);
+                throw new FluentValidationException(message);
             }
 
             return await next();

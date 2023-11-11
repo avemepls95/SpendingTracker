@@ -4,23 +4,23 @@ using SpendingTracker.GenericSubDomain.Validation;
 
 namespace SpendingTracker.Application.ExceptionDescriptors
 {
-    internal sealed class KeyNotFoundExceptionDescriptor : IExceptionDescriptor
+    internal sealed class SpendingTrackerValidationExceptionDescriptor : IExceptionDescriptor
     {
         public bool CanHandle(Exception ex)
         {
-            return ex is KeyNotFoundException;
+            return ex is SpendingTrackerValidationException;
         }
 
         public HttpStatusCode StatusCode => HttpStatusCode.BadRequest;
 
         public ErrorProperty[] Handle(Exception ex)
         {
-            var errors = new[]
-            {
-                ErrorProperty.FromCode(ValidationErrorCodeEnum.KeyNotFound)
-            };
+            var validationException = (SpendingTrackerValidationException) ex;
 
-            return errors;
+            return new[]
+            {
+                ErrorProperty.FromCode(validationException.Code)
+            };
         }
     }
 }

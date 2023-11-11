@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SpendingTracker.Application.ExceptionDescriptors;
 using SpendingTracker.GenericSubDomain.Common;
+using SpendingTracker.GenericSubDomain.Validation;
 
 namespace SpendingTracker.Application.Middleware.ExceptionHandling
 {
@@ -45,10 +46,10 @@ namespace SpendingTracker.Application.Middleware.ExceptionHandling
                         ? ConvertToDevelop(exception)
                         : new[]
                         {
-                            new ErrorProperty(nameof(Exception.Message), HttpStatusCode.InternalServerError.ToString())
+                            ErrorProperty.FromCode(ValidationErrorCodeEnum.InternalServerError)
                         };
 
-                    WriteResponse(context, HttpStatusCode.InternalServerError, new ErrorResult(errors));
+                    WriteResponse(context, HttpStatusCode.InternalServerError, errors);
                 }
             }
         }
@@ -84,25 +85,23 @@ namespace SpendingTracker.Application.Middleware.ExceptionHandling
             var errors = exception.InnerException == null
                 ? new[]
                 {
-                    new ErrorProperty(nameof(Exception.Message), exception.Message),
-                    new ErrorProperty(nameof(Exception.StackTrace), exception.StackTrace)
+                    ErrorProperty.FromMessage($"{nameof(exception.Message)}: {exception.Message}"),
+                    ErrorProperty.FromMessage($"{nameof(exception.StackTrace)}: {exception.StackTrace}")
                 }
                 : new[]
                 {
-                    new ErrorProperty(nameof(Exception.Message), exception.Message),
-                    new ErrorProperty(nameof(Exception.StackTrace), exception.StackTrace),
-                    new ErrorProperty($"{nameof(Exception.InnerException)}_{nameof(Exception.Message)}",
-                        exception.InnerException.Message),
-                    new ErrorProperty($"{nameof(Exception.InnerException)}_{nameof(Exception.StackTrace)}",
-                        exception.InnerException.StackTrace)
+                    ErrorProperty.FromMessage($"{nameof(exception.Message)}: {exception.Message}"),
+                    ErrorProperty.FromMessage($"{nameof(exception.StackTrace)}: {exception.StackTrace}"),
+                    ErrorProperty.FromMessage($"{nameof(Exception.InnerException)}_{nameof(Exception.Message)}: {exception.InnerException.Message}"),
+                    ErrorProperty.FromMessage($"{nameof(Exception.InnerException)}_{nameof(Exception.StackTrace)}: {exception.InnerException.StackTrace}")
                 };
 
             return errors;
         }
 
-        private void WriteResponse(HttpContext context, HttpStatusCode statusCode, ErrorResult errorResult)
+        private void WriteResponse(HttpContext context, HttpStatusCode statusCode, ErrorProperty[] errors)
         {
-            var data = _jsonSerializer.Serialize(errorResult);
+            var data = _jsonSerializer.Serialize(errors);
 
             context.Response.Clear();
             context.Response.StatusCode = (int) statusCode;

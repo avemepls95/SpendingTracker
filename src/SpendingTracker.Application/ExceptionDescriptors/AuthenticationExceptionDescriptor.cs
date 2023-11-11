@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Security.Authentication;
 using SpendingTracker.Application.Middleware.ExceptionHandling;
+using SpendingTracker.GenericSubDomain.Validation;
 
 namespace SpendingTracker.Application.ExceptionDescriptors
 {
@@ -13,14 +14,14 @@ namespace SpendingTracker.Application.ExceptionDescriptors
 
         public HttpStatusCode StatusCode => HttpStatusCode.Forbidden;
 
-        public ErrorResult Handle(Exception ex)
+        public ErrorProperty[] Handle(Exception ex)
         {
             var errors = new[]
             {
-                new ErrorProperty(nameof(HttpStatusCode.Forbidden), ex.Message)
+                ErrorProperty.FromCode(ValidationErrorCodeEnum.Forbidden)
             };
 
-            return new ErrorResult(errors);
+            return errors;
         }
     }
 }

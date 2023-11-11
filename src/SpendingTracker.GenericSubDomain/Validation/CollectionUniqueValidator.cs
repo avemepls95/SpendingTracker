@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace SpendingTracker.GenericSubDomain.Validators
+namespace SpendingTracker.GenericSubDomain.Validation
 {
     public static class CollectionUniqueValidator
     {

@@ -9,6 +9,6 @@ namespace SpendingTracker.Application.ExceptionDescriptors
 
         HttpStatusCode StatusCode { get; }
 
-        ErrorResult Handle(Exception ex);
+        ErrorProperty[] Handle(Exception ex);
     }
 }

@@ -1,6 +1,6 @@
-﻿using FluentValidation;
-using SpendingTracker.Application.Handlers.Spending.AddSpendingToExistCategory.Contracts;
+﻿using SpendingTracker.Application.Handlers.Spending.AddSpendingToExistCategory.Contracts;
 using SpendingTracker.Dispatcher.DataTransfer.Dispatcher;
+using SpendingTracker.GenericSubDomain.Validation;
 using SpendingTracker.Infrastructure.Abstractions;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
 
@@ -31,7 +31,7 @@ internal class AddSpendingToExistCategoryCommandHandler : CommandHandler<AddSpen
 
         if (spendingAlreadyHasCategory)
         {
-            throw new ValidationException($"Категория {command.CategoryId} уже имеет категорию {command.CategoryId}");
+            throw new SpendingTrackerValidationException(ValidationErrorCodeEnum.CategoriesAlreadyLinked);
         }
 
         var userHasCategory = await _categoryRepository.UserHasById(
@@ -41,7 +41,7 @@ internal class AddSpendingToExistCategoryCommandHandler : CommandHandler<AddSpen
 
         if (!userHasCategory)
         {
-            throw new ValidationException($"Пользователь не имеет категории {command.CategoryId}");
+            throw new SpendingTrackerValidationException(ValidationErrorCodeEnum.CategoryDoesNotBelongsToUser);
         }
         
         await _spendingRepository.AddToCategory(command.SpendingId, command.CategoryId, cancellationToken);

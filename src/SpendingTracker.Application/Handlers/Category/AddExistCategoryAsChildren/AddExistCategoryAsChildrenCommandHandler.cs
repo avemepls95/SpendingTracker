@@ -1,6 +1,6 @@
-﻿using FluentValidation;
-using SpendingTracker.Common.Primitives;
+﻿using SpendingTracker.Common.Primitives;
 using SpendingTracker.Dispatcher.DataTransfer.Dispatcher;
+using SpendingTracker.GenericSubDomain.Validation;
 using SpendingTracker.Infrastructure.Abstractions;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
 
@@ -27,7 +27,7 @@ internal class AddExistCategoryAsChildrenCommandHandler : CommandHandler<Contrac
         var childCategory = await _categoryRepository.GetById(command.ChildId, cancellationToken);
         if (childCategory.OwnerId != parentCategoryUserId)
         {
-            throw new ValidationException("Дочерния категория принадлежит другому пользователю");
+            throw new SpendingTrackerValidationException(ValidationErrorCodeEnum.CategoryDoesNotBelongsToUser);
         }
 
         await EnsureValidDependencies(command.UserId, parentCategory, childCategory, cancellationToken);
@@ -59,7 +59,7 @@ internal class AddExistCategoryAsChildrenCommandHandler : CommandHandler<Contrac
             var childHasParent = ChildHasParent(nodeInBranch, child);
             if (childHasParent)
             {
-                throw new ValidationException("Указанная родительская категория является дочерней");
+                throw new SpendingTrackerValidationException(ValidationErrorCodeEnum.RecursivelyAddedCategory);
             }
         }
 

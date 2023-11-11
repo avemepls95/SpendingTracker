@@ -13,6 +13,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\SpendingTracker.Common\SpendingTracker.Common.csproj" />
+      <ProjectReference Include="..\SpendingTracker.GenericSubDomain\SpendingTracker.GenericSubDomain.csproj" />
     </ItemGroup>
 
 </Project>

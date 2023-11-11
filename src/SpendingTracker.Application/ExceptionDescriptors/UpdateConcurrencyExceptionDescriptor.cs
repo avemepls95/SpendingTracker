@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Microsoft.EntityFrameworkCore;
 using SpendingTracker.Application.Middleware.ExceptionHandling;
+using SpendingTracker.GenericSubDomain.Validation;
 
 namespace SpendingTracker.Application.ExceptionDescriptors
 {
@@ -13,16 +14,14 @@ namespace SpendingTracker.Application.ExceptionDescriptors
 
         public HttpStatusCode StatusCode => HttpStatusCode.Conflict;
 
-        public ErrorResult Handle(Exception ex)
+        public ErrorProperty[] Handle(Exception ex)
         {
             var errors = new[]
             {
-                new ErrorProperty(
-                    nameof(HttpStatusCode.Conflict),
-                "С последней загрузки объект был изменен. Обновите страницу.")
+                ErrorProperty.FromCode(ValidationErrorCodeEnum.ObjectWasChanged)
             };
 
-            return new ErrorResult(errors);
+            return errors;
         }
     }
 }

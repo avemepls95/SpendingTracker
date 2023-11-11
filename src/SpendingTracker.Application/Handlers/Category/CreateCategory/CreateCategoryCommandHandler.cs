@@ -1,7 +1,7 @@
-﻿using FluentValidation;
-using SpendingTracker.Application.Factories.Abstractions;
+﻿using SpendingTracker.Application.Factories.Abstractions;
 using SpendingTracker.Application.Handlers.Category.CreateCategory.Contracts;
 using SpendingTracker.Dispatcher.DataTransfer.Dispatcher;
+using SpendingTracker.GenericSubDomain.Validation;
 using SpendingTracker.Infrastructure.Abstractions;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
 
@@ -32,7 +32,7 @@ internal sealed class CreateCategoryCommandHandler : CommandHandler<CreateCatego
 
         if (userAlreadyHasByTitle)
         {
-            throw new ValidationException("У Вас уже есть категория с таким названием");
+            throw new SpendingTrackerValidationException(ValidationErrorCodeEnum.UserAlreadyHasCategoryWithSpecifiedName);
         }
         
         var category = _categoryFactory.Create(command.Title, command.UserId);

@@ -4,7 +4,7 @@ using SpendingTracker.Application.Middleware.ExceptionHandling;
 
 namespace SpendingTracker.Application.ExceptionDescriptors
 {
-    internal sealed class ValidationExceptionDescriptor : IExceptionDescriptor
+    internal sealed class FluentValidationExceptionDescriptor : IExceptionDescriptor
     {
         public bool CanHandle(Exception ex)
         {
@@ -13,23 +13,23 @@ namespace SpendingTracker.Application.ExceptionDescriptors
 
         public HttpStatusCode StatusCode => HttpStatusCode.BadRequest;
 
-        public ErrorResult Handle(Exception ex)
+        public ErrorProperty[] Handle(Exception ex)
         {
             var validationException = (ValidationException) ex;
 
             if (!string.IsNullOrWhiteSpace(validationException.Message))
             {
-                return new ErrorResult(new[]
+                return new[]
                 {
-                    new ErrorProperty(nameof(HttpStatusCode.BadRequest), validationException.Message)
-                });
+                    ErrorProperty.FromMessage(validationException.Message)
+                };
             }
             
             var errors = validationException.Errors
-                .Select(e => new ErrorProperty(e.PropertyName, e.ErrorMessage))
+                .Select(e => ErrorProperty.FromMessage(e.ErrorMessage))
                 .ToArray();
 
-            return new ErrorResult(errors);
+            return errors;
         }
     }
 }

@@ -1,7 +1,7 @@
-﻿using FluentValidation;
-using SpendingTracker.Application.Factories.Abstractions;
+﻿using SpendingTracker.Application.Factories.Abstractions;
 using SpendingTracker.Application.Handlers.Category.AddNewCategoryAsParent.Contracts;
 using SpendingTracker.Dispatcher.DataTransfer.Dispatcher;
+using SpendingTracker.GenericSubDomain.Validation;
 using SpendingTracker.Infrastructure.Abstractions;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
 
@@ -32,7 +32,7 @@ internal class AddNewCategoryAsParentCommandHandler : CommandHandler<AddNewCateg
 
         if (userAlreadyHasByTitle)
         {
-            throw new ValidationException("У пользователя уже есть категория с таким названием");
+            throw new SpendingTrackerValidationException(ValidationErrorCodeEnum.UserAlreadyHasCategoryWithSpecifiedName);
         }
 
         var newParent = _categoryFactory.Create(command.NewParentTitle, command.UserId);

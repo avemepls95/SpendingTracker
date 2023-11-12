@@ -2,7 +2,7 @@
 
 internal interface IRatesProvider
 {
-    Task<Models.CurrencyRate[]> Get(
+    Task<Models.ExternalApiCurrencyRate[]> Get(
         string baseCode,
         string[] codes,
         CancellationToken cancellationToken = default);

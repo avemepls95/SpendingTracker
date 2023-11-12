@@ -32,6 +32,7 @@ public class SpendingController : BaseController
     
     [HttpGet("list")]
     public Task<GetSpendingsResponseItem[]> Get(
+        [FromQuery] Guid? currencyId = null,
         [FromQuery] int offset = 0,
         [FromQuery] int count = 10,
         CancellationToken cancellationToken = default)
@@ -39,6 +40,7 @@ public class SpendingController : BaseController
         var query = new GetSpendingsQuery
         {
             UserId = GetCurrentUserId(),
+            TargetCurrencyId = currencyId,
             Offset = offset,
             Count = count
         };

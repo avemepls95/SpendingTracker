@@ -15,9 +15,9 @@ internal sealed class RatesProvider : IRatesProvider
         _memoryCache = memoryCache;
     }
 
-    public async Task<Models.CurrencyRate[]> Get(string baseCode, string[] codes, CancellationToken cancellationToken)
+    public async Task<Models.ExternalApiCurrencyRate[]> Get(string baseCode, string[] codes, CancellationToken cancellationToken)
     {
-        var rates = await _memoryCache.GetOrCreateAsync("CurrencyRates_RussianCB", async entry =>
+        var rates = await _memoryCache.GetOrCreateAsync("CurrencyRates", async entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
             
@@ -39,7 +39,7 @@ internal sealed class RatesProvider : IRatesProvider
             throw new Exception("Не удалось получить данные о курсах валют.");
         }
     
-        return rates.Select(c => new Models.CurrencyRate
+        return rates.Select(c => new Models.ExternalApiCurrencyRate
         {
             SourceCode = c.SourceCode,
             TargetCode = c.TargetCode,

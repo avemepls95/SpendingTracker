@@ -10,7 +10,7 @@ namespace SpendingTracker.CurrencyRate
         public static IServiceCollection AddCurrencyRates(this IServiceCollection services)
         {
             services
-                .AddSingleton<ICurrencyConverter, CurrencyConverter>()
+                .AddScoped<ICurrencyConverter, CurrencyConverter>()
                 .AddSingleton<IRatesProvider, RatesProvider>()
                 .AddHostedService<CurrencyBackgroundService>()
                 .AddFixerRateApiClient();

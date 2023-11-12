@@ -21,14 +21,6 @@
       <None Include="appsettings.Development.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-
-
-
-
-
     </ItemGroup>
-
-
-
 
 </Project>

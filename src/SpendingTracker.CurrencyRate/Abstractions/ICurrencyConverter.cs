@@ -1,6 +1,10 @@
-﻿namespace SpendingTracker.CurrencyRate.Abstractions;
+﻿using SpendingTracker.CurrencyRate.Contracts;
+
+namespace SpendingTracker.CurrencyRate.Abstractions;
 
 public interface ICurrencyConverter
 {
-    Task<decimal> GetCoefficient(string code, CancellationToken cancellationToken = default);
+    Task<GetCoefficientResult[]> GetCoefficients(
+        GetCoefficientRequest[] requests,
+        CancellationToken cancellationToken = default);
 }

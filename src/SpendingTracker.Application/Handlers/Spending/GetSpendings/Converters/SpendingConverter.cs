@@ -21,6 +21,26 @@ public static class SpendingConverter
             Categories = categories
         };
     }
+    
+    public static GetSpendingsResponseItem ConvertToDto(
+        Domain.Spending spending,
+        double customCurrencyAmount,
+        Domain.Categories.Category[] categoriesTree)
+    {
+        var categories = ConvertCategories(spending, categoriesTree);
+        
+        return new GetSpendingsResponseItem
+        {
+            Id = spending.Id,
+            Amount = spending.Amount,
+            CurrencyId = spending.Currency.Id,
+            Date = spending.Date,
+            Description = spending.Description,
+            CreateDate = spending.CreatedDate,
+            Categories = categories,
+            CustomCurrencyAmount = customCurrencyAmount
+        };
+    }
 
     private static CategoryDto[] ConvertCategories(
         Domain.Spending spending,

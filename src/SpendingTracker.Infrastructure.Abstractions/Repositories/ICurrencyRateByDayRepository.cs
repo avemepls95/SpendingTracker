@@ -1,4 +1,6 @@
-﻿namespace SpendingTracker.Infrastructure.Abstractions.Repositories;
+﻿using SpendingTracker.Infrastructure.Abstractions.Repositories.Models;
+
+namespace SpendingTracker.Infrastructure.Abstractions.Repositories;
 
 public interface ICurrencyRateByDayRepository
 {
@@ -9,4 +11,12 @@ public interface ICurrencyRateByDayRepository
         CancellationToken cancellationToken = default);
 
     public Task<bool> ExistsAnyInThisDay(DateTimeOffset day, CancellationToken cancellationToken = default);
+
+    public Task<CurrencyRateByDayShortModel[]> GetRatesByDays(
+        DateOnly[] dates,
+        CancellationToken cancellationToken = default);
+    
+    public Task<CurrencyRateByDayShortModel[]> GetRatesByNearestDay(
+        DateOnly date,
+        CancellationToken cancellationToken = default);
 }

@@ -37,7 +37,7 @@ internal class CurrencyBackgroundService : BackgroundService
                 var allCurrencies = await currencyRepository.GetAll(cancellationToken);
                 var targetCurrencies = allCurrencies.Where(c => !c.IsDefault).ToArray();
                 var targetCurrencyCodes = targetCurrencies.Select(c => c.Code).ToArray();
-                var rates = await _ratesProvider.Get(
+                var rates = await _ratesProvider.GetToday(
                     CurrencyOptions.BaseCurrencyCode,
                     targetCurrencyCodes,
                     cancellationToken);

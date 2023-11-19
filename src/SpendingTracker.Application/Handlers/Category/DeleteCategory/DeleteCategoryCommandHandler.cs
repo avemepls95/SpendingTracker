@@ -26,7 +26,9 @@ internal sealed class DeleteCategoryCommandHandler : CommandHandler<DeleteCatego
         {
             throw new SpendingTrackerValidationException(ValidationErrorCodeEnum.CurrentUserHasNoPermissionToDeleteCategory);
         }
-
+        
+        _categoryRepository.RemoveFromAllSpendings(command.Id);
+        _categoryRepository.RemoveAllLinksWithAnotherCategories(command.Id);
         await _categoryRepository.DeleteCategory(category, cancellationToken);
         
         await _unitOfWork.SaveAsync(cancellationToken);

@@ -15,9 +15,8 @@
     <ItemGroup>
       <ProjectReference Include="..\SpendingTracker.ApiClient\SpendingTracker.ApiClient.csproj" />
       <ProjectReference Include="..\SpendingTracker.FixerApiClient\SpendingTracker.FixerApiClient.csproj" />
+      <ProjectReference Include="..\SpendingTracker.GenericSubDomain\SpendingTracker.GenericSubDomain.csproj" />
       <ProjectReference Include="..\SpendingTracker.Infrastructure.Abstractions\SpendingTracker.Infrastructure.Abstractions.csproj" />
     </ItemGroup>
-
-
 
 </Project>

@@ -1,14 +1,11 @@
 ﻿using Newtonsoft.Json;
 
-namespace FixerApiClient.FixerApiModel.GetLastRates;
+namespace FixerApiClient.FixerApiModel.GetRatesByDates;
 
-internal class GetLastRatesResponse
+public class GetRatesByDatesResponse
 {
     [JsonProperty(PropertyName = "base")]
     public string BaseCode { get; set; }
-
-    [JsonProperty(PropertyName = "date")]
-    public DateTime Date { get; set; }
 
     [JsonProperty(PropertyName = "rates")]
     public object Rates { get; set; }

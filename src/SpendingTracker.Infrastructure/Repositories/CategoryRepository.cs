@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SpendingTracker.Common.Primitives;
 using SpendingTracker.Domain.Categories;
+using SpendingTracker.Infrastructure.Abstractions.Models.Request;
 using SpendingTracker.Infrastructure.Abstractions.Models.Stored.Categories;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
 using SpendingTracker.Infrastructure.Factories.Abstractions;
@@ -28,6 +29,20 @@ internal class CategoryRepository : ICategoryRepository
         };
 
         await _dbContext.Set<StoredCategory>().AddAsync(newStoredCategory, cancellationToken);
+    }
+
+    public async Task UpdateCategory(UpdateCategoryModel updateModel, CancellationToken cancellationToken)
+    {
+        var dbSpending = await _dbContext.Set<StoredCategory>()
+            .Where(s => !s.IsDeleted && s.Id == updateModel.Id)
+            .FirstAsync(cancellationToken);
+            
+        if (dbSpending == null)
+        {
+            throw new ArgumentException($"Не найдена категория с идентификатором {updateModel.Id}");
+        }
+
+        dbSpending.Title = updateModel.Title;
     }
 
     public async Task CreateCategories(Category[] newCategories, CancellationToken cancellationToken)
@@ -277,5 +292,21 @@ internal class CategoryRepository : ICategoryRepository
         };
         _dbContext.Set<StoredCategoriesLink>().Attach(categoriesLink);
         _dbContext.Set<StoredCategoriesLink>().Remove(categoriesLink);
+    }
+
+    public void RemoveAllLinksWithAnotherCategories(Guid id)
+    {
+        var linksWithSpendings = _dbContext.Set<StoredCategoriesLink>()
+            .Where(l => l.ChildId == id || l.ParentId == id);
+        
+        _dbContext.Set<StoredCategoriesLink>().RemoveRange(linksWithSpendings);
+    }
+
+    public void RemoveFromAllSpendings(Guid id)
+    {
+        var linksWithSpendings = _dbContext.Set<StoredSpendingCategoryLink>()
+            .Where(l => l.CategoryId == id);
+        
+        _dbContext.Set<StoredSpendingCategoryLink>().RemoveRange(linksWithSpendings);
     }
 }

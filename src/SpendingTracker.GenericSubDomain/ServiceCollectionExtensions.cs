@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SpendingTracker.GenericSubDomain.Common;
+using SpendingTracker.GenericSubDomain.StartupTasks.Abstractions;
 using SpendingTracker.GenericSubDomain.User;
 using SpendingTracker.GenericSubDomain.User.Abstractions;
 using SpendingTracker.GenericSubDomain.User.Internal;
@@ -30,6 +31,12 @@ namespace SpendingTracker.GenericSubDomain
             services.AddSingleton<IJsonSerializer, NewtonsoftJsonSerializer>();
 
             return services;
+        }
+        
+        public static IServiceCollection AddStartupTask<T>(this IServiceCollection services)
+            where T : class, IStartupTask
+        {
+            return services.AddTransient<IStartupTask, T>();
         }
     }
 }

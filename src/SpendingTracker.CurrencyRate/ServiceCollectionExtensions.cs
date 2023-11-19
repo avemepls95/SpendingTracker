@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using SpendingTracker.CurrencyRate.Abstractions;
 using SpendingTracker.CurrencyRate.BackgroundServices;
+using SpendingTracker.CurrencyRate.StartupTasks;
+using SpendingTracker.GenericSubDomain;
 
 namespace SpendingTracker.CurrencyRate
 {
@@ -14,6 +16,9 @@ namespace SpendingTracker.CurrencyRate
                 .AddSingleton<IRatesProvider, RatesProvider>()
                 .AddHostedService<CurrencyBackgroundService>()
                 .AddFixerRateApiClient();
+
+            services
+                .AddStartupTask<ActualizeCurrencyRatesByDaysStartupTask>();
 
             return services;
         }

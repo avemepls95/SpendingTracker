@@ -7,6 +7,7 @@ using SpendingTracker.Application.Handlers.Category.CreateCategory.Contracts;
 using SpendingTracker.Application.Handlers.Category.DeleteCategory.Contracts;
 using SpendingTracker.Application.Handlers.Category.GetUserCategories.Contracts;
 using SpendingTracker.Application.Handlers.Category.RemoveChildCategoryFromParent.Contracts;
+using SpendingTracker.Application.Handlers.Category.UpdateCategory.Contracts;
 using SpendingTracker.BearerTokenAuth;
 using SpendingTracker.Dispatcher.Extensions;
 using SpendingTracker.Domain;
@@ -14,6 +15,7 @@ using SpendingTracker.WebApp.Contracts.AddExistCategoryAsChildren;
 using SpendingTracker.WebApp.Contracts.AddNewCategoryAsParent;
 using SpendingTracker.WebApp.Contracts.CreateCategory;
 using SpendingTracker.WebApp.Contracts.DeleteCategory;
+using SpendingTracker.WebApp.Contracts.UpdateCategory;
 
 namespace SpendingTracker.WebApp.Controllers;
 
@@ -38,6 +40,19 @@ public class CategoryController : BaseController
         {
             UserId = GetCurrentUserId(),
             Title = request.Title
+        };
+
+        return _mediator.SendCommandAsync(command, cancellationToken);
+    }
+    
+    [HttpPost("update")]
+    public Task Delete([FromBody] UpdateCategoryRequest request, CancellationToken cancellationToken)
+    {
+        var command = new UpdateCategoryCommand
+        {
+            Id = request.Id,
+            Title = request.Title,
+            ActionSource = ActionSource.Api
         };
 
         return _mediator.SendCommandAsync(command, cancellationToken);

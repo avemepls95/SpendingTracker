@@ -12,6 +12,7 @@ using SpendingTracker.CurrencyRate;
 using SpendingTracker.Dispatcher.Extensions;
 using SpendingTracker.GenericSubDomain;
 using SpendingTracker.Infrastructure;
+using SpendingTracker.WebApp;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 ConfigureServices(builder.Services);
     
 var app = builder.Build();
+app.RunStartupTasks();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

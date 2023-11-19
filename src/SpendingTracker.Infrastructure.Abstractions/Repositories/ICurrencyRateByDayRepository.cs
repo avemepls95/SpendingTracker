@@ -19,4 +19,6 @@ public interface ICurrencyRateByDayRepository
     public Task<CurrencyRateByDayShortModel[]> GetRatesByNearestDay(
         DateOnly date,
         CancellationToken cancellationToken = default);
+
+    public Task<DateOnly[]> GetMissedDaysFromDate(DateTime dateFrom, CancellationToken cancellationToken = default);
 }

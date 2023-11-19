@@ -79,4 +79,20 @@ LIMIT 1
         
         return result;
     }
+
+    public async Task<DateOnly[]> GetMissedDaysFromDate(DateTime dateFrom, CancellationToken cancellationToken)
+    {
+        var existDates = await _dbContext.Set<StoredCurrencyRateByDay>()
+            .GroupBy(r => DateOnly.FromDateTime(r.Date.Date))
+            .Select(grouping => grouping.Key)
+            .ToArrayAsync(cancellationToken);
+
+        var now = DateTimeOffset.Now.Date;
+        var missedDates = Enumerable.Range(0, 1 + now.Subtract(dateFrom).Days)
+            .Select(offset => DateOnly.FromDateTime(dateFrom.AddDays(offset)))
+            .Where(d => !existDates.Contains(d))
+            .ToArray();
+
+        return missedDates;
+    }
 }

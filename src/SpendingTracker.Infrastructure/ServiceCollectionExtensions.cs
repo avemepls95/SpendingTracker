@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SpendingTracker.Infrastructure.Abstractions;
@@ -14,29 +13,19 @@ namespace SpendingTracker.Infrastructure
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructure(
+            this IServiceCollection services,
+            ConnectionStrings connectionStrings)
         {
-            var connectionsStrings = configuration.GetSection(nameof(ConnectionStrings)).Get<ConnectionStrings>()!;
-            if (string.IsNullOrWhiteSpace(connectionsStrings.SpendingTrackerDb))
-            {
-                connectionsStrings.SpendingTrackerDb = Environment.GetEnvironmentVariable("CONNECTION-STRINGS_SPENDING-TRACKER-DB");
-            }
-
             var loggerFactory = LoggerFactory.Create(builder => { builder.AddConsole(); });
             
             services
-                .AddSingleton(connectionsStrings)
+                .AddSingleton(connectionStrings)
                 .AddDbContextPool<MainDbContext>(
-                    o => o.UseNpgsql(connectionsStrings.SpendingTrackerDb)
+                    o => o.UseNpgsql(connectionStrings.SpendingTrackerDb)
                         .UseLoggerFactory(loggerFactory)
                         .EnableSensitiveDataLogging()
                         .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored)));
-
-            services.AddDbContextFactory<MainDbContext>(options => options
-                .UseNpgsql(connectionsStrings.SpendingTrackerDb)
-                .UseLoggerFactory(loggerFactory)
-                .EnableSensitiveDataLogging()
-                .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored)));
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddServices();
@@ -54,6 +43,8 @@ namespace SpendingTracker.Infrastructure
                 .AddSingleton<ISpendingFactory, SpendingFactory>()
                 .AddSingleton<ICategoryFactory, CategoryFactory>()
                 .AddSingleton<IUserFactory, UserFactory>();
+
+            services.AddScoped<IDataInitializer, DataInitializer>();
 
             return services;
         }

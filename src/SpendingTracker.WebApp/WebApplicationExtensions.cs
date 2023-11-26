@@ -6,7 +6,7 @@ namespace SpendingTracker.WebApp
     [ExcludeFromCodeCoverage]
     public static class WebApplicationExtensions
     {
-        public static void RunStartupTasks(this WebApplication webApplication)
+        public static WebApplication RunStartupTasks(this WebApplication webApplication)
         {
             var startupTasks = webApplication.Services.GetServices<IStartupTask>();
 
@@ -21,6 +21,8 @@ namespace SpendingTracker.WebApp
                     throw new Exception(e.Message);
                 }
             }
+
+            return webApplication;
         }
     }
 }

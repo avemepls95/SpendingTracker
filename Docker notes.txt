@@ -1,6 +1,12 @@
 docker build --rm -t avemepls/spending-tracker_telegram-bot:latest .
 docker push avemepls/spending-tracker_telegram-bot:latest
 
+docker build --rm -t avemepls/spending-tracker_web-api:latest .
+docker push avemepls/spending-tracker_web-api:latest
+
+docker build --rm -t avemepls/spending-tracker_web-app:latest .
+docker push avemepls/spending-tracker_web-api:latest
+
 scp docker-compose.yml root@45.132.18.28:/src/spending-tracker
 cd ../src/spending-tracker
 

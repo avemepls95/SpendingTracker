@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using SpendingTracker.GenericSubDomain.User.Abstractions;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
 
@@ -8,13 +7,13 @@ namespace SpendingTracker.GenericSubDomain.User.Internal
     internal sealed class UserByTelegramContextFactory : IUserContextFactory
     {
         private readonly IMemoryCache _memoryCache;
-        private readonly IOptionsMonitor<TelegramUserContextOptions> _options;
+        private readonly TelegramUserContextOptions _options;
         private readonly IUserRepository _userRepository;
         private readonly ITelegramUserIdStore _telegramUserIdStore;
 
         public UserByTelegramContextFactory(
             IMemoryCache memoryCache,
-            IOptionsMonitor<TelegramUserContextOptions> options,
+            TelegramUserContextOptions options,
             IUserRepository userRepository,
             ITelegramUserIdStore telegramUserIdStore)
         {
@@ -36,7 +35,7 @@ namespace SpendingTracker.GenericSubDomain.User.Internal
                 {
                     var userId = await _userRepository.GetIdByTelegramId(telegramUserId, cancellationToken);
                     
-                    cacheEntry.AbsoluteExpirationRelativeToNow = _options.CurrentValue.CacheAbsoluteExpirationRelativeToNow;
+                    cacheEntry.AbsoluteExpirationRelativeToNow = _options.CacheAbsoluteExpirationRelativeToNow;
 
                     return new UserContext(userId);
                 });

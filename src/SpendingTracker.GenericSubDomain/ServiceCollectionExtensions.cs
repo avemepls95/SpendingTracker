@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using SpendingTracker.GenericSubDomain.Common;
 using SpendingTracker.GenericSubDomain.StartupTasks.Abstractions;
 using SpendingTracker.GenericSubDomain.User;
@@ -12,14 +11,17 @@ namespace SpendingTracker.GenericSubDomain
     {
         public static IServiceCollection AddGenericSubDomain(
             this IServiceCollection services,
-            IConfiguration configuration)
+            SystemUserContextOptions systemUserContextOptions,
+            TelegramUserContextOptions telegramUserContextOptions)
         {
-            var systemUserContextOptions = configuration.GetSection(nameof(SystemUserContextOptions));
-            services.Configure<SystemUserContextOptions>(systemUserContextOptions);
-            
-            var telegramUserContextOptions = configuration.GetSection(nameof(TelegramUserContextOptions));
-            services.Configure<TelegramUserContextOptions>(telegramUserContextOptions);
-            
+            services.AddSingleton<SystemUserContextOptions>(_ => systemUserContextOptions);
+            services.AddSingleton<TelegramUserContextOptions>(_ => telegramUserContextOptions);
+
+            return AddGenericSubDomain(services);
+        }
+        
+        public static IServiceCollection AddGenericSubDomain(this IServiceCollection services)
+        {
             services
                 .AddScoped<IUserContextFactory, SystemUserContextFactory>()
                 .AddScoped<IUserContextFactory, UserByTelegramContextFactory>()

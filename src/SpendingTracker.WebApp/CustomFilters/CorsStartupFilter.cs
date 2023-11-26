@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-
-namespace SpendingTracker.Application.CustomFilters
+﻿namespace SpendingTracker.WebApp.CustomFilters
 {
     public class CorsStartupFilter : IStartupFilter
     {
@@ -17,7 +13,7 @@ namespace SpendingTracker.Application.CustomFilters
         {
             return app =>
             {
-                var corsOptions = _configuration.GetSection(nameof(CorsOptions)).Get<CorsOptions>();
+                var corsOptions = ConfigurationReader.ReadCorsOptions(_configuration);
 
                 app.UseCors(c => c
                     .WithOrigins(corsOptions.Origins)

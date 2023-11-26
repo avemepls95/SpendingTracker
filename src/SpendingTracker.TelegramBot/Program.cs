@@ -235,16 +235,18 @@ IServiceProvider InitializeDependencies()
 {
     var configuration = AppConfigurationBuilder.Build();
 
+    var connectionStrings = ConfigurationReader.ReadConnectionStrings(configuration);
+
     var builder = new HostBuilder()
         .ConfigureServices((_, services) =>
         {
             var assemblyNamesForScan = new [] { "SpendingTracker.Application" };
             var assembliesForScan = assemblyNamesForScan.Select(Assembly.Load).ToArray();
             services.AddLogging(configure => configure.AddConsole())
-                .AddInfrastructure(configuration)
+                .AddInfrastructure(connectionStrings)
                 .AddDispatcher(assembliesForScan)
                 .AddFluentValidation(assembliesForScan)
-                .AddGenericSubDomain(configuration)
+                .AddGenericSubDomain()
                 .AddMemoryCache()
                 .AddServices()
                 .AddTelegramBotWrappingServices();

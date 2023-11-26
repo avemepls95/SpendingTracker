@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using SpendingTracker.GenericSubDomain.User.Abstractions;
 
 namespace SpendingTracker.GenericSubDomain.User.Internal
@@ -7,9 +6,9 @@ namespace SpendingTracker.GenericSubDomain.User.Internal
     internal sealed class SystemUserContextFactory : IUserContextFactory
     {
         private readonly IMemoryCache _memoryCache;
-        private readonly IOptionsMonitor<SystemUserContextOptions> _options;
+        private readonly SystemUserContextOptions _options;
 
-        public SystemUserContextFactory(IMemoryCache memoryCache, IOptionsMonitor<SystemUserContextOptions> options)
+        public SystemUserContextFactory(IMemoryCache memoryCache, SystemUserContextOptions options)
         {
             _memoryCache = memoryCache;
             _options = options;
@@ -22,7 +21,7 @@ namespace SpendingTracker.GenericSubDomain.User.Internal
             var result = await _memoryCache.GetOrCreateAsync<UserContext>(
                 nameof(SystemUserContextFactory), cacheEntry =>
                 {
-                    cacheEntry.AbsoluteExpirationRelativeToNow = _options.CurrentValue.CacheAbsoluteExpirationRelativeToNow;
+                    cacheEntry.AbsoluteExpirationRelativeToNow = _options.CacheAbsoluteExpirationRelativeToNow;
 
                     var systemUserId = Domain.User.SystemUserId;
                     return Task.FromResult(new UserContext(systemUserId));

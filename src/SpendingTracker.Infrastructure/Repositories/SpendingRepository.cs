@@ -69,12 +69,29 @@ namespace SpendingTracker.Infrastructure.Repositories
             UserKey userKey,
             int offset,
             int count,
+            string? searchString,
+            bool onlyWithoutCategories,
             CancellationToken cancellationToken)
         {
-            var dbSpendings = await _dbContext.Set<StoredSpending>()
+            var queryable = _dbContext.Set<StoredSpending>()
                 .Include(s => s.Currency)
-                .Where(s => !s.IsDeleted && s.CreatedBy == userKey)
+                .Where(s => !s.IsDeleted && s.CreatedBy == userKey);
+
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                queryable = queryable.Where(s => EF.Functions.Like(s.Description, $"%{searchString}%"));
+            }
+
+            if (onlyWithoutCategories)
+            {
+                queryable = queryable.Where(s =>
+                    !_dbContext.Set<StoredSpendingCategoryLink>()
+                        .Any(l => l.SpendingId == s.Id));
+            }
+            
+            var dbSpendings = await queryable
                 .OrderByDescending(s => s.Date)
+                .ThenByDescending(s => s.CreatedDate)
                 .Skip(offset)
                 .Take(count)
                 .ToArrayAsync(cancellationToken);

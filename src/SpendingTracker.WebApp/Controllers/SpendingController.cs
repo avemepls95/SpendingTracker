@@ -35,6 +35,8 @@ public class SpendingController : BaseController
         [FromQuery] Guid? currencyId = null,
         [FromQuery] int offset = 0,
         [FromQuery] int count = 10,
+        [FromQuery] string? searchString = null,
+        [FromQuery] bool onlyWithoutCategories = false,
         CancellationToken cancellationToken = default)
     {
         var query = new GetSpendingsQuery
@@ -42,7 +44,9 @@ public class SpendingController : BaseController
             UserId = GetCurrentUserId(),
             TargetCurrencyId = currencyId,
             Offset = offset,
-            Count = count
+            Count = count,
+            SearchString = searchString,
+            OnlyWithoutCategories = onlyWithoutCategories
         };
 
         return _mediator.SendQueryAsync<GetSpendingsQuery, GetSpendingsResponseItem[]>(

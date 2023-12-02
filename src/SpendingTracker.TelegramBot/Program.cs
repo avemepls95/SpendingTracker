@@ -76,6 +76,18 @@ async Task HandleUpdateAsync(
     }
     catch (Exception e)
     {
+        var userId = update.Type == UpdateType.Message
+            ? update.Message!.From!.Id
+            : update.CallbackQuery!.From.Id;
+
+        var message = userId == 375036212
+            ? e.ToString()
+            : "Произошла непредвиденная ошибка";
+            
+        await bot.SendTextMessageAsync(
+            userId,
+            message,
+            cancellationToken: cancellationToken);
         Console.WriteLine(e);
     }
 }
@@ -152,6 +164,14 @@ async Task HandleMessage(Message msg, CancellationToken cancellationToken)
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
+    else
+    {
+        await bot.SendTextMessageAsync(
+            userId,
+            "Отправлено пустое сообщение",
+            cancellationToken: cancellationToken
+        );
     }
 }
 
@@ -236,6 +256,8 @@ IServiceProvider InitializeDependencies()
     var configuration = AppConfigurationBuilder.Build();
 
     var connectionStrings = ConfigurationReader.ReadConnectionStrings(configuration);
+    var systemUserContextOptions = ConfigurationReader.ReadSystemUserContextOptions(configuration);
+    var telegramUserContextOptions = ConfigurationReader.ReadTelegramUserContextOptions(configuration);
 
     var builder = new HostBuilder()
         .ConfigureServices((_, services) =>
@@ -246,7 +268,7 @@ IServiceProvider InitializeDependencies()
                 .AddInfrastructure(connectionStrings)
                 .AddDispatcher(assembliesForScan)
                 .AddFluentValidation(assembliesForScan)
-                .AddGenericSubDomain()
+                .AddGenericSubDomain(systemUserContextOptions, telegramUserContextOptions)
                 .AddMemoryCache()
                 .AddServices()
                 .AddTelegramBotWrappingServices();

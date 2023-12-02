@@ -31,6 +31,8 @@ internal class GetSpendingsQueryHandler : QueryHandler<GetSpendingsQuery, GetSpe
             query.UserId,
             query.Offset,
             query.Count,
+            query.SearchString,
+            query.OnlyWithoutCategories,
             cancellationToken);
 
         var categoriesTree = await _categoryRepository.GetUserCategoriesTree(query.UserId, cancellationToken);

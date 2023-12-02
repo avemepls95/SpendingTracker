@@ -19,6 +19,8 @@ namespace SpendingTracker.Infrastructure.Abstractions.Repositories
             UserKey userKey,
             int offset,
             int count,
+            string? searchString,
+            bool onlyWithoutCategories = false,
             CancellationToken cancellationToken = default);
 
         Task AddExistToCategories(

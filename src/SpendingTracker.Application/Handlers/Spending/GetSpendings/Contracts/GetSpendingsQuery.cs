@@ -9,4 +9,6 @@ public class GetSpendingsQuery : IQuery<GetSpendingsResponseItem[]>
     public Guid? TargetCurrencyId { get; init; }
     public int Offset { get; init; } = 0;
     public int Count { get; init; } = 10;
+    public string? SearchString { get; init; }
+    public bool OnlyWithoutCategories { get; init; }
 }

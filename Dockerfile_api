@@ -1,0 +1,31 @@
+﻿FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+WORKDIR /app
+EXPOSE 5000
+EXPOSE 443
+
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+WORKDIR /src
+COPY ["./src/SpendingTracker.WebApp/SpendingTracker.WebApp.csproj", "SpendingTracker.WebApp/"]
+COPY ["./src/SpendingTracker.Application/SpendingTracker.Application.csproj", "SpendingTracker.Application/"]
+COPY ["./src/SpendingTracker.Dispatcher/SpendingTracker.Dispatcher.csproj", "SpendingTracker.Dispatcher/"]
+COPY ["./src/SpendingTracker.Common/SpendingTracker.Common.csproj", "SpendingTracker.Common/"]
+COPY ["./src/SpendingTracker.GenericSubDomain/SpendingTracker.GenericSubDomain.csproj", "SpendingTracker.GenericSubDomain/"]
+COPY ["./src/SpendingTracker.Domain/SpendingTracker.Domain.csproj", "SpendingTracker.Domain/"]
+COPY ["./src/SpendingTracker.Infrastructure.Abstractions/SpendingTracker.Infrastructure.Abstractions.csproj", "SpendingTracker.Infrastructure.Abstractions/"]
+COPY ["./src/SpendingTracker.BearerTokenAuth/SpendingTracker.BearerTokenAuth.csproj", "SpendingTracker.BearerTokenAuth/"]
+COPY ["./src/SpendingTracker.CurrencyRate/SpendingTracker.CurrencyRate.csproj", "SpendingTracker.CurrencyRate/"]
+COPY ["./src/SpendingTracker.ApiClient/SpendingTracker.ApiClient.csproj", "SpendingTracker.ApiClient/"]
+COPY ["./src/SpendingTracker.FixerApiClient/SpendingTracker.FixerApiClient.csproj", "SpendingTracker.FixerApiClient/"]
+COPY ["./src/SpendingTracker.Infrastructure/SpendingTracker.Infrastructure.csproj", "SpendingTracker.Infrastructure/"]
+RUN dotnet restore "SpendingTracker.WebApp/SpendingTracker.WebApp.csproj"
+COPY . .
+WORKDIR "src/SpendingTracker.WebApp"
+RUN dotnet build "SpendingTracker.WebApp.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "SpendingTracker.WebApp.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "SpendingTracker.WebApp.dll"]

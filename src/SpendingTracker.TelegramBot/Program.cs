@@ -180,6 +180,7 @@ async Task HandleCommand(User user, string command, CancellationToken cancellati
     switch (command)
     {
         case "/menu":
+        case "/start":
             await gatewayService.ProcessStartButton(bot, user, cancellationToken);
             break;
     }

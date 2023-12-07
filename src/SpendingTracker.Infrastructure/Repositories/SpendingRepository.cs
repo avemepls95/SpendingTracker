@@ -2,6 +2,7 @@
 using SpendingTracker.Common.Primitives;
 using SpendingTracker.Domain;
 using SpendingTracker.Domain.Categories;
+using SpendingTracker.GenericSubDomain.Validation;
 using SpendingTracker.Infrastructure.Abstractions.Models.Request;
 using SpendingTracker.Infrastructure.Abstractions.Models.Stored;
 using SpendingTracker.Infrastructure.Abstractions.Models.Stored.Categories;
@@ -105,15 +106,36 @@ namespace SpendingTracker.Infrastructure.Repositories
             var result = dbSpendings
                 .Select(s =>
                 {
-                    var categories = allCategoryLinks
+                    var categoryIds = allCategoryLinks
                         .Where(link => link.SpendingId == s.Id)
                         .Select(link => link.CategoryId)
                         .ToArray();
                         
-                    return _spendingFactory.Create(s, categories);
+                    return _spendingFactory.Create(s, categoryIds);
                 })
                 .ToArray();
             
+            return result;
+        }
+
+        public async Task<Spending> GetUserSpendingById(Guid id, CancellationToken cancellationToken)
+        {
+            var dbSpending = await _dbContext.Set<StoredSpending>()
+                .Include(s => s.Currency)
+                .Where(s => !s.IsDeleted && s.Id == id)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (dbSpending is null)
+            {
+                throw new SpendingTrackerValidationException(ValidationErrorCodeEnum.KeyNotFound);
+            }
+            
+            var categoryIds = await _dbContext.Set<StoredSpendingCategoryLink>()
+                .Where(l => l.SpendingId == id)
+                .Select(l => l.CategoryId)
+                .ToArrayAsync(cancellationToken);
+
+            var result = _spendingFactory.Create(dbSpending, categoryIds);
             return result;
         }
 

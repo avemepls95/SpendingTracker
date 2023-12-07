@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SpendingTracker.Application.Handlers.Spending.AddSpendingToExistCategory.Contracts;
 using SpendingTracker.Application.Handlers.Spending.AddSpendingToNewCategory.Contracts;
 using SpendingTracker.Application.Handlers.Spending.DeleteSpending.Contracts;
+using SpendingTracker.Application.Handlers.Spending.GetSpendingById.Contracts;
 using SpendingTracker.Application.Handlers.Spending.GetSpendings.Contracts;
 using SpendingTracker.Application.Handlers.Spending.RemoveSpendingFromCategory.Contracts;
 using SpendingTracker.Application.Handlers.Spending.UpdateSpending.Contracts;
@@ -52,6 +53,22 @@ public class SpendingController : BaseController
         return _mediator.SendQueryAsync<GetSpendingsQuery, GetSpendingsResponseItem[]>(
             query,
             cancellationToken);
+    }
+    
+    [HttpGet("get-by-id")]
+    public Task<GetSpendingByIdResponse> Delete(
+        [FromQuery] Guid id,
+        [FromQuery] Guid? currencyId,
+        CancellationToken cancellationToken)
+    {
+        var command = new GetSpendingByIdQuery
+        {
+            Id = id,
+            UserId = GetCurrentUserId(),
+            TargetCurrencyId = currencyId
+        };
+
+        return _mediator.SendQueryAsync<GetSpendingByIdQuery, GetSpendingByIdResponse>(command, cancellationToken);
     }
     
     [HttpPost("delete")]

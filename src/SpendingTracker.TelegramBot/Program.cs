@@ -70,6 +70,10 @@ async Task HandleUpdateAsync(
             case UpdateType.CallbackQuery:
                 await HandleButton(update.CallbackQuery!, cancellationToken);
                 break;
+            
+            case UpdateType.MyChatMember:
+                break;
+            
             default:
                 throw new ArgumentOutOfRangeException();
         }

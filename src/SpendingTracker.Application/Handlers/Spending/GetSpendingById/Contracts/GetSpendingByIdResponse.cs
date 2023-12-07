@@ -1,8 +1,8 @@
 ﻿using SpendingTracker.Application.Handlers.Spending.Common;
 
-namespace SpendingTracker.Application.Handlers.Spending.GetSpendings.Contracts;
+namespace SpendingTracker.Application.Handlers.Spending.GetSpendingById.Contracts;
 
-public class GetSpendingsResponseItem
+public class GetSpendingByIdResponse
 {
     public Guid Id { get; init; }
     public double Amount { get; init; }

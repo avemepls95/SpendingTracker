@@ -22,6 +22,10 @@ namespace SpendingTracker.Infrastructure.Abstractions.Repositories
             string? searchString,
             bool onlyWithoutCategories = false,
             CancellationToken cancellationToken = default);
+        
+        Task<Spending> GetUserSpendingById(
+            Guid id,
+            CancellationToken cancellationToken = default);
 
         Task AddExistToCategories(
             Guid spendingId,

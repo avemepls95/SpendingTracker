@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SpendingTracker.Common.Primitives;
 using SpendingTracker.Domain.Categories;
+using SpendingTracker.GenericSubDomain.Validation;
 using SpendingTracker.Infrastructure.Abstractions.Models.Request;
+using SpendingTracker.Infrastructure.Abstractions.Models.Stored;
 using SpendingTracker.Infrastructure.Abstractions.Models.Stored.Categories;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
 using SpendingTracker.Infrastructure.Factories.Abstractions;
@@ -249,6 +251,66 @@ internal class CategoryRepository : ICategoryRepository
                 parent.AddChild(category);
                 category.AddParent(parent);
 
+                ProcessCategory(parent);
+            }
+        }
+    }
+
+    public async Task<Category[]> GetSpendingCategoriesTree(Guid spendingId, CancellationToken cancellationToken)
+    {
+        var userId = await _dbContext.Set<StoredSpending>()
+            .Where(s => s.Id == spendingId && !s.IsDeleted)
+            .Select(s => s.CreatedBy)
+            .FirstOrDefaultAsync(cancellationToken);
+        if (userId is null)
+        {
+            throw new SpendingTrackerValidationException(ValidationErrorCodeEnum.KeyNotFound);
+        }
+
+        var dbCategories = await _dbContext.Set<StoredCategory>()
+            .Where(c => c.OwnerId == userId && !c.IsDeleted)
+            .ToArrayAsync(cancellationToken);
+        var dbCategoryIds = dbCategories.Select(c => c.Id).ToArray();
+
+        var categoryLinks = await _dbContext.Set<StoredCategoriesLink>()
+            .Where(l => dbCategoryIds.Contains(l.ChildId) || dbCategoryIds.Contains(l.ParentId))
+            .ToArrayAsync(cancellationToken);
+
+        var spendingCategoryIds = await _dbContext.Set<StoredSpendingCategoryLink>()
+            .Where(l => l.SpendingId == spendingId)
+            .Select(l => l.CategoryId)
+            .Distinct()
+            .ToArrayAsync(cancellationToken);
+        
+        var result = new List<Category>();
+        var spendingDbCategories = dbCategories
+            .Where(c => spendingCategoryIds.Contains(c.Id))
+            .ToArray();
+    
+        foreach (var firstLevelDbCategory in spendingDbCategories)
+        {
+            var category = _categoryFactory.Create(firstLevelDbCategory);
+            result.Add(category);
+            ProcessCategory(category);
+        }
+    
+        return result.ToArray();
+    
+        void ProcessCategory(Category category)
+        {
+            var linksWhereCategoryChild = categoryLinks.Where(l => l.ChildId == category.Id).ToArray();
+            if (linksWhereCategoryChild.Length == 0)
+            {
+                return;
+            }
+    
+            foreach (var linkWhereCategoryChild in linksWhereCategoryChild)
+            {
+                var dbParent = dbCategories.First(c => c.Id == linkWhereCategoryChild.ParentId);
+                var parent = _categoryFactory.Create(dbParent);
+                parent.AddChild(category);
+                category.AddParent(parent);
+    
                 ProcessCategory(parent);
             }
         }

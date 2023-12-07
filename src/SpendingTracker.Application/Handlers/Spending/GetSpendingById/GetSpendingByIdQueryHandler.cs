@@ -1,18 +1,18 @@
-﻿using SpendingTracker.Application.Handlers.Spending.GetSpendings.Contracts;
+﻿using SpendingTracker.Application.Handlers.Spending.GetSpendingById.Contracts;
 using SpendingTracker.Application.Handlers.Spending.GetSpendings.Converters;
 using SpendingTracker.Application.Handlers.Spending.Services.Abstractions;
 using SpendingTracker.Dispatcher.DataTransfer.Dispatcher;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
 
-namespace SpendingTracker.Application.Handlers.Spending.GetSpendings;
+namespace SpendingTracker.Application.Handlers.Spending.GetSpendingById;
 
-internal class GetSpendingsQueryHandler : QueryHandler<GetSpendingsQuery, GetSpendingsResponseItem[]>
+internal class GetSpendingByIdQueryHandler : QueryHandler<GetSpendingByIdQuery, GetSpendingByIdResponse>
 {
     private readonly ISpendingRepository _spendingRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly ISpendingsConvertingService _spendingsConvertingService;
 
-    public GetSpendingsQueryHandler(
+    public GetSpendingByIdQueryHandler(
         ISpendingRepository spendingRepository,
         ICategoryRepository categoryRepository,
         ISpendingsConvertingService spendingsConvertingService)
@@ -22,41 +22,29 @@ internal class GetSpendingsQueryHandler : QueryHandler<GetSpendingsQuery, GetSpe
         _spendingsConvertingService = spendingsConvertingService;
     }
 
-    public override async Task<GetSpendingsResponseItem[]> HandleAsync(
-        GetSpendingsQuery query,
+    public override async Task<GetSpendingByIdResponse> HandleAsync(
+        GetSpendingByIdQuery query,
         CancellationToken cancellationToken)
     {
-        var spendings = await _spendingRepository.GetUserSpendings(
-            query.UserId,
-            query.Offset,
-            query.Count,
-            query.SearchString,
-            query.OnlyWithoutCategories,
-            cancellationToken);
+        var spending = await _spendingRepository.GetUserSpendingById(query.Id, cancellationToken);
+        
+        var categoriesTree = await _categoryRepository.GetSpendingCategoriesTree(query.Id, cancellationToken);
 
-        var categoriesTree = await _categoryRepository.GetUserCategoriesTree(query.UserId, cancellationToken);
-
-        GetSpendingsResponseItem[] result; 
+        GetSpendingByIdResponse result; 
         if (query.TargetCurrencyId.HasValue)
         {
             var spendingConvertedAmountDict = await _spendingsConvertingService.GetSpendingsConvertedAmountDict(
-                spendings,
+                new [] { spending },
                 query.TargetCurrencyId.Value,
                 cancellationToken);
 
-            result = spendings
-                .Select(s => SpendingConverter.ConvertToGetSpendingsResponseItem(s, spendingConvertedAmountDict[s], categoriesTree))
-                .ToArray();
+            result = SpendingConverter.ConvertToGetSpendingByIdResponse(spending, spendingConvertedAmountDict[spending], categoriesTree);
         }
         else
         {
-            result = spendings
-                .Select(s => SpendingConverter.ConvertToGetSpendingsResponseItem(s, categoriesTree))
-                .ToArray();
+            result = SpendingConverter.ConvertToGetSpendingByIdResponse(spending, categoriesTree);
         }
 
         return result;
     }
-
-    
 }

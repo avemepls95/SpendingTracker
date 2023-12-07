@@ -2,6 +2,8 @@
 using SpendingTracker.Application.ExceptionDescriptors;
 using SpendingTracker.Application.Factories;
 using SpendingTracker.Application.Factories.Abstractions;
+using SpendingTracker.Application.Handlers.Spending.Services;
+using SpendingTracker.Application.Handlers.Spending.Services.Abstractions;
 
 namespace SpendingTracker.Application
 {
@@ -11,6 +13,7 @@ namespace SpendingTracker.Application
         {
             services
                 .AddSingleton<ICategoryFactory, CategoryFactory>()
+                .AddScoped<ISpendingsConvertingService, SpendingsConvertingService>()
                 .AddExceptionDescriptors();
 
             return services;

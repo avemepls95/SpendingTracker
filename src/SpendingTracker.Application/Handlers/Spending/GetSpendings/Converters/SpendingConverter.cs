@@ -1,10 +1,12 @@
-﻿using SpendingTracker.Application.Handlers.Spending.GetSpendings.Contracts;
+﻿using SpendingTracker.Application.Handlers.Spending.Common;
+using SpendingTracker.Application.Handlers.Spending.GetSpendingById.Contracts;
+using SpendingTracker.Application.Handlers.Spending.GetSpendings.Contracts;
 
 namespace SpendingTracker.Application.Handlers.Spending.GetSpendings.Converters;
 
 public static class SpendingConverter
 {
-    public static GetSpendingsResponseItem ConvertToDto(
+    public static GetSpendingsResponseItem ConvertToGetSpendingsResponseItem(
         Domain.Spending spending,
         Domain.Categories.Category[] categoriesTree)
     {
@@ -22,7 +24,7 @@ public static class SpendingConverter
         };
     }
     
-    public static GetSpendingsResponseItem ConvertToDto(
+    public static GetSpendingsResponseItem ConvertToGetSpendingsResponseItem(
         Domain.Spending spending,
         double customCurrencyAmount,
         Domain.Categories.Category[] categoriesTree)
@@ -30,6 +32,44 @@ public static class SpendingConverter
         var categories = ConvertCategories(spending, categoriesTree);
         
         return new GetSpendingsResponseItem
+        {
+            Id = spending.Id,
+            Amount = spending.Amount,
+            CurrencyId = spending.Currency.Id,
+            Date = spending.Date,
+            Description = spending.Description,
+            CreateDate = spending.CreatedDate,
+            Categories = categories,
+            CustomCurrencyAmount = customCurrencyAmount
+        };
+    }
+    
+    public static GetSpendingByIdResponse ConvertToGetSpendingByIdResponse(
+        Domain.Spending spending,
+        Domain.Categories.Category[] categoriesTree)
+    {
+        var categories = ConvertCategories(spending, categoriesTree);
+        
+        return new GetSpendingByIdResponse
+        {
+            Id = spending.Id,
+            Amount = spending.Amount,
+            CurrencyId = spending.Currency.Id,
+            Date = spending.Date,
+            Description = spending.Description,
+            CreateDate = spending.CreatedDate,
+            Categories = categories
+        };
+    }
+    
+    public static GetSpendingByIdResponse ConvertToGetSpendingByIdResponse(
+        Domain.Spending spending,
+        double customCurrencyAmount,
+        Domain.Categories.Category[] categoriesTree)
+    {
+        var categories = ConvertCategories(spending, categoriesTree);
+        
+        return new GetSpendingByIdResponse
         {
             Id = spending.Id,
             Amount = spending.Amount,

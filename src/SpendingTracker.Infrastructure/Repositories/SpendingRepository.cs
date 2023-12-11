@@ -80,7 +80,7 @@ namespace SpendingTracker.Infrastructure.Repositories
 
             if (!string.IsNullOrWhiteSpace(searchString))
             {
-                queryable = queryable.Where(s => EF.Functions.Like(s.Description, $"%{searchString}%"));
+                queryable = queryable.Where(s => EF.Functions.ILike(s.Description, $"%{searchString}%"));
             }
 
             if (onlyWithoutCategories)

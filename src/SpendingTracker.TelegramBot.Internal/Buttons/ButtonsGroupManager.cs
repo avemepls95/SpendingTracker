@@ -55,11 +55,8 @@ internal class ButtonsGroupManager : IButtonsGroupManager
             .AddButtonsLayer(new Button("Назад", StartGroup, createSpendingGroup));
 
         StartGroup
-            .AddButtonsLayer(
-                new Button("Перейти на сайт", "https://www.google.com"),
-                new Button("Добавить трату ✏️", createSpendingGroup, StartGroup))
-            .AddButtonsLayer(
-                new Button("⚙️ Настройки", settingsGroup, StartGroup));
+            .AddButtonsLayer(new Button("✏️ Добавить трату", createSpendingGroup, StartGroup))
+            .AddButtonsLayer(new Button("⚙️ Настройки", settingsGroup, StartGroup));
 
         _groups = new []
         {

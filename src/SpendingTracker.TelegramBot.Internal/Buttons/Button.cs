@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types.ReplyMarkups;
+﻿using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace SpendingTracker.TelegramBot.Internal.Buttons;
 
@@ -20,7 +21,7 @@ public class Button
         }
 
         Title = title;
-        TelegramButton = new InlineKeyboardButton(title) { Url = url };
+        TelegramButton = new InlineKeyboardButton(title) { WebApp = new WebAppInfo { Url = "https://spendingsdev.web.app"}};
     }
 
     public Button(

@@ -1,7 +1,7 @@
 docker build -f Dockerfile_bot --rm -t avemepls/spending-tracker_telegram-bot:latest .
 docker push avemepls/spending-tracker_telegram-bot:latest
 
-docker build --rm -t avemepls/spending-tracker_web-api:latest .
+docker build -f Dockerfile_api --rm -t avemepls/spending-tracker_web-api:latest .
 docker push avemepls/spending-tracker_web-api:latest
 
 docker build --rm -t avemepls/spending-tracker_web-app:latest .

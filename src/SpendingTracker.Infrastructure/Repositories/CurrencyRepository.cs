@@ -32,4 +32,11 @@ internal class CurrencyRepository : ICurrencyRepository
             .Select(c => _currencyFactory.Create(c))
             .ToArrayAsync(cancellationToken);
     }
+
+    public Task<bool> IsExistsById(Guid id, CancellationToken cancellationToken)
+    {
+        return _dbContext.Set<StoredCurrency>()
+            .AnyAsync(c => c.Id == id && !c.IsDeleted,
+                cancellationToken);
+    }
 }

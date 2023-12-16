@@ -15,7 +15,7 @@ public class Category : EntityObject<Category, Guid>
     public UserKey OwnerId { get; }
     public string Title { get; }
 
-    private List<Category> _childs { get; } = new();
+    private List<Category> _childs { get; set; } = new();
     /// <summary>
     /// Категории, которые включены в текущую.
     /// </summary>
@@ -34,9 +34,23 @@ public class Category : EntityObject<Category, Guid>
         return this;
     }
     
+    public Category SetChilds(Category[] childs)
+    {
+        _childs = childs.ToList();
+
+        return this;
+    }
+    
     public Category AddParent(Category child)
     {
         _parents.Add(child);
+
+        return this;
+    }
+    
+    public Category SetParents(Category[] parents)
+    {
+        _childs = parents.ToList();
 
         return this;
     }

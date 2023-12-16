@@ -7,7 +7,7 @@ docker push avemepls/spending-tracker_web-api:latest
 docker build --rm -t avemepls/spending-tracker_web-app:latest .
 docker push avemepls/spending-tracker_web-app:latest
 
-scp docker-compose.yml root@45.132.18.28:/src/spending-tracker
+scp spendings.db.env root@45.132.18.28:app/SpendingTracker.Infra
 cd ../src/spending-tracker
 
 docker pull avemepls/spending-tracker_telegram-bot

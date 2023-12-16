@@ -34,7 +34,7 @@ internal class GetSpendingsQueryHandler : QueryHandler<GetSpendingsQuery, GetSpe
             query.OnlyWithoutCategories,
             cancellationToken);
 
-        var categoriesTree = await _categoryRepository.GetUserCategoriesTree(query.UserId, cancellationToken);
+        var categoriesTree = await _categoryRepository.GetUserCategoriesReverseTree(query.UserId, cancellationToken);
 
         GetSpendingsResponseItem[] result; 
         if (query.TargetCurrencyId.HasValue)

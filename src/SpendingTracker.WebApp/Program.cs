@@ -72,7 +72,7 @@ static void ConfigureServices(WebApplicationBuilder webApplicationBuilder)
     var oAuthOptions = ConfigurationReader.ReadOAuthOptions(configuration);
     serviceCollection.AddJwtBearerTokenAuth(oAuthOptions);
 
-    serviceCollection.AddControllers();
+    serviceCollection.AddControllers(options => options.UseDateOnlyTimeOnlyStringConverters());
     serviceCollection.AddEndpointsApiExplorer();
     serviceCollection.AddSwaggerGen();
     serviceCollection.AddCors();

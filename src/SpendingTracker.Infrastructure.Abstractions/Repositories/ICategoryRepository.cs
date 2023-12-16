@@ -15,8 +15,9 @@ public interface ICategoryRepository
     Task<Category> GetById(Guid id, CancellationToken cancellationToken = default);
     Task<Category[]> GetByIds(Guid[] ids, CancellationToken cancellationToken = default);
     Task<Category[]> GetUserCategories(UserKey userId, CancellationToken cancellationToken = default);
+    Task<Category[]> GetUserCategoriesReverseTree(UserKey userId, CancellationToken cancellationToken = default);
     Task<Category[]> GetUserCategoriesTree(UserKey userId, CancellationToken cancellationToken = default);
-    Task<Category[]> GetSpendingCategoriesTree(Guid spendingId, CancellationToken cancellationToken = default);
+    Task<Category[]> GetSpendingCategoriesReverseTree(Guid spendingId, CancellationToken cancellationToken = default);
     Task<bool> UserHasByTitle(UserKey userId, string title, CancellationToken cancellationToken = default);
     Task<bool> UserHasById(UserKey userId, Guid categoryId, CancellationToken cancellationToken = default);
     Task RemoveChildFromParent(Guid childId, Guid parentId, CancellationToken cancellationToken = default);

@@ -206,7 +206,7 @@ internal class CategoryRepository : ICategoryRepository
         return result;
     }
     
-    public async Task<Category[]> GetUserCategoriesTree(UserKey userId, CancellationToken cancellationToken)
+    public async Task<Category[]> GetUserCategoriesReverseTree(UserKey userId, CancellationToken cancellationToken)
     {
         var dbCategories = await _dbContext.Set<StoredCategory>()
             .Where(c => c.OwnerId == userId && !c.IsDeleted)
@@ -256,7 +256,52 @@ internal class CategoryRepository : ICategoryRepository
         }
     }
 
-    public async Task<Category[]> GetSpendingCategoriesTree(Guid spendingId, CancellationToken cancellationToken)
+    public async Task<Category[]> GetUserCategoriesTree(UserKey userId, CancellationToken cancellationToken)
+    {
+        var dbCategories = await _dbContext.Set<StoredCategory>()
+            .Where(c => c.OwnerId == userId && !c.IsDeleted)
+            .ToArrayAsync(cancellationToken);
+        var dbCategoryIds = dbCategories.Select(c => c.Id).ToArray();
+
+        var dbCategoryLinks = await _dbContext.Set<StoredCategoriesLink>()
+            .Where(l => dbCategoryIds.Contains(l.ChildId) || dbCategoryIds.Contains(l.ParentId))
+            .ToArrayAsync(cancellationToken);
+
+        // идентификаторы категорий, которые не являются детьми - то есть рутовые
+        var rootCategories = dbCategories
+            .Where(c => !dbCategoryLinks.Select(l => l.ChildId).Contains(c.Id))
+            .ToArray();
+
+        var result = rootCategories.Select(_categoryFactory.Create).ToArray();
+        foreach (var rootCategory in result)
+        {
+            FillChilds(rootCategory);
+        }
+
+        return result;
+
+        void FillChilds(Category parent)
+        {
+            var childIds = dbCategoryLinks
+                .Where(l => l.ParentId == parent.Id)
+                .Select(l => l.ChildId)
+                .ToArray();
+
+            parent.SetChilds(dbCategories
+                .Where(c => childIds.Contains(c.Id))
+                .Select(_categoryFactory.Create)
+                .ToArray());
+
+            foreach (var child in parent.Childs)
+            {
+                child.AddParent(parent);
+                
+                FillChilds(child);
+            }
+        }
+    }
+
+    public async Task<Category[]> GetSpendingCategoriesReverseTree(Guid spendingId, CancellationToken cancellationToken)
     {
         var userId = await _dbContext.Set<StoredSpending>()
             .Where(s => s.Id == spendingId && !s.IsDeleted)

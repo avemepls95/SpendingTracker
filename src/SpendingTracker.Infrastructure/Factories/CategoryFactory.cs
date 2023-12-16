@@ -6,15 +6,9 @@ namespace SpendingTracker.Infrastructure.Factories;
 
 internal class CategoryFactory : ICategoryFactory
 {
-    public Category Create(StoredCategory storedCategory, StoredSpendingCategoryLink[] userCategoryLinks = null)
+    public Category Create(StoredCategory storedCategory)
     {
         var result = new Category(storedCategory.Id, storedCategory.OwnerId, storedCategory.Title);
-
-        // if (userCategoryLinks.Any())
-        // {
-        //     var childCategories = storedCategory.ChildCategoryLinks.Select(l => Create(l.Child)).ToArray();
-        //     result.SetChildCategories(childCategories);
-        // }
 
         return result;
     }

@@ -43,13 +43,15 @@ namespace SpendingTracker.Infrastructure.Repositories
             DateOnly dateTo,
             CancellationToken cancellationToken)
         {
+            var datetimeForm = dateFrom.ToDateTime(TimeOnly.MinValue).ToUniversalTime();
+            var datetimeTo = dateTo.ToDateTime(TimeOnly.MaxValue).ToUniversalTime();
             var dbSpendings = await _dbContext.Set<StoredSpending>()
                 .Include(s => s.Currency)
                 .Where(s =>
                     !s.IsDeleted
                     && s.CreatedBy == userKey
-                    && dateFrom.DayNumber < s.Date.Day
-                    && s.Date.Day + 1 < dateTo.DayNumber)
+                    && datetimeForm < s.Date
+                    && s.Date < datetimeTo)
                 .ToArrayAsync(cancellationToken);
             
             var spendingIds = dbSpendings.Select(s => s.Id).ToArray();

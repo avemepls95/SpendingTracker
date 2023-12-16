@@ -42,7 +42,7 @@ internal class AddExistCategoryAsChildrenCommandHandler : CommandHandler<Contrac
         Domain.Categories.Category child,
         CancellationToken cancellationToken)
     {
-        var categoriesTree = await _categoryRepository.GetUserCategoriesTree(userId, cancellationToken);
+        var categoriesTree = await _categoryRepository.GetUserCategoriesReverseTree(userId, cancellationToken);
         foreach (var firstLevelCategoryNode in categoriesTree)
         {
             if (firstLevelCategoryNode.Id == child.Id)

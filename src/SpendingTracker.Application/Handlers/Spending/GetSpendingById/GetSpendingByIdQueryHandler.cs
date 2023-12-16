@@ -28,7 +28,7 @@ internal class GetSpendingByIdQueryHandler : QueryHandler<GetSpendingByIdQuery, 
     {
         var spending = await _spendingRepository.GetUserSpendingById(query.Id, cancellationToken);
         
-        var categoriesTree = await _categoryRepository.GetSpendingCategoriesTree(query.Id, cancellationToken);
+        var categoriesTree = await _categoryRepository.GetSpendingCategoriesReverseTree(query.Id, cancellationToken);
 
         GetSpendingByIdResponse result; 
         if (query.TargetCurrencyId.HasValue)

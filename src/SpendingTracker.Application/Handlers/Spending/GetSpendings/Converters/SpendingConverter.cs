@@ -1,6 +1,7 @@
 ﻿using SpendingTracker.Application.Handlers.Spending.Common;
 using SpendingTracker.Application.Handlers.Spending.GetSpendingById.Contracts;
 using SpendingTracker.Application.Handlers.Spending.GetSpendings.Contracts;
+using SpendingTracker.Application.Handlers.Spending.GetSpendingsInDateRange.Contracts;
 
 namespace SpendingTracker.Application.Handlers.Spending.GetSpendings.Converters;
 
@@ -21,6 +22,34 @@ public static class SpendingConverter
             Description = spending.Description,
             CreateDate = spending.CreatedDate,
             Categories = categories
+        };
+    }
+    
+    public static GetSpendingsInDateRangeResponseItem ConvertToGetSpendingsInDateRangeResponseItem(Domain.Spending spending)
+    {
+        return new GetSpendingsInDateRangeResponseItem
+        {
+            Id = spending.Id,
+            Amount = spending.Amount,
+            CurrencyId = spending.Currency.Id,
+            Date = spending.Date,
+            Description = spending.Description,
+            CreateDate = spending.CreatedDate
+        };
+    }
+    
+    public static GetSpendingsInDateRangeResponseItem ConvertToGetSpendingsInDateRangeResponseItem(
+        Domain.Spending spending,
+        double customCurrencyAmount)
+    {
+        return new GetSpendingsInDateRangeResponseItem
+        {
+            Id = spending.Id,
+            Amount = customCurrencyAmount,
+            CurrencyId = spending.Currency.Id,
+            Date = spending.Date,
+            Description = spending.Description,
+            CreateDate = spending.CreatedDate
         };
     }
     

@@ -43,6 +43,16 @@ namespace SpendingTracker.Infrastructure.Repositories
             DateOnly dateTo,
             CancellationToken cancellationToken)
         {
+            if (userKey is null)
+            {
+                throw new ArgumentException(nameof(userKey));
+            }
+            
+            if (dateFrom >= dateTo)
+            {
+                throw new ArgumentException(nameof(dateTo));
+            }
+            
             var datetimeForm = dateFrom.ToDateTime(TimeOnly.MinValue).ToUniversalTime();
             var datetimeTo = dateTo.ToDateTime(TimeOnly.MaxValue).ToUniversalTime();
             var dbSpendings = await _dbContext.Set<StoredSpending>()
@@ -66,6 +76,79 @@ namespace SpendingTracker.Infrastructure.Repositories
                 .ToArray();
             
             return result;
+        }
+
+        public async Task<Spending[]> GetUserSpendingsByCategoryInRange(
+            Guid categoryId,
+            DateOnly dateFrom,
+            DateOnly dateTo,
+            CancellationToken cancellationToken)
+        {
+            if (dateFrom >= dateTo)
+            {
+                throw new ArgumentException(nameof(dateTo));
+            }
+
+            if (categoryId == Guid.Empty)
+            {
+                throw new ArgumentException(nameof(categoryId));
+            }
+
+            var categoryOwner = await _dbContext.Set<StoredCategory>()
+                .Where(c => c.Id == categoryId && !c.IsDeleted)
+                .Select(c => (UserKey?) c.OwnerId)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (categoryOwner is null)
+            {
+                throw new SpendingTrackerValidationException(ValidationErrorCodeEnum.KeyNotFound);
+            }
+            
+            var allCategoryIds = await _dbContext.Set<StoredCategory>()
+                .Where(c => c.OwnerId == categoryOwner && !c.IsDeleted)
+                .Select(c => c.Id)
+                .ToArrayAsync(cancellationToken);
+
+            var allCategoryLinks = await _dbContext.Set<StoredCategoriesLink>()
+                .Where(l => allCategoryIds.Contains(l.ChildId) || allCategoryIds.Contains(l.ParentId))
+                .ToArrayAsync(cancellationToken);
+
+            var categoryIdsInTargetCategory = new List<Guid>();
+            FillCategoryIdsInTargetCategory(categoryId);
+
+            var datetimeForm = dateFrom.ToDateTime(TimeOnly.MinValue).ToUniversalTime();
+            var datetimeTo = dateTo.ToDateTime(TimeOnly.MaxValue).ToUniversalTime();
+            var spendingIds = await _dbContext.Set<StoredSpendingCategoryLink>()
+                .Where(l =>
+                    categoryIdsInTargetCategory.Contains(l.CategoryId)
+                    && !l.Spending.IsDeleted
+                    && datetimeForm < l.Spending.Date
+                    && l.Spending.Date < datetimeTo)
+                .Select(l => l.SpendingId)
+                .ToArrayAsync(cancellationToken);
+
+            var spendings = await _dbContext.Set<StoredSpending>()
+                .Where(s => spendingIds.Contains(s.Id))
+                .Include(s => s.Currency)
+                .Select(s => _spendingFactory.Create(s, null))
+                .ToArrayAsync(cancellationToken);
+
+            return spendings;
+
+            void FillCategoryIdsInTargetCategory(Guid parentId)
+            {
+                categoryIdsInTargetCategory.Add(parentId);
+
+                var childIds = allCategoryLinks
+                    .Where(l => l.ParentId == parentId)
+                    .Select(l => l.ChildId)
+                    .ToArray();
+
+                foreach (var childId in childIds)
+                {
+                    FillCategoryIdsInTargetCategory(childId);
+                }
+            }
         }
 
         public async Task<Spending[]> GetUserSpendings(

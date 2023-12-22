@@ -14,6 +14,12 @@ namespace SpendingTracker.Infrastructure.Abstractions.Repositories
             DateOnly dateFrom,
             DateOnly dateTo,
             CancellationToken cancellationToken = default);
+        
+        Task<Spending[]> GetUserSpendingsByCategoryInRange(
+            Guid categoryId,
+            DateOnly dateFrom,
+            DateOnly dateTo,
+            CancellationToken cancellationToken = default);
 
         Task<Spending[]> GetUserSpendings(
             UserKey userKey,

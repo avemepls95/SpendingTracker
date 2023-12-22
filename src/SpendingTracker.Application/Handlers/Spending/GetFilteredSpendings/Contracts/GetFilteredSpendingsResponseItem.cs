@@ -1,6 +1,6 @@
-﻿namespace SpendingTracker.Application.Handlers.Spending.GetSpendingsInDateRange.Contracts;
+﻿namespace SpendingTracker.Application.Handlers.Spending.GetFilteredSpendings.Contracts;
 
-public class GetSpendingsInDateRangeResponseItem
+public class GetFilteredSpendingsResponseItem
 {
     public Guid Id { get; init; }
     public double Amount { get; init; }

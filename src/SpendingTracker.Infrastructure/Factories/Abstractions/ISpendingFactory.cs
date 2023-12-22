@@ -5,5 +5,5 @@ namespace SpendingTracker.Infrastructure.Factories.Abstractions;
 
 internal interface ISpendingFactory
 {
-    Spending Create(StoredSpending storedSpending, Guid[] categoryIds);
+    Spending Create(StoredSpending storedSpending, Guid[]? categoryIds = null);
 }

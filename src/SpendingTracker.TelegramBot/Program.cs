@@ -80,18 +80,21 @@ async Task HandleUpdateAsync(
     }
     catch (Exception e)
     {
-        var userId = update.Type == UpdateType.Message
-            ? update.Message!.From!.Id
-            : update.CallbackQuery!.From.Id;
+        var user = update.Type == UpdateType.Message
+            ? update.Message!.From!
+            : update.CallbackQuery!.From;
+        var userId = user.Id;
 
-        var message = userId == 375036212
-            ? e.ToString()
-            : "Произошла непредвиденная ошибка";
-            
         await bot.SendTextMessageAsync(
             userId,
-            message,
+            "Произошла непредвиденная ошибка",
             cancellationToken: cancellationToken);
+
+        await bot.SendTextMessageAsync(
+            375036212,
+            $"Пользователь {user.LastName} {user.FirstName}{Environment.NewLine}{e}",
+            cancellationToken: cancellationToken);    
+        
         Console.WriteLine(e);
     }
 }

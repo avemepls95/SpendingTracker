@@ -1,9 +1,9 @@
 ﻿using SpendingTracker.Common.Primitives;
 using SpendingTracker.Dispatcher.DataTransfer.Dispatcher.Interfaces;
 
-namespace SpendingTracker.Application.Handlers.Spending.GetSpendings.Contracts;
+namespace SpendingTracker.Application.Handlers.Spending.GetSpendingsWithCategories.Contracts;
 
-public class GetSpendingsQuery : IQuery<GetSpendingsResponseItem[]>
+public class GetSpendingsWithCategoriesQuery : IQuery<GetSpendingsWithCategoriesResponseItem[]>
 {
     public UserKey UserId { get; init; }
     public Guid? TargetCurrencyId { get; init; }

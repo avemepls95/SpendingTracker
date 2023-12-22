@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using SpendingTracker.Application.Handlers.Spending.AddSpendingToExistCategory.Contracts;
 using SpendingTracker.Application.Handlers.Spending.AddSpendingToNewCategory.Contracts;
 using SpendingTracker.Application.Handlers.Spending.DeleteSpending.Contracts;
+using SpendingTracker.Application.Handlers.Spending.GetFilteredSpendings.Contracts;
 using SpendingTracker.Application.Handlers.Spending.GetSpendingById.Contracts;
-using SpendingTracker.Application.Handlers.Spending.GetSpendings.Contracts;
+using SpendingTracker.Application.Handlers.Spending.GetSpendingsWithCategories.Contracts;
 using SpendingTracker.Application.Handlers.Spending.RemoveSpendingFromCategory.Contracts;
 using SpendingTracker.Application.Handlers.Spending.UpdateSpending.Contracts;
 using SpendingTracker.BearerTokenAuth;
@@ -31,28 +32,52 @@ public class SpendingController : BaseController
         _mediator = mediator;
     }
     
-    [HttpGet("list")]
-    public Task<GetSpendingsResponseItem[]> Get(
-        [FromQuery] Guid? currencyId = null,
+    [HttpGet("list-with-categories")]
+    public Task<GetSpendingsWithCategoriesResponseItem[]> GetListWithCategories(
+        [FromQuery] Guid? targetCurrencyId = null,
         [FromQuery] int offset = 0,
         [FromQuery] int count = 10,
         [FromQuery] string? searchString = null,
         [FromQuery] bool onlyWithoutCategories = false,
         CancellationToken cancellationToken = default)
     {
-        var query = new GetSpendingsQuery
+        var query = new GetSpendingsWithCategoriesQuery
         {
             UserId = GetCurrentUserId(),
-            TargetCurrencyId = currencyId,
+            TargetCurrencyId = targetCurrencyId,
             Offset = offset,
             Count = count,
             SearchString = searchString,
             OnlyWithoutCategories = onlyWithoutCategories
         };
 
-        return _mediator.SendQueryAsync<GetSpendingsQuery, GetSpendingsResponseItem[]>(
+        return _mediator.SendQueryAsync<GetSpendingsWithCategoriesQuery, GetSpendingsWithCategoriesResponseItem[]>(
             query,
             cancellationToken);
+    }
+    
+    [HttpGet("filtered-list")]
+    public async Task<GetFilteredSpendingsResponseItem[]> GetFilteredList(
+        [FromQuery] Guid? targetCurrencyId,
+        [FromQuery] Guid? categoryId,
+        [FromQuery] DateOnly dateFrom,
+        [FromQuery] DateOnly dateTo,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetFilteredSpendingsQuery
+        {
+            UserId = GetCurrentUserId(),
+            DateFrom = dateFrom,
+            DateTo = dateTo,
+            TargetCurrencyId = targetCurrencyId,
+            CategoryId = categoryId
+        };
+        
+        var spendings = await _mediator.SendQueryAsync<GetFilteredSpendingsQuery, GetFilteredSpendingsResponseItem[]>(
+            query,
+            cancellationToken);
+
+        return spendings;
     }
     
     [HttpGet("get-by-id")]

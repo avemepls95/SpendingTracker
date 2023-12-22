@@ -1,19 +1,19 @@
 ﻿using SpendingTracker.Application.Handlers.Spending.Common;
+using SpendingTracker.Application.Handlers.Spending.GetFilteredSpendings.Contracts;
 using SpendingTracker.Application.Handlers.Spending.GetSpendingById.Contracts;
-using SpendingTracker.Application.Handlers.Spending.GetSpendings.Contracts;
-using SpendingTracker.Application.Handlers.Spending.GetSpendingsInDateRange.Contracts;
+using SpendingTracker.Application.Handlers.Spending.GetSpendingsWithCategories.Contracts;
 
-namespace SpendingTracker.Application.Handlers.Spending.GetSpendings.Converters;
+namespace SpendingTracker.Application.Handlers.Spending.GetSpendingsWithCategories.Converters;
 
 public static class SpendingConverter
 {
-    public static GetSpendingsResponseItem ConvertToGetSpendingsResponseItem(
+    public static GetSpendingsWithCategoriesResponseItem ConvertToGetSpendingsResponseItem(
         Domain.Spending spending,
         Domain.Categories.Category[] categoriesTree)
     {
         var categories = ConvertCategories(spending, categoriesTree);
         
-        return new GetSpendingsResponseItem
+        return new GetSpendingsWithCategoriesResponseItem
         {
             Id = spending.Id,
             Amount = spending.Amount,
@@ -25,9 +25,9 @@ public static class SpendingConverter
         };
     }
     
-    public static GetSpendingsInDateRangeResponseItem ConvertToGetSpendingsInDateRangeResponseItem(Domain.Spending spending)
+    public static GetFilteredSpendingsResponseItem ConvertToGetSpendingsInDateRangeResponseItem(Domain.Spending spending)
     {
-        return new GetSpendingsInDateRangeResponseItem
+        return new GetFilteredSpendingsResponseItem
         {
             Id = spending.Id,
             Amount = spending.Amount,
@@ -38,11 +38,11 @@ public static class SpendingConverter
         };
     }
     
-    public static GetSpendingsInDateRangeResponseItem ConvertToGetSpendingsInDateRangeResponseItem(
+    public static GetFilteredSpendingsResponseItem ConvertToGetSpendingsInDateRangeResponseItem(
         Domain.Spending spending,
         double customCurrencyAmount)
     {
-        return new GetSpendingsInDateRangeResponseItem
+        return new GetFilteredSpendingsResponseItem
         {
             Id = spending.Id,
             Amount = customCurrencyAmount,
@@ -53,14 +53,14 @@ public static class SpendingConverter
         };
     }
     
-    public static GetSpendingsResponseItem ConvertToGetSpendingsResponseItem(
+    public static GetSpendingsWithCategoriesResponseItem ConvertToGetSpendingsResponseItem(
         Domain.Spending spending,
         double customCurrencyAmount,
         Domain.Categories.Category[] categoriesTree)
     {
         var categories = ConvertCategories(spending, categoriesTree);
         
-        return new GetSpendingsResponseItem
+        return new GetSpendingsWithCategoriesResponseItem
         {
             Id = spending.Id,
             Amount = spending.Amount,

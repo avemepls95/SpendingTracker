@@ -1,5 +1,5 @@
 ﻿using SpendingTracker.Application.Handlers.Spending.GetSpendingById.Contracts;
-using SpendingTracker.Application.Handlers.Spending.GetSpendings.Converters;
+using SpendingTracker.Application.Handlers.Spending.GetSpendingsWithCategories.Converters;
 using SpendingTracker.Application.Handlers.Spending.Services.Abstractions;
 using SpendingTracker.Dispatcher.DataTransfer.Dispatcher;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;

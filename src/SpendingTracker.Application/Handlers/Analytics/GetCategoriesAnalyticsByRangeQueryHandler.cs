@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using SpendingTracker.Application.Handlers.Analytics.GetCategoriesAnalyticsByRange.Contracts;
-using SpendingTracker.Application.Handlers.Spending.GetSpendingsInDateRange.Contracts;
+using SpendingTracker.Application.Handlers.Spending.GetFilteredSpendings.Contracts;
 using SpendingTracker.Dispatcher.DataTransfer.Dispatcher;
 using SpendingTracker.Dispatcher.Extensions;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
@@ -38,8 +38,8 @@ internal sealed class GetCategoriesAnalyticsByRangeQueryHandler
         }
         
         var spendings =
-            await _mediator.SendQueryAsync<GetSpendingsInDateRangeQuery, GetSpendingsInDateRangeResponseItem[]>(
-                new GetSpendingsInDateRangeQuery
+            await _mediator.SendQueryAsync<GetFilteredSpendingsQuery, GetFilteredSpendingsResponseItem[]>(
+                new GetFilteredSpendingsQuery
                 {
                     UserId = query.UserId,
                     DateFrom = query.DateFrom,

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using SpendingTracker.Application;
 using SpendingTracker.Dispatcher.Extensions;
 using SpendingTracker.GenericSubDomain;
+using SpendingTracker.GenericSubDomain.User;
 using SpendingTracker.GenericSubDomain.User.Abstractions;
 using SpendingTracker.Infrastructure;
 using SpendingTracker.TelegramBot;
@@ -23,9 +24,6 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-var telegramBotToken = Environment.GetEnvironmentVariable("TELEGRAM_TOKEN");
-var bot = new TelegramBotClient(telegramBotToken);
-Console.OutputEncoding = Encoding.UTF8;
 var serviceProvider = InitializeDependencies();
 var gatewayService = serviceProvider.GetService<GatewayService>()!;
 var telegramUserCurrentButtonGroupService = serviceProvider.GetService<ITelegramUserCurrentButtonGroupService>()!;
@@ -34,6 +32,8 @@ var spendingMessageParser = new SpendingMessageParser();
 var buttonsGroupManager = serviceProvider.GetService<IButtonsGroupManager>()!;
 
 Console.OutputEncoding = Encoding.UTF8;
+var telegramOptions = serviceProvider.GetService<TelegramOptions>()!;
+var bot = new TelegramBotClient(telegramOptions.Token);
 Console.WriteLine("Запущен бот " + bot.GetMeAsync().Result.FirstName);
 
 var cts = new CancellationTokenSource();
@@ -264,8 +264,7 @@ IServiceProvider InitializeDependencies()
     var configuration = AppConfigurationBuilder.Build();
 
     var connectionStrings = ConfigurationReader.ReadConnectionStrings(configuration);
-    var systemUserContextOptions = ConfigurationReader.ReadSystemUserContextOptions(configuration);
-    var telegramUserContextOptions = ConfigurationReader.ReadTelegramUserContextOptions(configuration);
+    var telegramOptions = ConfigurationReader.ReadTelegramOptions(configuration);
 
     var builder = new HostBuilder()
         .ConfigureServices((_, services) =>
@@ -276,7 +275,7 @@ IServiceProvider InitializeDependencies()
                 .AddInfrastructure(connectionStrings)
                 .AddDispatcher(assembliesForScan)
                 .AddFluentValidation(assembliesForScan)
-                .AddGenericSubDomain(systemUserContextOptions, telegramUserContextOptions)
+                .AddGenericSubDomain(telegramOptions)
                 .AddMemoryCache()
                 .AddServices()
                 .AddTelegramBotWrappingServices();

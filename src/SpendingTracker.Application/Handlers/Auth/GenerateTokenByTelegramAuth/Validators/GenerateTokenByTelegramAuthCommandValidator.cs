@@ -7,6 +7,8 @@ internal class GenerateTokenByTelegramAuthCommandValidator : AbstractValidator<G
 {
     public GenerateTokenByTelegramAuthCommandValidator()
     {
+        RuleFor(c => c.Hash).NotEmpty();
+        RuleFor(c => c.AuthDateAsString).NotEmpty();
         RuleFor(c => c.FirstName).NotEmpty();
         RuleFor(c => c.UserId).NotEmpty();
     }

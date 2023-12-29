@@ -11,17 +11,10 @@ namespace SpendingTracker.GenericSubDomain
     {
         public static IServiceCollection AddGenericSubDomain(
             this IServiceCollection services,
-            SystemUserContextOptions systemUserContextOptions,
-            TelegramUserContextOptions telegramUserContextOptions)
+            TelegramOptions telegramOptions)
         {
-            services.AddSingleton<SystemUserContextOptions>(_ => systemUserContextOptions);
-            services.AddSingleton<TelegramUserContextOptions>(_ => telegramUserContextOptions);
+            services.AddSingleton<TelegramOptions>(_ => telegramOptions);
 
-            return AddGenericSubDomain(services);
-        }
-        
-        public static IServiceCollection AddGenericSubDomain(this IServiceCollection services)
-        {
             services
                 .AddScoped<IUserContextFactory, SystemUserContextFactory>()
                 .AddScoped<IUserContextFactory, UserByTelegramContextFactory>()

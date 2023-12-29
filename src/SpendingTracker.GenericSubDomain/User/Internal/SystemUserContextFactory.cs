@@ -6,12 +6,10 @@ namespace SpendingTracker.GenericSubDomain.User.Internal
     internal sealed class SystemUserContextFactory : IUserContextFactory
     {
         private readonly IMemoryCache _memoryCache;
-        private readonly SystemUserContextOptions _options;
 
-        public SystemUserContextFactory(IMemoryCache memoryCache, SystemUserContextOptions options)
+        public SystemUserContextFactory(IMemoryCache memoryCache)
         {
             _memoryCache = memoryCache;
-            _options = options;
         }
 
         public string Key => nameof(SystemUserContextFactory);
@@ -21,7 +19,7 @@ namespace SpendingTracker.GenericSubDomain.User.Internal
             var result = await _memoryCache.GetOrCreateAsync<UserContext>(
                 nameof(SystemUserContextFactory), cacheEntry =>
                 {
-                    cacheEntry.AbsoluteExpirationRelativeToNow = _options.CacheAbsoluteExpirationRelativeToNow;
+                    cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
 
                     var systemUserId = Domain.User.SystemUserId;
                     return Task.FromResult(new UserContext(systemUserId));

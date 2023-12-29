@@ -59,13 +59,12 @@ static void ConfigureServices(WebApplicationBuilder webApplicationBuilder)
     var configuration = AppConfigurationBuilder.Build();
 
     var connectionStrings = ConfigurationReader.ReadConnectionStrings(configuration);
-    var systemUserContextOptions = ConfigurationReader.ReadSystemUserContextOptions(configuration);
-    var telegramUserContextOptions = ConfigurationReader.ReadTelegramUserContextOptions(configuration);
+    var telegramOptions = ConfigurationReader.ReadTelegramOptions(configuration);
 
     serviceCollection
         .AddDispatcher(assembliesForScan)
         .AddFluentValidation(assembliesForScan)
-        .AddGenericSubDomain(systemUserContextOptions, telegramUserContextOptions)
+        .AddGenericSubDomain(telegramOptions)
         .AddInfrastructure(connectionStrings)
         .AddApplicationLayer()
         .AddCurrencyRates()

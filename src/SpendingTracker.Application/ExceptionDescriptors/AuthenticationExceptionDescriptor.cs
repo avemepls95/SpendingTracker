@@ -12,7 +12,7 @@ namespace SpendingTracker.Application.ExceptionDescriptors
             return ex is AuthenticationException;
         }
 
-        public HttpStatusCode StatusCode => HttpStatusCode.Forbidden;
+        public HttpStatusCode StatusCode => HttpStatusCode.Unauthorized;
 
         public ErrorProperty[] Handle(Exception ex)
         {

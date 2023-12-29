@@ -1,5 +1,5 @@
 ﻿using SpendingTracker.BearerTokenAuth;
-using SpendingTracker.GenericSubDomain.User.Internal;
+using SpendingTracker.GenericSubDomain.User;
 using SpendingTracker.Infrastructure;
 using SpendingTracker.WebApp.CustomFilters;
 
@@ -70,46 +70,23 @@ public static class ConfigurationReader
 
         return connectionStringsConfig;
     }
-
-    public static SystemUserContextOptions ReadSystemUserContextOptions(IConfiguration configuration)
+    
+    public static TelegramOptions ReadTelegramOptions(IConfiguration configuration)
     {
-        var cacheAbsoluteExpirationRelativeToNowAsString = Environment.GetEnvironmentVariable("SYSTEM-USER-CONTEXT-OPTIONS_CACHE-ABSOLUTE-EXPIRATION-RELATIVE-TO-NOW");
+        var token = Environment.GetEnvironmentVariable("TELEGRAM-OPTIONS_TOKEN");
 
-        if (!string.IsNullOrWhiteSpace(cacheAbsoluteExpirationRelativeToNowAsString)
-            && TimeSpan.TryParse(cacheAbsoluteExpirationRelativeToNowAsString, out var cacheAbsoluteExpirationRelativeToNow))
+        if (!string.IsNullOrWhiteSpace(token))
         {
-            return new SystemUserContextOptions
+            return new TelegramOptions
             {
-                CacheAbsoluteExpirationRelativeToNow = cacheAbsoluteExpirationRelativeToNow
+                Token = token
             };
         }
 
-        var systemUserContextOptions = configuration.GetSection(nameof(SystemUserContextOptions)).Get<SystemUserContextOptions>();
+        var systemUserContextOptions = configuration.GetSection(nameof(TelegramOptions)).Get<TelegramOptions>();
         if (systemUserContextOptions is null)
         {
-            throw new Exception("Empty SystemUserContextOptions");
-        }
-            
-        return systemUserContextOptions;
-    }
-
-    public static TelegramUserContextOptions ReadTelegramUserContextOptions(IConfiguration configuration)
-    {
-        var cacheAbsoluteExpirationRelativeToNowAsString = Environment.GetEnvironmentVariable("TELEGRAM-USER-CONTEXT-OPTIONS_CACHE-ABSOLUTE-EXPIRATION-RELATIVE-TO-NOW");
-
-        if (!string.IsNullOrWhiteSpace(cacheAbsoluteExpirationRelativeToNowAsString)
-            && TimeSpan.TryParse(cacheAbsoluteExpirationRelativeToNowAsString, out var cacheAbsoluteExpirationRelativeToNow))
-        {
-            return new TelegramUserContextOptions
-            {
-                CacheAbsoluteExpirationRelativeToNow = cacheAbsoluteExpirationRelativeToNow
-            };
-        }
-
-        var systemUserContextOptions = configuration.GetSection(nameof(TelegramUserContextOptions)).Get<TelegramUserContextOptions>();
-        if (systemUserContextOptions is null)
-        {
-            throw new Exception("Empty TelegramUserContextOptions");
+            throw new Exception("Empty TelegramOptions");
         }
             
         return systemUserContextOptions;

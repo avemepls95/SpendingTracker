@@ -7,18 +7,15 @@ namespace SpendingTracker.GenericSubDomain.User.Internal
     internal sealed class UserByTelegramContextFactory : IUserContextFactory
     {
         private readonly IMemoryCache _memoryCache;
-        private readonly TelegramUserContextOptions _options;
         private readonly IUserRepository _userRepository;
         private readonly ITelegramUserIdStore _telegramUserIdStore;
 
         public UserByTelegramContextFactory(
             IMemoryCache memoryCache,
-            TelegramUserContextOptions options,
             IUserRepository userRepository,
             ITelegramUserIdStore telegramUserIdStore)
         {
             _memoryCache = memoryCache;
-            _options = options;
             _userRepository = userRepository;
             _telegramUserIdStore = telegramUserIdStore;
         }
@@ -35,7 +32,7 @@ namespace SpendingTracker.GenericSubDomain.User.Internal
                 {
                     var userId = await _userRepository.GetIdByTelegramId(telegramUserId, cancellationToken);
                     
-                    cacheEntry.AbsoluteExpirationRelativeToNow = _options.CacheAbsoluteExpirationRelativeToNow;
+                    cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
 
                     return new UserContext(userId);
                 });

@@ -25,5 +25,6 @@
       <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="6.32.2" />
       <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.32.2" />
       <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.32.2" />
+      <PackageReference Include="Telegram.Bot.Extensions.LoginWidget" Version="1.2.0" />
     </ItemGroup>
 </Project>

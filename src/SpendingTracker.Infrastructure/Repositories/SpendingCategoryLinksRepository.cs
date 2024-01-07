@@ -5,7 +5,7 @@ using SpendingTracker.Infrastructure.Abstractions.Repositories.Models;
 
 namespace SpendingTracker.Infrastructure.Repositories;
 
-public class SpendingCategoryLinksRepository : ISpendingCategoryLinksRepository
+internal class SpendingCategoryLinksRepository : ISpendingCategoryLinksRepository
 {
     private readonly MainDbContext _dbContext;
 

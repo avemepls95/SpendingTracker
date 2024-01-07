@@ -20,7 +20,9 @@ namespace SpendingTracker.Infrastructure
                 .ApplyConfiguration(new CategoriesLinkConfiguration())
                 .ApplyConfiguration(new SpendingCategoryLinkConfiguration())
                 .ApplyConfiguration(new StoredCategoryConfiguration())
-                .ApplyConfiguration(new StoredCurrencyRateByDayConfiguration());
+                .ApplyConfiguration(new StoredCurrencyRateByDayConfiguration())
+                .ApplyConfiguration(new StoredUserSettingConfiguration())
+                .ApplyConfiguration(new StoredUserSettingValueConfiguration());
         }
     }
 }

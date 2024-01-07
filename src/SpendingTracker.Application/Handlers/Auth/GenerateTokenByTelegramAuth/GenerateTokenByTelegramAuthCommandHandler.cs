@@ -17,36 +17,28 @@ internal sealed class GenerateTokenByTelegramAuthCommandHandler
     private readonly ITokenGenerator _tokenGenerator;
     private readonly IUserRepository _userRepository;
     private readonly IMediator _mediator;
-    private readonly ITelegramHashValidator _telegramHashValidator;
+    private readonly ITelegramHashValidator _telegramCheckStringValidator;
 
     public GenerateTokenByTelegramAuthCommandHandler(
         ITokenGenerator tokenGenerator,
         IUserRepository userRepository,
         IMediator mediator,
-        ITelegramHashValidator telegramHashValidator)
+        ITelegramHashValidator telegramCheckStringValidator)
     {
         _tokenGenerator = tokenGenerator;
         _userRepository = userRepository;
         _mediator = mediator;
-        _telegramHashValidator = telegramHashValidator;
+        _telegramCheckStringValidator = telegramCheckStringValidator;
     }
 
     public override async Task<GenerateTokenByTelegramAuthResponse> Handle(
         GenerateTokenByTelegramAuthCommand command,
         CancellationToken cancellationToken)
     {
-        var hashIsValid = _telegramHashValidator.IsValid(
-            command.Hash,
-            command.AuthDateAsString,
-            command.FirstName,
-            command.LastName,
-            command.UserId,
-            command.PhotoUrl,   
-            command.UserName);
-
-        if (!hashIsValid)
+        var checkStringIsValid = _telegramCheckStringValidator.IsValid(command.CheckString, command.AuthType);
+        if (!checkStringIsValid)
         {
-            throw new AuthenticationException("Incorrect hash");
+            throw new AuthenticationException("Incorrect CheckString");
         }
         
         var id = await _userRepository.FindIdByTelegramId(command.UserId, cancellationToken);
@@ -57,8 +49,7 @@ internal sealed class GenerateTokenByTelegramAuthCommandHandler
                 TelegramUserId = command.UserId,
                 FirstName = command.FirstName,
                 LastName = command.LastName,
-                UserName = command.UserName,
-                PhotoUrl = command.PhotoUrl
+                UserName = command.UserName
             }, cancellationToken);
         }
     
@@ -69,8 +60,7 @@ internal sealed class GenerateTokenByTelegramAuthCommandHandler
             TokenInformation = tokenInformation,
             Id = id,
             FirstName = command.FirstName,
-            LastName = command.LastName,
-            PhotoUrl = command.PhotoUrl
+            LastName = command.LastName
         };
     }
 }

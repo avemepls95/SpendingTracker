@@ -57,10 +57,9 @@ internal class UserRepository : IUserRepository
         return result;
     }
 
-    public Task<bool> IsExistsTelegramUser(long telegramId, CancellationToken cancellationToken = default)
+    public Task<bool> IsExistsById(UserKey id, CancellationToken cancellationToken)
     {
-        return _dbContext.Set<StoredTelegramUser>()
-            .AnyAsync(u => u.Id == telegramId, cancellationToken);
+        return _dbContext.Set<StoredUser>().AnyAsync(u => u.Id == id, cancellationToken);
     }
 
     private async Task<StoredUser?> FindStoredUserByTelegramId(long telegramId, CancellationToken cancellationToken)

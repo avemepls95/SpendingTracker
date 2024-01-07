@@ -37,13 +37,17 @@ namespace SpendingTracker.Infrastructure
                 .AddScoped<ICurrencyRepository, CurrencyRepository>()
                 .AddScoped<ICategoryRepository, CategoryRepository>()
                 .AddScoped<ISpendingCategoryLinksRepository, SpendingCategoryLinksRepository>()
-                .AddScoped<ICurrencyRateByDayRepository, CurrencyRateByDayRepository>();
+                .AddScoped<ICurrencyRateByDayRepository, CurrencyRateByDayRepository>()
+                .AddScoped<IUserSettingsRepository, UserSettingsRepository>()
+                .AddScoped<IUserSettingValuesRepository, UserSettingValuesRepository>();
 
             services
                 .AddSingleton<ICurrencyFactory, CurrencyFactory>()
                 .AddSingleton<ISpendingFactory, SpendingFactory>()
                 .AddSingleton<ICategoryFactory, CategoryFactory>()
-                .AddSingleton<IUserFactory, UserFactory>();
+                .AddSingleton<IUserFactory, UserFactory>()
+                .AddSingleton<IUserSettingValueFactory, UserSettingValueFactory>()
+                .AddSingleton<IUserSettingFactory, UserSettingFactory>();
 
             services.AddScoped<IDataInitializer, DataInitializer>();
 

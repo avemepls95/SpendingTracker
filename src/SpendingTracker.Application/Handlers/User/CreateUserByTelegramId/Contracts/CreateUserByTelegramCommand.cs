@@ -5,9 +5,8 @@ namespace SpendingTracker.Application.Handlers.User.CreateUserByTelegramId.Contr
 
 public class CreateUserByTelegramCommand : ICommand<UserKey>
 {
-    public long TelegramUserId { get; set; }
-    public string FirstName { get; set; }
-    public string? LastName { get; set; }
-    public string? UserName { get; set; }
-    public string? PhotoUrl { get; set; }
+    public long TelegramUserId { get; init; }
+    public string FirstName { get; init; }
+    public string? LastName { get; init; }
+    public string? UserName { get; init; }
 }

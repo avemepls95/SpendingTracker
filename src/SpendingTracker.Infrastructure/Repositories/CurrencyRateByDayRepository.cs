@@ -5,7 +5,7 @@ using SpendingTracker.Infrastructure.Abstractions.Repositories.Models;
 
 namespace SpendingTracker.Infrastructure.Repositories;
 
-public class CurrencyRateByDayRepository : ICurrencyRateByDayRepository
+internal class CurrencyRateByDayRepository : ICurrencyRateByDayRepository
 {
     private readonly MainDbContext _dbContext;
 

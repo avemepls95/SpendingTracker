@@ -10,5 +10,6 @@ public enum ValidationErrorCodeEnum
     CategoriesAlreadyLinked,
     UserAlreadyHasCategoryWithSpecifiedName,
     CategoryDoesNotBelongsToUser,
-    CurrentUserHasNoPermissionToDeleteCategory
+    CurrentUserHasNoPermissionToDeleteCategory,
+    TooManyAccountsCount
 }

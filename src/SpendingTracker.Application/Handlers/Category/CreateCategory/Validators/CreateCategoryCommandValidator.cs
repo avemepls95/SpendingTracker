@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using SpendingTracker.Application.Handlers.Category.CreateCategory.Contracts;
-using SpendingTracker.Application.Handlers.Common;
+using SpendingTracker.GenericSubDomain.Common;
 
 namespace SpendingTracker.Application.Handlers.Category.CreateCategory.Validators;
 

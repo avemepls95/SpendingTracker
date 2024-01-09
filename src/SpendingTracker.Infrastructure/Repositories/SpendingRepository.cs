@@ -7,6 +7,7 @@ using SpendingTracker.Infrastructure.Abstractions.Models.Request;
 using SpendingTracker.Infrastructure.Abstractions.Models.Stored;
 using SpendingTracker.Infrastructure.Abstractions.Models.Stored.Categories;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
+using SpendingTracker.Infrastructure.Abstractions.Repositories.Models;
 using SpendingTracker.Infrastructure.Factories.Abstractions;
 
 namespace SpendingTracker.Infrastructure.Repositories
@@ -22,16 +23,16 @@ namespace SpendingTracker.Infrastructure.Repositories
             _spendingFactory = spendingFactory;
         }
 
-        public async Task CreateAsync(Spending spending, CancellationToken cancellationToken)
+        public async Task CreateAsync(CreateSpendingModel createModel, CancellationToken cancellationToken)
         {
             var storedSpending = new StoredSpending
             {
-                Id = spending.Id,
-                Amount = spending.Amount,
-                CurrencyId = spending.Currency.Id,
-                Date = spending.Date,
-                Description = spending.Description,
-                ActionSource = spending.ActionSource
+                Id = Guid.NewGuid(),
+                Amount = createModel.Amount,
+                CurrencyId = createModel.CurrencyId,
+                Date = createModel.Date,
+                Description = createModel.Description,
+                ActionSource = createModel.ActionSource
             };
 
             await _dbContext.Set<StoredSpending>().AddAsync(storedSpending, cancellationToken);

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SpendingTracker.Common.Primitives;
+using SpendingTracker.GenericSubDomain.Common;
 using SpendingTracker.Infrastructure.Abstractions.Models.Stored.Categories;
 
 namespace SpendingTracker.Infrastructure.Configurations;
@@ -20,7 +21,7 @@ internal class StoredCategoryConfiguration : EntityObjectConfiguration<StoredCat
             .ValueGeneratedNever()
             .HasConversion(v => v.Value, v => new UserKey(v));
         
-        builder.Property(e => e.Title).HasMaxLength(100);
+        builder.Property(e => e.Title).HasMaxLength(PropertiesMaxLength.CategoryTitle);
         // builder.HasMany(c => c.ChildCategoryLinks)
         //     .WithOne(l => l.Child);
         // builder.HasMany(c => c.ParentCategoryLinks)

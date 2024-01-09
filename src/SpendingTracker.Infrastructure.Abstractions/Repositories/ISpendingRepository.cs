@@ -2,12 +2,13 @@
 using SpendingTracker.Domain;
 using SpendingTracker.Domain.Categories;
 using SpendingTracker.Infrastructure.Abstractions.Models.Request;
+using SpendingTracker.Infrastructure.Abstractions.Repositories.Models;
 
 namespace SpendingTracker.Infrastructure.Abstractions.Repositories
 {
     public interface ISpendingRepository
     {
-        Task CreateAsync(Spending spending, CancellationToken cancellationToken = default);
+        Task CreateAsync(CreateSpendingModel createModel, CancellationToken cancellationToken = default);
 
         Task<Spending[]> GetUserSpendingsInRange(
             UserKey userKey,

@@ -39,7 +39,8 @@ namespace SpendingTracker.Infrastructure
                 .AddScoped<ISpendingCategoryLinksRepository, SpendingCategoryLinksRepository>()
                 .AddScoped<ICurrencyRateByDayRepository, CurrencyRateByDayRepository>()
                 .AddScoped<IUserSettingsRepository, UserSettingsRepository>()
-                .AddScoped<IUserSettingValuesRepository, UserSettingValuesRepository>();
+                .AddScoped<IUserSettingValuesRepository, UserSettingValuesRepository>()
+                .AddScoped<IAccountRepository, AccountRepository>();
 
             services
                 .AddSingleton<ICurrencyFactory, CurrencyFactory>()

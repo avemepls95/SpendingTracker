@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SpendingTracker.Application.Handlers.Account.CreateAccount.Contracts;
+using SpendingTracker.Application.Handlers.Account.DeleteAccount.Contracts;
 using SpendingTracker.Application.Handlers.Account.GetAccountsInfo.Contracts;
 using SpendingTracker.Application.Handlers.Account.UpdateAccount.Contracts;
 using SpendingTracker.BearerTokenAuth;
@@ -52,6 +53,17 @@ public class AccountController : BaseController
         await _mediator.SendCommandAsync(command, cancellationToken);
     }
     
+    [HttpPost("delete")]
+    public async Task Delete([FromBody] DeleteAccountRequest request, CancellationToken cancellationToken)
+    {
+        var command = new DeleteAccountCommand
+        {
+            Id = request.Id
+        };
+
+        await _mediator.SendCommandAsync(command, cancellationToken);
+    }
+    
     [HttpGet("get-list-info")]
     public async Task<GetAccountsInfoResponse> GetAccountsInfo(
         [FromQuery] Guid currencyId,
@@ -66,7 +78,7 @@ public class AccountController : BaseController
         var result = await _mediator.SendQueryAsync<GetAccountsInfoQuery, GetAccountsInfoResponse>(
             query,
             cancellationToken);
-
+        
         return result;
     }
 }

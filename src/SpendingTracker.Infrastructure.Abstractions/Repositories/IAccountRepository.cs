@@ -12,4 +12,5 @@ public interface IAccountRepository
     Task<int> GetUserAccountsCount(UserKey userId, CancellationToken cancellationToken);
     Task<Account> GetById(Guid id, CancellationToken cancellationToken);
     Task<bool> IsExistsById(Guid id, CancellationToken cancellationToken);
+    Task MarkAsDeleted(Guid id, CancellationToken cancellationToken);
 }

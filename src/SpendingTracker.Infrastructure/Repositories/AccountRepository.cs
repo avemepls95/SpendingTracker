@@ -99,10 +99,20 @@ internal class AccountRepository : IAccountRepository
         };
     }
 
-    public Task<bool> IsExistsById(Guid id, CancellationToken cancellationToken)
+    public async Task<bool> IsExistsById(Guid id, CancellationToken cancellationToken)
     {
-        return _dbContext.Set<StoredAccount>().AnyAsync(
+        return await _dbContext.Set<StoredAccount>().AnyAsync(
             a => a.Id == id && !a.IsDeleted,
             cancellationToken);
+    }
+
+    public async Task MarkAsDeleted(Guid id, CancellationToken cancellationToken)
+    {
+        await _dbContext.Set<StoredAccount>()
+            .Where(a => a.Id == id && !a.IsDeleted)
+            .ExecuteUpdateAsync(
+                b => b
+                    .SetProperty(a => a.IsDeleted, true),
+                cancellationToken);
     }
 }

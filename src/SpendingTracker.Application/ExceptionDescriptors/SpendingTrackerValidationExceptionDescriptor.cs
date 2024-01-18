@@ -17,9 +17,10 @@ namespace SpendingTracker.Application.ExceptionDescriptors
         {
             var validationException = (SpendingTrackerValidationException) ex;
 
-            return new[]
+            return validationException.Data switch
             {
-                ErrorProperty.FromCode(validationException.Code)
+                null => new[] { ErrorProperty.FromCode(validationException.Code) },
+                not null => new[] { ErrorProperty.FromCode(validationException.Code, validationException.Data) }
             };
         }
     }

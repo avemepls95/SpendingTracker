@@ -27,7 +27,7 @@ internal sealed class CreateCategoryCommandHandler : CommandHandler<CreateCatego
     {
         var userAlreadyHasByTitle = await _categoryRepository.UserHasByTitle(
             command.UserId,
-            command.Title,
+            command.Title.Trim(),
             cancellationToken);
 
         if (userAlreadyHasByTitle)
@@ -35,7 +35,7 @@ internal sealed class CreateCategoryCommandHandler : CommandHandler<CreateCatego
             throw new SpendingTrackerValidationException(ValidationErrorCodeEnum.UserAlreadyHasCategoryWithSpecifiedName);
         }
         
-        var category = _categoryFactory.Create(command.Title, command.UserId);
+        var category = _categoryFactory.Create(command.Title.Trim(), command.UserId);
         await _categoryRepository.CreateCategory(category, cancellationToken);
         
         await _unitOfWork.SaveAsync(cancellationToken);

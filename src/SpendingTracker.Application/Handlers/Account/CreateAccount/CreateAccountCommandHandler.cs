@@ -20,17 +20,26 @@ internal sealed class CreateAccountCommandHandler : CommandHandler<CreateAccount
 
     public override async Task Handle(CreateAccountCommand command, CancellationToken cancellationToken)
     {
-        var currentCount = await _accountRepository.GetUserAccountsCount(command.UserId, cancellationToken);
-        if (currentCount == 20)
+        var userAccounts = await _accountRepository.GetUserAccounts(command.UserId, cancellationToken);
+        const int maxAccountsCount = 20;
+        if (userAccounts.Length == maxAccountsCount)
         {
-            throw new SpendingTrackerValidationException(ValidationErrorCodeEnum.TooManyAccountsCount);
+            throw new SpendingTrackerValidationException(ValidationErrorCodeEnum.TooManyAccountsCount, maxAccountsCount);
+        }
+
+        if (userAccounts.Any(a =>
+                a.Name.Equals(command.Name.Trim(), StringComparison.InvariantCultureIgnoreCase)
+                && a.CurrencyId == command.CurrencyId
+                && a.Type == command.Type))
+        {
+            throw new SpendingTrackerValidationException(ValidationErrorCodeEnum.CannotCreateAccountBecauseAlreadyExist);
         }
         
         var createModel = new CreateAccountModel
         {
             UserId = command.UserId,
             Type = command.Type,
-            Name = command.Name,
+            Name = command.Name.Trim(),
             CurrencyId = command.CurrencyId,
             Amount = command.Amount
         };

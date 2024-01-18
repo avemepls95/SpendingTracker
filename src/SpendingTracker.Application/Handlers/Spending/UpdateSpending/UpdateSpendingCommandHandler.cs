@@ -25,7 +25,7 @@ internal sealed class UpdateSpendingCommandHandler : CommandHandler<UpdateSpendi
             Amount = command.Amount,
             Date = command.Date.ToUniversalTime(),
             CurrencyId = command.CurrencyId,
-            Description = command.Description
+            Description = command.Description.Trim()
         };
 
         await _spendingRepository.UpdateSpending(repositoryModel, cancellationToken);

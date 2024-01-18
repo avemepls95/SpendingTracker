@@ -27,7 +27,7 @@ internal class AddNewCategoryAsParentCommandHandler : CommandHandler<AddNewCateg
     {
         var userAlreadyHasByTitle = await _categoryRepository.UserHasByTitle(
             command.UserId,
-            command.NewParentTitle,
+            command.NewParentTitle.Trim(),
             cancellationToken);
 
         if (userAlreadyHasByTitle)
@@ -35,7 +35,7 @@ internal class AddNewCategoryAsParentCommandHandler : CommandHandler<AddNewCateg
             throw new SpendingTrackerValidationException(ValidationErrorCodeEnum.UserAlreadyHasCategoryWithSpecifiedName);
         }
 
-        var newParent = _categoryFactory.Create(command.NewParentTitle, command.UserId);
+        var newParent = _categoryFactory.Create(command.NewParentTitle.Trim(), command.UserId);
         await _categoryRepository.CreateCategory(newParent, cancellationToken);
         await _categoryRepository.AddChildCategory(newParent.Id, command.ChildId, cancellationToken);
 

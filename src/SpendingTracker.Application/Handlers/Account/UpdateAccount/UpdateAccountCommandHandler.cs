@@ -30,7 +30,7 @@ internal sealed class CreateAccountCommandHandler : CommandHandler<UpdateAccount
         {
             Id = command.Id,
             Type = command.Type,
-            Name = command.Name,
+            Name = command.Name.Trim(),
             CurrencyId = command.CurrencyId,
             Amount = command.Amount
         };

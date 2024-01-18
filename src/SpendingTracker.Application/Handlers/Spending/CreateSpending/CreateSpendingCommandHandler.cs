@@ -31,7 +31,7 @@ internal class CreateSpendingCommandHandler : CommandHandler<CreateSpendingComma
             Amount = command.Amount,
             CurrencyId = user.Currency.Id,
             Date = command.Date.ToUniversalTime(),
-            Description = command.Description,
+            Description = command.Description.Trim(),
             ActionSource = command.ActionSource
         };
 

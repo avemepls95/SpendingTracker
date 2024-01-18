@@ -11,5 +11,6 @@ public enum ValidationErrorCodeEnum
     UserAlreadyHasCategoryWithSpecifiedName,
     CategoryDoesNotBelongsToUser,
     CurrentUserHasNoPermissionToDeleteCategory,
-    TooManyAccountsCount
+    TooManyAccountsCount,
+    CannotCreateAccountBecauseAlreadyExist
 }

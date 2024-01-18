@@ -23,7 +23,7 @@ internal class UpdateCategoryCommandHandler : CommandHandler<UpdateCategoryComma
             new UpdateCategoryModel
             {
                 Id = command.Id,
-                Title = command.Title
+                Title = command.Title.Trim()
             },
             cancellationToken);
 

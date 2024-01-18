@@ -19,7 +19,9 @@ internal sealed class UnitOfWork : IUnitOfWork
     public async Task SaveAsync(CancellationToken cancellationToken)
     {
         if (!_dbContext.ChangeTracker.HasChanges())
+        {
             return;
+        }
 
         var entries = _dbContext.ChangeTracker.Entries().ToArray();
 

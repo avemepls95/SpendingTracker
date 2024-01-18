@@ -7,6 +7,8 @@ using SpendingTracker.BearerTokenAuth.Abstractions;
 using SpendingTracker.Common.Primitives;
 using SpendingTracker.Dispatcher.DataTransfer.Dispatcher;
 using SpendingTracker.Dispatcher.Extensions;
+using SpendingTracker.Infrastructure.Abstractions;
+using SpendingTracker.Infrastructure.Abstractions.Models.Stored;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
 
 namespace SpendingTracker.Application.Handlers.Auth.GenerateTokenByTelegramAuth;
@@ -18,17 +20,23 @@ internal sealed class GenerateTokenByTelegramAuthCommandHandler
     private readonly IUserRepository _userRepository;
     private readonly IMediator _mediator;
     private readonly ITelegramHashValidator _telegramCheckStringValidator;
+    private readonly IAuthLogRepository _authLogRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public GenerateTokenByTelegramAuthCommandHandler(
         ITokenGenerator tokenGenerator,
         IUserRepository userRepository,
         IMediator mediator,
-        ITelegramHashValidator telegramCheckStringValidator)
+        ITelegramHashValidator telegramCheckStringValidator,
+        IAuthLogRepository authLogRepository,
+        IUnitOfWork unitOfWork)
     {
         _tokenGenerator = tokenGenerator;
         _userRepository = userRepository;
         _mediator = mediator;
         _telegramCheckStringValidator = telegramCheckStringValidator;
+        _authLogRepository = authLogRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public override async Task<GenerateTokenByTelegramAuthResponse> Handle(
@@ -41,10 +49,10 @@ internal sealed class GenerateTokenByTelegramAuthCommandHandler
             throw new AuthenticationException("Incorrect CheckString");
         }
         
-        var id = await _userRepository.FindIdByTelegramId(command.UserId, cancellationToken);
-        if (id is null)
+        var userId = await _userRepository.FindIdByTelegramId(command.UserId, cancellationToken);
+        if (userId is null)
         {
-            id = await _mediator.SendCommandAsync<CreateUserByTelegramCommand, UserKey>(new CreateUserByTelegramCommand
+            userId = await _mediator.SendCommandAsync<CreateUserByTelegramCommand, UserKey>(new CreateUserByTelegramCommand
             {
                 TelegramUserId = command.UserId,
                 FirstName = command.FirstName,
@@ -53,14 +61,37 @@ internal sealed class GenerateTokenByTelegramAuthCommandHandler
             }, cancellationToken);
         }
     
-        var tokenInformation = _tokenGenerator.Create(id.Value);
+        var tokenInformation = _tokenGenerator.Create(userId.Value);
+
+        await SaveLog(userId, command.AuthType, cancellationToken);
 
         return new GenerateTokenByTelegramAuthResponse
         {
             TokenInformation = tokenInformation,
-            Id = id,
+            Id = userId,
             FirstName = command.FirstName,
             LastName = command.LastName
         };
+    }
+
+    private async Task SaveLog(UserKey userId, TelegramAuthType authType, CancellationToken cancellationToken)
+    {
+        await _authLogRepository.Create(userId, AuthSource.Telegram, new { Type = authType }, cancellationToken);
+        await _unitOfWork.SaveAsync(cancellationToken);
+        // _ = _mediator.SendCommandAsync(new CreateAuthLogCommand
+        // {
+        //     UserId = userId,
+        //     Source = AuthSource.Telegram,
+        //     AdditionalData = new { Type = authType }
+        // }, cancellationToken);
+        // _ = Task.Run(async () =>
+        // {
+        //     await _mediator.SendCommandAsync(new CreateAuthLogCommand
+        //     {
+        //         UserId = userId,
+        //         Source = AuthSource.Telegram,
+        //         AdditionalData = new { Type = authType }
+        //     }, cancellationToken);
+        // }, cancellationToken);
     }
 }

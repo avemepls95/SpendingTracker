@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using SpendingTracker.TelegramBot.Services;
 using SpendingTracker.TelegramBot.Services.Abstractions;
+using SpendingTracker.TelegramBot.Services.ButtonGroupTransformers;
 
 namespace SpendingTracker.TelegramBot
 {
@@ -9,7 +9,6 @@ namespace SpendingTracker.TelegramBot
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services
-                .AddScoped<GatewayService>()
                 .AddScoped<ITelegramUserCurrentButtonGroupService, TelegramUserCurrentButtonGroupService>();
 
             return services;

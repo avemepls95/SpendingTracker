@@ -7,7 +7,6 @@ public class ButtonGroup
     public string Text { get; private set; }
     public ButtonsGroupType Type { get; } = ButtonsGroupType.None;
     public int Id { get; }
-    public ButtonGroup Next { get; protected init; }
 
     private readonly List<Button[]> _buttons = new();
     public InlineKeyboardMarkup Markup
@@ -28,7 +27,7 @@ public class ButtonGroup
         Text = text;
     }
     
-    public ButtonGroup(int id, ButtonsGroupType type, string? text = null, ButtonGroup? next = null)
+    public ButtonGroup(int id, ButtonsGroupType type, string? text = null)
     {
         if (type is ButtonsGroupType.None)
         {
@@ -37,7 +36,6 @@ public class ButtonGroup
 
         Id = id;
         Type = type;
-        Next = next;
 
         Text = string.IsNullOrWhiteSpace(text)
             ? ButtonsGroupTextProvider.GetText(type)

@@ -12,7 +12,16 @@ Cумма
 Описание
 Дата (опционально)"
         },
-        { ButtonsGroupType.CreateAnotherSpending, "Трата добавлена. Введите следующую, если необходимо" }
+        { ButtonsGroupType.CreateAnotherSpending, "Трата добавлена. Введите следующую, если необходимо" },
+        {
+            ButtonsGroupType.CreateIncome,
+            @"Введите доход в формате
+
+Cумма
+Описание
+Номер счета списания
+Дата (опционально)"
+        },
     };
 
     public static string GetText(ButtonsGroupType type)

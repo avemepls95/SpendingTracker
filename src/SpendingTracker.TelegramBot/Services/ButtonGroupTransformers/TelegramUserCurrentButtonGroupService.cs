@@ -1,31 +1,27 @@
 ﻿using SpendingTracker.Infrastructure.Abstractions;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
-using SpendingTracker.TelegramBot.Internal.Abstractions;
 using SpendingTracker.TelegramBot.Internal.Buttons;
 using SpendingTracker.TelegramBot.Services.Abstractions;
 
-namespace SpendingTracker.TelegramBot.Services;
+namespace SpendingTracker.TelegramBot.Services.ButtonGroupTransformers;
 
 internal class TelegramUserCurrentButtonGroupService : ITelegramUserCurrentButtonGroupService
 {
     private readonly ITelegramUserCurrentButtonGroupRepository _telegramUserCurrentButtonGroupRepository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IButtonsGroupManager _buttonsGroupManager;
 
     public TelegramUserCurrentButtonGroupService(
         ITelegramUserCurrentButtonGroupRepository telegramUserCurrentButtonGroupRepository,
-        IUnitOfWork unitOfWork,
-        IButtonsGroupManager buttonsGroupManager)
+        IUnitOfWork unitOfWork)
     {
         _telegramUserCurrentButtonGroupRepository = telegramUserCurrentButtonGroupRepository;
         _unitOfWork = unitOfWork;
-        _buttonsGroupManager = buttonsGroupManager;
     }
 
     public async Task<ButtonGroup> GetGroupByUserId(long id, CancellationToken cancellationToken)
     {
         var groupId = await _telegramUserCurrentButtonGroupRepository.GetIdByUserId(id, cancellationToken);
-        var group = await _buttonsGroupManager.ConstructById(groupId);
+        var group = ButtonsGroupStore.GetById(groupId);
         return group;
     }
 

@@ -5,5 +5,6 @@ public enum ButtonsGroupType
     None = 0,
     CreateSpending,
     CreateAnotherSpending,
+    CreateIncome,
     ChangeCurrency
 }

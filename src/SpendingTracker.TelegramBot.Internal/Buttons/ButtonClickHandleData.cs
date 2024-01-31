@@ -4,7 +4,7 @@ namespace SpendingTracker.TelegramBot.Internal.Buttons;
 
 public record ButtonClickHandleData
 {
-    public int CurrentGroupId { get; init; }
+    public int OwnerGroupId { get; init; }
     public int NextGroupId { get; init; }
     public bool ShouldReplacePrevious { get; init; }
     public string? Content { get; set; }
@@ -13,7 +13,7 @@ public record ButtonClickHandleData
     public string Serialize()
     {
         var shouldReplacePreviousAsString = ShouldReplacePrevious ? "1" : "0";
-        var resultBuilder = new StringBuilder($"{CurrentGroupId};{NextGroupId};{shouldReplacePreviousAsString};{Content}");
+        var resultBuilder = new StringBuilder($"{OwnerGroupId};{NextGroupId};{shouldReplacePreviousAsString};{Content}");
 
         if (Operation.HasValue)
         {
@@ -33,7 +33,7 @@ public record ButtonClickHandleData
 
         var result = new ButtonClickHandleData
         {
-            CurrentGroupId = currentGroupId,
+            OwnerGroupId = currentGroupId,
             NextGroupId = nextGroupId,
             ShouldReplacePrevious = shouldReplacePrevious,
             Content = content

@@ -27,7 +27,7 @@ public class Button
     public Button(
         string title,
         ButtonGroup navigationGroupByClick,
-        ButtonGroup group,
+        ButtonGroup ownerGroup,
         bool shouldEditPreviousMessage = true,
         ButtonContent.ButtonContent? content = null,
         ButtonOperation? operation = null)
@@ -48,7 +48,7 @@ public class Button
         {
             NextGroupId = navigationGroupByClick.Id,
             ShouldReplacePrevious = shouldEditPreviousMessage,
-            CurrentGroupId = group.Id,
+            OwnerGroupId = ownerGroup.Id,
         };
 
         if (content is not null)

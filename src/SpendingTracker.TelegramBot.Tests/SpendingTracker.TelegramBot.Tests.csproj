@@ -15,6 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\SpendingTracker.TelegramBot.Internal\SpendingTracker.TelegramBot.Internal.csproj" />
       <ProjectReference Include="..\SpendingTracker.TelegramBot\SpendingTracker.TelegramBot.csproj" />
     </ItemGroup>
 

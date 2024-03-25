@@ -18,16 +18,16 @@ public class CreateAnotherSpendingGroupTransformer : IButtonsGroupTransformer
         _userRepository = userRepository;
     }
 
-    public async Task Transform(ButtonGroup createAnotherSpendingGroup, int? returnGroupId)
+    public async Task Transform(ButtonGroup createIncomeGroup, int? returnGroupId, CancellationToken cancellationToken)
     {
         var telegramUserId = _telegramUserIdStore.Id!.Value;
-        var user = await _userRepository.GetByTelegramId(telegramUserId);
+        var user = await _userRepository.GetByTelegramId(telegramUserId, cancellationToken);
 
         var text = string.Join(Environment.NewLine,
             $"Трата добавлена. Введите следующую, если необходимо",
             "-----------------------------------------",
             $"Текущая валюта: {user.Currency.CountryIcon}{user.Currency.Code}");
 
-        createAnotherSpendingGroup.SetText(text);
+        createIncomeGroup.SetText(text);
     }
 }

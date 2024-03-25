@@ -4,7 +4,7 @@ namespace SpendingTracker.TelegramBot.Internal.Buttons;
 
 public class ButtonGroup
 {
-    public string Text { get; private set; }
+    public string? Text { get; private set; }
     public ButtonsGroupType Type { get; } = ButtonsGroupType.None;
     public int Id { get; }
 
@@ -16,7 +16,7 @@ public class ButtonGroup
                 .ToArray());
     }
 
-    public ButtonGroup(int id, string text)
+    public ButtonGroup(int id, string? text)
     {
         if (string.IsNullOrWhiteSpace(text))
         {
@@ -38,7 +38,7 @@ public class ButtonGroup
         Type = type;
 
         Text = string.IsNullOrWhiteSpace(text)
-            ? ButtonsGroupTextProvider.GetText(type)
+            ? ButtonsGroupTextProvider.FindText(type)
             : text;
     }
     
@@ -49,7 +49,7 @@ public class ButtonGroup
         return this;
     }
 
-    public ButtonGroup SetText(string text)
+    public ButtonGroup SetText(string? text)
     {
         Text = text;
 

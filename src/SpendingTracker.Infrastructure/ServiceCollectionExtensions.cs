@@ -41,7 +41,8 @@ namespace SpendingTracker.Infrastructure
                 .AddScoped<IUserSettingsRepository, UserSettingsRepository>()
                 .AddScoped<IUserSettingValuesRepository, UserSettingValuesRepository>()
                 .AddScoped<IAccountRepository, AccountRepository>()
-                .AddScoped<IAuthLogRepository, AuthLogRepository>();
+                .AddScoped<IAuthLogRepository, AuthLogRepository>()
+                .AddScoped<IIncomeRepository, IncomeRepository>();
 
             services
                 .AddSingleton<ICurrencyFactory, CurrencyFactory>()

@@ -6,31 +6,19 @@ public class ButtonsGroupTextProvider
     {
         { 
             ButtonsGroupType.CreateSpending,
-@"Введите трату в формате
+@"Введите трату в следующем формате:
 
 Cумма
 Описание
 Дата (опционально)"
         },
         { ButtonsGroupType.CreateAnotherSpending, "Трата добавлена. Введите следующую, если необходимо" },
-        {
-            ButtonsGroupType.CreateIncome,
-            @"Введите доход в формате
-
-Cумма
-Описание
-Номер счета списания
-Дата (опционально)"
-        },
     };
 
-    public static string GetText(ButtonsGroupType type)
+    public static string? FindText(ButtonsGroupType type)
     {
-        if (OperationTextDict.TryGetValue(type, out var result))
-        {
-            return result;
-        }
-
-        throw new ArgumentException($"Не найден текст для операции {type}");
+        return OperationTextDict.TryGetValue(type, out var result)
+            ? result
+            : null;
     }
 }

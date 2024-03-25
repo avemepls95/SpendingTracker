@@ -57,17 +57,22 @@ internal class AccountRepository : IAccountRepository
         }
         
         return storedAccounts
-            .Select(a => new Account
-            {
-                Id = a.Id,
-                UserId = userId,
-                Type = a.Type,
-                Name = a.Name,
-                CurrencyId = a.CurrencyId,
-                Amount = a.Amount,
-                IsDeleted = a.IsDeleted
-            })
+            .Select(a => new Account(
+                a.Id,
+                a.UserId,
+                a.Type,
+                a.Name,
+                a.CurrencyId,
+                a.Amount,
+                a.CreatedDate))
             .ToArray();
+    }
+
+    public async Task<Account[]> GetOrderedByDateUserAccounts(UserKey userId, CancellationToken cancellationToken)
+    {
+        var accounts = await GetUserAccounts(userId, cancellationToken);
+        var result = accounts.OrderBy(a => a.CreatedDate).ToArray();
+        return result;
     }
 
     public Task<int> GetUserAccountsCount(UserKey userId, CancellationToken cancellationToken)
@@ -87,16 +92,14 @@ internal class AccountRepository : IAccountRepository
             throw new SpendingTrackerValidationException(ValidationErrorCodeEnum.KeyNotFound);
         }
 
-        return new Account
-        {
-            Id = storedAccount.Id,
-            UserId = storedAccount.UserId,
-            Type = storedAccount.Type,
-            Name = storedAccount.Name,
-            CurrencyId = storedAccount.CurrencyId,
-            Amount = storedAccount.Amount,
-            IsDeleted = storedAccount.IsDeleted
-        };
+        return new Account(
+            storedAccount.Id,
+            storedAccount.UserId,
+            storedAccount.Type,
+            storedAccount.Name,
+            storedAccount.CurrencyId,
+            storedAccount.Amount,
+            storedAccount.CreatedDate);
     }
 
     public async Task<bool> IsExistsById(Guid id, CancellationToken cancellationToken)
@@ -114,5 +117,19 @@ internal class AccountRepository : IAccountRepository
                 b => b
                     .SetProperty(a => a.IsDeleted, true),
                 cancellationToken);
+    }
+
+    public async Task ChangeAmount(Guid accountId, double delta, CancellationToken cancellationToken)
+    {
+        var storedAccount = await _dbContext.Set<StoredAccount>().FirstOrDefaultAsync(
+            a => a.Id == accountId && !a.IsDeleted,
+            cancellationToken);
+
+        if (storedAccount is null)
+        {
+            throw new SpendingTrackerValidationException(ValidationErrorCodeEnum.KeyNotFound);
+        }
+
+        storedAccount.Amount += delta;
     }
 }

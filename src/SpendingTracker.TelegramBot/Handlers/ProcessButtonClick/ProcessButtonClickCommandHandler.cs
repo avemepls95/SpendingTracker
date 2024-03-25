@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using SpendingTracker.Application.Handlers.Income.DeleteLast.Contracts;
 using SpendingTracker.Application.Handlers.Spending.DeleteLastSpending.Contracts;
 using SpendingTracker.Application.Handlers.UserCurrency.ChangeUserCurrency.Contracts;
 using SpendingTracker.Dispatcher.DataTransfer.Dispatcher;
@@ -75,11 +76,16 @@ internal sealed class ProcessButtonClickCommandHandler : CommandHandler<ProcessB
         {
             await ProcessDeleteLastSpendingButtonClick(telegramUserId, callbackQuery.Message!, cancellationToken);
         }
+        
+        if (buttonClickHandleData.Operation == ButtonOperation.DeleteLastIncome)
+        {
+            await ProcessDeleteLastIncomeButtonClick(telegramUserId, callbackQuery.Message!, cancellationToken);
+        }
 
         var nextGroupId = buttonClickHandleData.NextGroupId;
-        var groupTransformer = _buttonsGroupTransformerProvider.Get(nextGroupId);
         var nextGroup = ButtonsGroupStore.GetById(nextGroupId);
-        await groupTransformer.Transform(nextGroup, currentButtonsGroup.Id);
+        var groupTransformer = _buttonsGroupTransformerProvider.Get(nextGroupId);
+        await groupTransformer.Transform(nextGroup, currentButtonsGroup.Id, cancellationToken);
         if (buttonClickHandleData.ShouldReplacePrevious)
         {
             await _telegramBotClient.EditMessageTextAsync(
@@ -155,6 +161,30 @@ internal sealed class ProcessButtonClickCommandHandler : CommandHandler<ProcessB
         await _telegramBotClient.SendTextMessageAsync(
             telegramUserId,
             $"✅ Трата удалена",
+            cancellationToken: cancellationToken);
+    }
+    
+    private async Task ProcessDeleteLastIncomeButtonClick(
+        long telegramUserId,
+        Message telegramMessage,
+        CancellationToken cancellationToken)
+    {
+        var userId = await _userRepository.GetIdByTelegramId(telegramUserId, cancellationToken);
+
+        await _mediator.SendCommandAsync(new DeleteLastIncomeCommand
+        {
+            UserId = userId,
+            ActionSource = ActionSource.Telegram
+        }, cancellationToken);
+
+        await _telegramBotClient.DeleteMessageAsync(
+            telegramMessage!.Chat.Id,
+            telegramMessage.MessageId,
+            cancellationToken: cancellationToken);
+
+        await _telegramBotClient.SendTextMessageAsync(
+            telegramUserId,
+            $"✅ Доход удален",
             cancellationToken: cancellationToken);
     }
 }

@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using SpendingTracker.GenericSubDomain.Common;
-using SpendingTracker.TelegramBot.SpendingParsing.Internal;
+using SpendingTracker.TelegramBot.TextMessageParsing.Internal;
 using Xunit;
 
 namespace SpendingTracker.TelegramBot.Internal.Tests;
@@ -18,7 +18,7 @@ public class SpendingMessagePartParserTests
     public void ParseDateAsUts_InvalidInput_ShouldThrowException(string input)
     {
         // act
-        var result = SpendingMessagePartParser.ParseDate(input);
+        var result = TextMessagePartParser.ParseDate(input);
 
         // assert
         result.IsSuccess.Should().Be(false);
@@ -68,7 +68,7 @@ public class SpendingMessagePartParserTests
     public void ParseDateAsUts_ValidInput_ShouldParse(string input, DateTimeOffset expectedResultAsLocal)
     {
         // act
-        var result = SpendingMessagePartParser.ParseDate(input);
+        var result = TextMessagePartParser.ParseDate(input);
 
         // assert
         result.IsSuccess.Should().Be(true);
@@ -87,7 +87,7 @@ public class SpendingMessagePartParserTests
     public void ParseAmount_InputNotNumber_ShouldThrowException(string input)
     {
         // act
-        var result = SpendingMessagePartParser.ParseAmount(input);
+        var result = TextMessagePartParser.ParseAmount(input);
 
         // assert
         result.IsSuccess.Should().Be(false);
@@ -101,7 +101,7 @@ public class SpendingMessagePartParserTests
     public void ParseAmount_AmountLessThanOne_ShouldThrowException(string input)
     {
         // act
-        var result = SpendingMessagePartParser.ParseAmount(input);
+        var result = TextMessagePartParser.ParseAmount(input);
 
         // assert
         result.IsSuccess.Should().Be(false);
@@ -115,7 +115,7 @@ public class SpendingMessagePartParserTests
     public void ParseAmount_CorrectAmount_ShouldParse(string input, float expectedResult)
     {
         // act
-        var result = SpendingMessagePartParser.ParseAmount(input);
+        var result = TextMessagePartParser.ParseAmount(input);
 
         // assert
         result.IsSuccess.Should().Be(true);

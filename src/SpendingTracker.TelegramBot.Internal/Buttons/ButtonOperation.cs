@@ -4,4 +4,5 @@ public enum ButtonOperation
 {
     None = 0,
     DeleteLastSpending,
+    DeleteLastIncome,
 }

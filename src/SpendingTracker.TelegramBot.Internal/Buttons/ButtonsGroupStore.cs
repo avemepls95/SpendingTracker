@@ -4,6 +4,7 @@ public static class ButtonsGroupStore
 {
     public static ButtonGroup StartGroup { get; }
     public static ButtonGroup CreateAnotherSpendingGroup { get; }
+    public static ButtonGroup CreateAnotherIncomeGroup { get; }
     private static ButtonGroup CurrenciesGroup { get; }
 
     private static readonly ButtonGroup[] _groups;
@@ -23,6 +24,10 @@ public static class ButtonsGroupStore
         CreateAnotherSpendingGroup = new RecursiveButtonGroup(_incrementalGroupId++, ButtonsGroupType.CreateAnotherSpending);
         var createSpendingGroup = new ButtonGroup(_incrementalGroupId++, ButtonsGroupType.CreateSpending);
         var createIncomeGroup = new ButtonGroup(_incrementalGroupId++, ButtonsGroupType.CreateIncome);
+        CreateAnotherIncomeGroup = new RecursiveButtonGroup(
+            _incrementalGroupId++,
+            ButtonsGroupType.CreateAnotherIncome,
+            "Доход добавлен. Введите следующий, если необходимо");
 
         CreateAnotherSpendingGroup
             .AddButtonsLayer(
@@ -36,13 +41,28 @@ public static class ButtonsGroupStore
                 new Button("В меню", StartGroup, CreateAnotherSpendingGroup, false),
                 new Button("Сменить валюту", CurrenciesGroup, CreateAnotherSpendingGroup));
         
+        CreateAnotherIncomeGroup
+            .AddButtonsLayer(
+                new Button(
+                    "Удалить последний доход",
+                    createIncomeGroup,
+                    CreateAnotherSpendingGroup,
+                    operation: ButtonOperation.DeleteLastIncome,
+                    shouldEditPreviousMessage: false))
+            .AddButtonsLayer(
+                new Button("В меню", StartGroup, CreateAnotherIncomeGroup, false));
+        
         createSpendingGroup
             .AddButtonsLayer(new Button("Сменить валюту", CurrenciesGroup, createSpendingGroup))
             .AddButtonsLayer(new Button("Назад", StartGroup, createSpendingGroup));
+        
+        createIncomeGroup
+            .AddButtonsLayer(new Button("Назад", StartGroup, createIncomeGroup));
 
         StartGroup
-            .AddButtonsLayer(new Button("✏️ Добавить трату", createSpendingGroup, StartGroup))
-            .AddButtonsLayer(new Button("💵 Добавить доход", createIncomeGroup, StartGroup))
+            .AddButtonsLayer(
+                new Button("💵 Добавить доход", createIncomeGroup, StartGroup),
+                new Button("✏️ Добавить трату", createSpendingGroup, StartGroup))
             .AddButtonsLayer(new Button("⚙️ Настройки", settingsGroup, StartGroup));
 
         _groups = new []
@@ -51,7 +71,9 @@ public static class ButtonsGroupStore
             createSpendingGroup,
             CreateAnotherSpendingGroup,
             settingsGroup,
-            CurrenciesGroup
+            CurrenciesGroup,
+            createIncomeGroup,
+            CreateAnotherIncomeGroup
         };
     }
 

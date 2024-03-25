@@ -4,7 +4,7 @@ using SpendingTracker.TelegramBot.Internal.Buttons;
 using SpendingTracker.TelegramBot.Internal.Buttons.ButtonContent;
 using SpendingTracker.TelegramBot.Services.ButtonGroupTransformers.Abstractions;
 
-namespace SpendingTracker.TelegramBot.Services;
+namespace SpendingTracker.TelegramBot.Services.ButtonGroupTransformers;
 
 public class ChangeCurrencyGroupTransformer : IButtonsGroupTransformer
 {
@@ -22,14 +22,14 @@ public class ChangeCurrencyGroupTransformer : IButtonsGroupTransformer
         _currencyRepository = currencyRepository;
     }
 
-    public async Task Transform(ButtonGroup currenciesGroup, int? returnGroupId)
+    public async Task Transform(ButtonGroup createIncomeGroup, int? returnGroupId, CancellationToken cancellationToken)
     {
         if (returnGroupId is null)
         {
             throw new Exception("Change currency group should have return button");
         }
         
-        currenciesGroup.ClearButtons();
+        createIncomeGroup.ClearButtons();
         
         var returnGroup = ButtonsGroupStore.GetById(returnGroupId.Value);
         if (returnGroup is null)
@@ -38,13 +38,13 @@ public class ChangeCurrencyGroupTransformer : IButtonsGroupTransformer
         }
 
         var telegramUserId = _telegramUserIdStore.Id!.Value;
-        var currencyButtons = await GetCurrencyButtonsForUser(telegramUserId, currenciesGroup, returnGroup);
+        var currencyButtons = await GetCurrencyButtonsForUser(telegramUserId, createIncomeGroup, returnGroup);
         foreach (var currencyButton in currencyButtons)
         {
-            currenciesGroup.AddButtonsLayer(currencyButton);
+            createIncomeGroup.AddButtonsLayer(currencyButton);
         }
         
-        currenciesGroup.AddButtonsLayer(new Button("Назад", returnGroup, currenciesGroup));
+        createIncomeGroup.AddButtonsLayer(new Button("Назад", returnGroup, createIncomeGroup));
     }
 
     private async Task<Button[]> GetCurrencyButtonsForUser(

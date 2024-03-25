@@ -7,7 +7,7 @@ using SpendingTracker.TelegramBot.Handlers.CreateSpending.Contracts;
 using SpendingTracker.TelegramBot.Internal.Buttons;
 using SpendingTracker.TelegramBot.Services.Abstractions;
 using SpendingTracker.TelegramBot.Services.ButtonGroupTransformers.Abstractions;
-using SpendingTracker.TelegramBot.SpendingParsing;
+using SpendingTracker.TelegramBot.TextMessageParsing;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 
@@ -17,7 +17,7 @@ public class CreateSpendingCommandHandler : CommandHandler<CreateSpendingCommand
 {
     private readonly TelegramBotClient _telegramBotClient;
     private readonly ITelegramUserCurrentButtonGroupService _telegramUserCurrentButtonGroupService;
-    private readonly ISpendingMessageParser _spendingMessageParser;
+    private readonly ITextMessageParser _textMessageParser;
     private readonly IUserRepository _userRepository;
     private readonly IMediator _mediator;
     private readonly IButtonsGroupTransformerProvider _buttonsGroupTransformerProvider;
@@ -25,14 +25,14 @@ public class CreateSpendingCommandHandler : CommandHandler<CreateSpendingCommand
     public CreateSpendingCommandHandler(
         TelegramBotClient telegramBotClient,
         ITelegramUserCurrentButtonGroupService telegramUserCurrentButtonGroupService,
-        ISpendingMessageParser spendingMessageParser,
+        ITextMessageParser textMessageParser,
         IUserRepository userRepository,
         IMediator mediator,
         IButtonsGroupTransformerProvider buttonsGroupTransformerProvider)
     {
         _telegramBotClient = telegramBotClient;
         _telegramUserCurrentButtonGroupService = telegramUserCurrentButtonGroupService;
-        _spendingMessageParser = spendingMessageParser;
+        _textMessageParser = textMessageParser;
         _userRepository = userRepository;
         _mediator = mediator;
         _buttonsGroupTransformerProvider = buttonsGroupTransformerProvider;
@@ -40,7 +40,7 @@ public class CreateSpendingCommandHandler : CommandHandler<CreateSpendingCommand
 
     public override async Task Handle(CreateSpendingCommand command, CancellationToken cancellationToken)
     {
-        var spendingMessageParsingResult = _spendingMessageParser.Parse(command.Message.Text!);
+        var spendingMessageParsingResult = _textMessageParser.ParseSpending(command.Message.Text!);
         if (!spendingMessageParsingResult.IsSuccess)
         {
             await _telegramBotClient.SendTextMessageAsync(

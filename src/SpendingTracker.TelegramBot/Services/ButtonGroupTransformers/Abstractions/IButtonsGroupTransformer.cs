@@ -4,5 +4,5 @@ namespace SpendingTracker.TelegramBot.Services.ButtonGroupTransformers.Abstracti
 
 public interface IButtonsGroupTransformer
 {
-    Task Transform(ButtonGroup group, int? returnGroupId);
+    Task Transform(ButtonGroup createIncomeGroup, int? returnGroupId, CancellationToken cancellationToken = default);
 }

@@ -5,7 +5,7 @@ namespace SpendingTracker.TelegramBot.Services.ButtonGroupTransformers;
 
 public class GroupEmptyTransformer : IButtonsGroupTransformer
 {
-    public Task Transform(ButtonGroup group, int? returnGroupId)
+    public Task Transform(ButtonGroup createIncomeGroup, int? returnGroupId, CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }

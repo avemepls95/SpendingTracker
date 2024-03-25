@@ -22,7 +22,8 @@ public class ButtonsGroupTransformerProvider : IButtonsGroupTransformerProvider
             ButtonsGroupType.ChangeCurrency => _serviceProvider.GetService<ChangeCurrencyGroupTransformer>()!,
             ButtonsGroupType.None => new GroupEmptyTransformer(),
             ButtonsGroupType.CreateSpending => new GroupEmptyTransformer(),
-            ButtonsGroupType.CreateIncome => new GroupEmptyTransformer(),
+            ButtonsGroupType.CreateIncome => _serviceProvider.GetService<CreateIncomeGroupTransformer>()!,
+            ButtonsGroupType.CreateAnotherIncome => new GroupEmptyTransformer(),
             _ => throw new ArgumentOutOfRangeException(nameof(ButtonsGroupType), group.Type, null)
         };
     }

@@ -4,13 +4,13 @@ using SpendingTracker.Common.Primitives;
 using SpendingTracker.Dispatcher.DataTransfer.Dispatcher;
 using SpendingTracker.Dispatcher.Extensions;
 using SpendingTracker.Infrastructure.Abstractions.Repositories;
-using SpendingTracker.TelegramBot.Handlers.ProcessStartCommand.Contracts;
+using SpendingTracker.TelegramBot.Handlers.ProcessStart.Contracts;
 using SpendingTracker.TelegramBot.Internal.Buttons;
 using SpendingTracker.TelegramBot.Services.Abstractions;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 
-namespace SpendingTracker.TelegramBot.Handlers.ProcessStartCommand;
+namespace SpendingTracker.TelegramBot.Handlers.ProcessStart;
 
 internal sealed class ProcessStartCommandCommandHandler : CommandHandler<ProcessStartCommandCommand>
 {

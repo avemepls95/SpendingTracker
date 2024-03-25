@@ -11,15 +11,15 @@ using SpendingTracker.GenericSubDomain;
 using SpendingTracker.GenericSubDomain.User.Abstractions;
 using SpendingTracker.Infrastructure;
 using SpendingTracker.TelegramBot;
+using SpendingTracker.TelegramBot.Handlers.CreateIncome.Contracts;
 using SpendingTracker.TelegramBot.Handlers.CreateSpending.Contracts;
 using SpendingTracker.TelegramBot.Handlers.ProcessButtonClick.Contracts;
-using SpendingTracker.TelegramBot.Handlers.ProcessStartCommand.Contracts;
+using SpendingTracker.TelegramBot.Handlers.ProcessStart.Contracts;
 using SpendingTracker.TelegramBot.Internal.Buttons;
-using SpendingTracker.TelegramBot.Services;
 using SpendingTracker.TelegramBot.Services.Abstractions;
 using SpendingTracker.TelegramBot.Services.ButtonGroupTransformers;
 using SpendingTracker.TelegramBot.Services.ButtonGroupTransformers.Abstractions;
-using SpendingTracker.TelegramBot.SpendingParsing;
+using SpendingTracker.TelegramBot.TextMessageParsing;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -147,6 +147,14 @@ async Task HandleMessage(Message msg, CancellationToken cancellationToken)
                     Message = msg
                 }, cancellationToken);
                 break;
+            case ButtonsGroupType.CreateIncome:
+            case ButtonsGroupType.CreateAnotherIncome:
+                await mediator.SendCommandAsync(new CreateIncomeCommand
+                {
+                    TelegramUserId = userId,
+                    Message = msg
+                }, cancellationToken);
+                break;
             case ButtonsGroupType.None:
                 return;
             default:
@@ -193,8 +201,9 @@ IServiceProvider InitializeDependencies()
             services.AddSingleton<TelegramBotClient>(_ => bot);
             services.AddScoped<CreateAnotherSpendingGroupTransformer>();
             services.AddScoped<ChangeCurrencyGroupTransformer>();
+            services.AddScoped<CreateIncomeGroupTransformer>();
             services.AddScoped<IButtonsGroupTransformerProvider, ButtonsGroupTransformerProvider>();
-            services.AddScoped<ISpendingMessageParser, SpendingMessageParser>();
+            services.AddScoped<ITextMessageParser, TextMessageParser>();
         }).UseConsoleLifetime();
 
     var host = builder.Build();

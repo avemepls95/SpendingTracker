@@ -1,8 +1,8 @@
-﻿namespace SpendingTracker.TelegramBot.SpendingParsing;
+﻿namespace SpendingTracker.TelegramBot.TextMessageParsing;
 
 public class SpendingMessageParsingResult
 {
-    public bool IsSuccess { get; init; }
+    public bool IsSuccess { get; private init; }
     public double Amount { get; private init; }
     public DateTimeOffset? Date { get; private init; }
     public string Description { get; private init; }

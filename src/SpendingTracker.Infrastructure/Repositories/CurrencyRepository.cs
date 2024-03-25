@@ -33,6 +33,14 @@ internal class CurrencyRepository : ICurrencyRepository
             .ToArrayAsync(cancellationToken);
     }
 
+    public Task<Currency[]> GetByIds(Guid[] ids, CancellationToken cancellationToken = default)
+    {
+        return _dbContext.Set<StoredCurrency>()
+            .Where(c => ids.Contains(c.Id) && !c.IsDeleted)
+            .Select(c => _currencyFactory.Create(c))
+            .ToArrayAsync(cancellationToken);
+    }
+
     public Task<bool> IsExistsById(Guid id, CancellationToken cancellationToken)
     {
         return _dbContext.Set<StoredCurrency>()

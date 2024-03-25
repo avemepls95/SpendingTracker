@@ -24,7 +24,8 @@ namespace SpendingTracker.Infrastructure
                 .ApplyConfiguration(new StoredUserSettingConfiguration())
                 .ApplyConfiguration(new StoredUserSettingValueConfiguration())
                 .ApplyConfiguration(new StoredAccountConfiguration())
-                .ApplyConfiguration(new StoredAuthLogConfiguration());
+                .ApplyConfiguration(new StoredAuthLogConfiguration())
+                .ApplyConfiguration(new StoredIncomeConfiguration());
         }
     }
 }

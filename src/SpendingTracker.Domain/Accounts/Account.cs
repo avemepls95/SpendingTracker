@@ -4,13 +4,31 @@ namespace SpendingTracker.Domain.Accounts;
 
 public class Account : EntityObject<Account, Guid>
 {
-    public Guid Id { get; set; }
-    public UserKey UserId { get; set; }
-    public AccountTypeEnum Type { get; set; }
-    public string Name { get; set; }
-    public Guid CurrencyId { get; set; }
-    public double Amount { get; set; }
-    public bool IsDeleted { get; set; }
+    public Account(
+        Guid id,
+        UserKey userId,
+        AccountTypeEnum type,
+        string name,
+        Guid currencyId,
+        double amount,
+        DateTimeOffset createDate)
+    {
+        Id = id;
+        UserId = userId;
+        Type = type;
+        Name = name;
+        CurrencyId = currencyId;
+        Amount = amount;
+        CreatedDate = createDate;
+    }
+    
+    public Guid Id { get; private set; }
+    public UserKey UserId { get; private set; }
+    public AccountTypeEnum Type { get; private set; }
+    public string Name { get; private set; }
+    public Guid CurrencyId { get; private set; }
+    public double Amount { get; private set; }
+    public bool IsDeleted { get; private set; }
     
     public override Guid GetKey()
     {

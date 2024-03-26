@@ -24,31 +24,35 @@ namespace SpendingTracker.CurrencyRate.StartupTasks
             var currencyRepository = scope.ServiceProvider.GetService<ICurrencyRepository>()!;
             var unitOfWork = scope.ServiceProvider.GetService<IUnitOfWork>()!;
             
-            var missedDays = await currencyRateByDayRepository.GetMissedDaysFromDate(SpendingConstants.MinDate.Date);
-            if (missedDays.Length == 0)
-            {
-                return;
-            }
-            
             var allCurrencies = await currencyRepository.GetAll();
             var targetCurrencies = allCurrencies.Where(c => !c.IsDefault).ToArray();
-            var targetCurrencyCodes = targetCurrencies.Select(c => c.Code).ToArray();
-            var missedDaysRates = await ratesProvider.GetByDates(
-                CurrencyOptions.BaseCurrencyCode,
-                targetCurrencyCodes,
-                missedDays);
-            
-            var currencyCodeIdDict = targetCurrencies.ToDictionary(c => c.Code, c => c.Id);
-            foreach (var rateInfo in missedDaysRates)
-            {
-                var targetCurrency = currencyCodeIdDict[rateInfo.TargetCode];
-                await currencyRateByDayRepository.Create(
-                    rateInfo.Date.ToDateTimeOffset(TimeZoneInfo.Utc),
-                    targetCurrency,
-                    rateInfo.Coefficient);
-            }
 
-            await unitOfWork.SaveAsync();
+            foreach (var targetCurrency in targetCurrencies)
+            {
+                var missedDaysByCurrency = await currencyRateByDayRepository.GetMissedDaysFromDate(
+                    SpendingConstants.MinDate.Date,
+                    targetCurrency.Id);
+
+                if (missedDaysByCurrency.Length == 0)
+                {
+                    continue;
+                }
+            
+                var missedDaysRates = await ratesProvider.GetByDates(
+                    CurrencyOptions.BaseCurrencyCode,
+                    new []{ targetCurrency.Code },
+                    missedDaysByCurrency);
+            
+                foreach (var rateInfo in missedDaysRates)
+                {
+                    await currencyRateByDayRepository.Create(
+                        rateInfo.Date.ToDateTimeOffset(TimeZoneInfo.Utc),
+                        targetCurrency.Id,
+                        rateInfo.Coefficient);
+                }
+
+                await unitOfWork.SaveAsync();
+            }
         }
     }
 }

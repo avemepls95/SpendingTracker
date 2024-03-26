@@ -20,5 +20,8 @@ public interface ICurrencyRateByDayRepository
         DateOnly date,
         CancellationToken cancellationToken = default);
 
-    public Task<DateOnly[]> GetMissedDaysFromDate(DateTime dateFrom, CancellationToken cancellationToken = default);
+    public Task<DateOnly[]> GetMissedDaysFromDate(
+        DateTime dateFrom,
+        Guid targetCurrencyId,
+        CancellationToken cancellationToken = default);
 }

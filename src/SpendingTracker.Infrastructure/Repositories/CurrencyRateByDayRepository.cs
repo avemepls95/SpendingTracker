@@ -80,9 +80,13 @@ LIMIT 1
         return result;
     }
 
-    public async Task<DateOnly[]> GetMissedDaysFromDate(DateTime dateFrom, CancellationToken cancellationToken)
+    public async Task<DateOnly[]> GetMissedDaysFromDate(
+        DateTime dateFrom,
+        Guid targetCurrencyId,
+        CancellationToken cancellationToken)
     {
         var existDates = await _dbContext.Set<StoredCurrencyRateByDay>()
+            .Where(r => r.Target == targetCurrencyId)
             .GroupBy(r => DateOnly.FromDateTime(r.Date.Date))
             .Select(grouping => grouping.Key)
             .ToArrayAsync(cancellationToken);
